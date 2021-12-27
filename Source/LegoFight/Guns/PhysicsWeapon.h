@@ -13,8 +13,9 @@ UCLASS()
 class LEGOFIGHT_API APhysicsWeapon : public AWeapon
 {
 	GENERATED_BODY()
-	
-	
+
+public:
+    APhysicsWeapon();
 	
 	
 };

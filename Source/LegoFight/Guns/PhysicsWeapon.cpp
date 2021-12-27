@@ -4,5 +4,9 @@
 #include "PhysicsWeapon.h"
 
 
+APhysicsWeapon::APhysicsWeapon()
+{
+    Type_ = Lego_Physics_Weapon;
 
+}
 

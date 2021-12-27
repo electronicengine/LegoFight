@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Brick.h"
+#include "../Brick.h"
 #include "Lego3x2Semi.generated.h"
 
 /**
@@ -14,7 +14,9 @@ class LEGOFIGHT_API ALego3x2Semi : public ABrick
 {
 	GENERATED_BODY()
 	
-	
+
+public:
+    ALego3x2Semi();
 	
 	
 };

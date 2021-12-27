@@ -7,16 +7,27 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
+#include "Destrictable.h"
+#include "Interfaces/BuiltInInterface.h"
+#include "Interfaces/PlugInterface.h"
+#include <vector>
+#include <map>
 
 #include "Brick.generated.h"
 
 #define BRICK_LENGHT        50
 
 
+
 class ALegoCarChasis;
 
 enum BrickType
 {
+    Lego_Hammer,
+    Lego_Ax,
+    Lego_Machine_Gun,
+    Lego_Cannon,
+    Lego_Physics_Weapon,
     Lego_Melee_Weapon,
     Lego_Fire_Weapon,
     Lego_Car_Seat,
@@ -30,9 +41,9 @@ enum BrickType
     Lego2x2_Comp,
     Lego2x2_Semi,
     Lego3x1_Comp,
-    Lego3x1_semi,
+    Lego3x1_Semi,
     Lego3x2_Comp,
-    Lego3x2_Semi
+    Lego3x2_Semi,
 
 };
 
@@ -44,8 +55,15 @@ enum BrickSubType
 };
 
 
+enum VehicleType
+{
+    Lego_Char_Vehicle = 30,
+    Lego_Enemy_Vehicle
+};
+
+
 UCLASS()
-class LEGOFIGHT_API ABrick : public AActor
+class LEGOFIGHT_API ABrick : public AActor, public IBuiltInInterface, public IPlugInterface
 {
 	GENERATED_BODY()
 	
@@ -56,40 +74,26 @@ public:
     UPROPERTY(EditAnywhere)
     UStaticMeshComponent *Brick;
 
-    UPROPERTY(EditAnywhere, Instanced)
-    TArray<UPhysicsConstraintComponent*> Plugin_Sockets;
+    /** Projectile class to spawn */
+    UPROPERTY(EditDefaultsOnly, Category="Bullet")
+    TSubclassOf<class ADestrictable> Destructible_Container;
 
-    UPROPERTY(EditAnywhere)
-    UPhysicsConstraintComponent* Current_Closest_Constrait;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     UStaticMesh *Brick_Mesh;
 
-    UPROPERTY(EditAnywhere, Instanced)
-    TArray<USceneComponent *> Plugin_Points;
 
     UPROPERTY(EditAnywhere)
     UBoxComponent *Collision_Box;
 
-    ALegoCarChasis *Owner_Car;
+    int Healt_;
 
 protected:
 
-    uint8 Socket_Number_Width;
-    uint8 Socket_Number_Height;
-    uint8 Socket_Number;
-
-    uint8 Plugin_Number_Width;
-    uint8 Plugin_Number_Height;
-    uint8 Plugin_Number;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-
-    float calculateDistance(const FVector &Vector1, const FVector &Vector2);
-    int getClosestPluginIndex(const std::vector<float> &Array);
-    UPhysicsConstraintComponent *findClosestContrait(const FVector &Location);
+    virtual USceneComponent *CreatePluginPoint(FString Name) override;
 
 
 
@@ -99,18 +103,20 @@ public:
 	virtual void Tick(float DeltaTime) override;
     void enablePhysics(bool Value);
     UStaticMesh *getBrickMesh();
-    FRotator getPluginRotation();
-
-
+    void addDamage(int Value);
+    void breakBrick();
 
     BrickType Type_;
     BrickSubType Sub_Type;
-    int Current_Plugin_Index;
+
 
     std::vector<float> Distance_Array;
     void setLegoCarOwner(ALegoCarChasis *Car);
-    FVector getPlugin(const FVector &ImpactPoint);
-    void plugTheBrick(ABrick *Object, const FRotator &OffsetRotation);
-    void highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMaterial *Possible_Material, UMaterial *ImPossible_Material,
-                         ABrick *Interactable_Brick, const FHitResult &OutHit, const FRotator &OffetRotation);
+
+    UFUNCTION()
+    void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+
+    bool First_Hit;
+
 };

@@ -2,13 +2,14 @@
 
 
 #include "PathFinder.h"
-
+#include "EnemyLegoVehicle.h"
+#include "Engine/Engine.h"
 
 // Sets default values
 APathFinder::APathFinder()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = false;
 
 }
 
@@ -33,3 +34,19 @@ void APathFinder::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
+
+
+void APathFinder::updateOwnerLocation(const FVector &Location)
+{
+    float distance = (GetActorLocation() - Location).Size();
+
+//    if(distance >= 500000)
+//        GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity / 1.5f;
+}
+
+
+
+void APathFinder::setOwnVehicle(AEnemyLegoVehicle *Vehicle)
+{
+    Own_Vehicle = Vehicle;
+}

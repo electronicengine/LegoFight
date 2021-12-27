@@ -4,7 +4,8 @@
 #include "Brick.h"
 #include <vector>
 #include "Engine/Engine.h"
-#include "LegoCarChasis.h"
+#include "Vehicles/LegoCarChasis.h"
+#include "Bricks/Lego1x1Comp.h"
 
 
 // Sets default values
@@ -15,18 +16,38 @@ ABrick::ABrick()
 
 
     Brick = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Brick"));
-    Brick->SetupAttachment(RootComponent);
+    SetRootComponent(Brick);
     Brick->SetSimulatePhysics(true);
+    Brick->SetCollisionProfileName(FName("OverlapAll"));
+
+    Collision_Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision_Box"));
+    Collision_Box->SetupAttachment(Brick);
+//    Collision_Box->SetSimulatePhysics(true);
+    Collision_Box->SetNotifyRigidBodyCollision(true);
+    Collision_Box->SetCollisionProfileName(FName("BlockAll"));
+    plugged = false;
+
+    Collision_Box->OnComponentHit.AddDynamic(this, &ABrick::OnHit);
+
 
 }
-
 
 
 // Called when the game starts or when spawned
 void ABrick::BeginPlay()
 {
 	Super::BeginPlay();
+    First_Hit = true;
 
+}
+
+
+USceneComponent *ABrick::CreatePluginPoint(FString Name)
+{
+    USceneComponent *scene;
+    scene = CreateDefaultSubobject<USceneComponent>(FName(Name));
+    scene->SetupAttachment(Brick);
+    return scene;
 }
 
 
@@ -43,34 +64,7 @@ void ABrick::Tick(float DeltaTime)
 void ABrick::enablePhysics(bool Value)
 {
     Brick->SetSimulatePhysics(Value);
-}
-
-
-
-FVector ABrick::getPlugin(const FVector &ImpactPoint)
-{
-
-    if(Plugin_Points.Num() == 0)
-        return FVector(0,0,0);
-
-    float distance;
-    std::vector<float> distance_array;
-
-
-    for(int i=0; i<Plugin_Points.Num(); i++)
-    {
-        distance = calculateDistance(ImpactPoint, (Plugin_Points[i]->GetComponentLocation()));
-
-        distance_array.push_back(distance);
-    }
-
-    Current_Plugin_Index = getClosestPluginIndex(distance_array);
-
-
-    Current_Closest_Constrait = findClosestContrait(ImpactPoint);
-
-
-    return Plugin_Points[Current_Plugin_Index]->GetComponentLocation();
+    Collision_Box->SetSimulatePhysics(false);
 
 }
 
@@ -83,13 +77,47 @@ UStaticMesh *ABrick::getBrickMesh()
 
 
 
-FRotator ABrick::getPluginRotation()
+void ABrick::addDamage(int Value)
 {
-    if(Plugin_Points.Num()!= 0)
-        return Plugin_Points[Current_Plugin_Index]->GetComponentRotation();
+
+    if(Healt_ == 0)
+        breakBrick();
     else
-        return FRotator(0,0,0);
+    {
+        Healt_ -=Value;
+
+        if(Healt_ <= 0)
+            breakBrick();
+    }
+
 }
+
+
+
+void ABrick::breakBrick()
+{
+
+    ADestrictable *dest_ptr;
+    FVector spawn_location = Brick->GetComponentLocation();
+    FRotator spawn_rotation = Brick->GetComponentRotation();
+
+    dest_ptr = GetWorld()->SpawnActor<ADestrictable>(Destructible_Container,  spawn_location, spawn_rotation);
+    GEngine->AddOnScreenDebugMessage(-1 ,5, FColor::Green, FString::SanitizeFloat(Plugged_Bricks_OnIt.size()));
+
+
+//    const FDetachmentTransformRules &detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+//                                                           EDetachmentRule::KeepWorld,
+//                                                           EDetachmentRule::KeepWorld, true);
+    for(int i=0; i<Plugged_Bricks_OnIt.size(); i++)
+    {
+        if(Plugged_Bricks_OnIt[i] != nullptr)
+            Plugged_Bricks_OnIt[i]->releaseAll();
+    }
+
+
+    Destroy();
+}
+
 
 
 
@@ -101,129 +129,58 @@ void ABrick::setLegoCarOwner(ALegoCarChasis *Car)
 
 
 
-void ABrick::plugTheBrick(ABrick *Object, const FRotator &OffsetRotation)
+
+void ABrick::OnHit(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
 {
 
-    FVector plug_location = Plugin_Points[Current_Plugin_Index]->GetComponentLocation();
-
-    if(Plugin_Sockets.Num() == 0)
-        return;
-
-    if(Cast<AWeapon>(Object))
-    {
-        if(Owner_Car != nullptr)
-        Owner_Car->addWeaponToInventory(Cast<AWeapon>(Object));
-    }
-
-    const FDetachmentTransformRules &attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
-                                                           EDetachmentRule::KeepWorld,
-                                                           EDetachmentRule::KeepWorld, true);
-    Object->DetachFromActor(attachment_rules);
-    Object->enablePhysics(true);
-    Object->SetActorEnableCollision(true);
-
-    if(Object->Sub_Type == Semi)
-        plug_location += FVector(0,0, -19.0f);
-
-    Object->SetActorLocationAndRotation(plug_location,
-                                        Brick->GetComponentRotation() + OffsetRotation,
-                                        false, 0, ETeleportType::None);
-
-    Current_Closest_Constrait->SetConstrainedComponents(Brick, FName("None"), Object->Brick, FName("None"));
-
-    if(Owner_Car != nullptr)
-        Object->setLegoCarOwner(Owner_Car);
-
-}
-
-
-
-
-void ABrick::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMaterial *Possible_Material, UMaterial *ImPossible_Material,
-                             ABrick *Interactable_Brick, const FHitResult &OutHit, const FRotator &OffetRotation)
-{
-
-    FVector plugin = getPlugin(OutHit.ImpactPoint);
-    FRotator plugin_rotation = getPluginRotation() + OffetRotation;
-
-    Ghost_Brick->SetStaticMesh(Interactable_Brick->getBrickMesh());
-
-    if(Interactable_Brick->Sub_Type == Semi)
-        plugin += FVector(0,0, -19.0f);
-
-    if(plugin != FVector(0,0,0))
+    if(First_Hit != false)
     {
 
-        Ghost_Brick->SetVisibility(true);
+        ABrick *below_brick = Cast<ABrick>(OtherActor);
 
-        Ghost_Brick->SetMaterial(0, Possible_Material);
-        Ghost_Brick->SetWorldLocationAndRotation(plugin,
-                                                     plugin_rotation);
+        if(below_brick != nullptr)
+        {
+//            GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("cast"));
 
+//            autoPlugin(below_brick);
+
+
+        }
+        else
+        {
+            ALegoCarChasis *car = Cast<ALegoCarChasis>(OtherActor);
+
+//            if(car != nullptr)
+//                autoPlugin(car);
+
+        }
+
+        First_Hit = false;
     }
     else
     {
+        AMeleeWeapon *weapon = Cast<AMeleeWeapon>(this);
 
-        Ghost_Brick->SetVisibility(false);
-    }
-
-}
-
-
-
-float ABrick::calculateDistance(const FVector &Vector1, const FVector &Vector2)
-{
-    FVector delta = Vector1 - Vector2;
-
-    return delta.Size();
-}
-
-
-
-int ABrick::getClosestPluginIndex(const std::vector<float> &Array)
-{
-
-    float dist = 4000000;
-    int index = 0;
-
-    for(int i=0; i<Array.size(); i++)
-    {
-        if(Array[i] < dist)
+        if(weapon != nullptr)
         {
-            index = i;
-            dist = Array[i];
+            ABrick *below_brick = Cast<ABrick>(OtherActor);
+
+            if(below_brick != nullptr)
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("hit meale weapon "));
+
+                below_brick->addDamage(10);
+            }
+
         }
     }
 
-    return index;
 
 
 }
 
 
 
-UPhysicsConstraintComponent *ABrick::findClosestContrait(const FVector &Location)
-{
-    float distance = 100000;
-    std::vector<float> distance_array;
-    int index = 0;
 
 
-    for(int i=0; i<Plugin_Sockets.Num(); i++)
-    {
-        distance = calculateDistance(Location, Plugin_Sockets[i]->GetComponentLocation());
-        distance_array.push_back(distance);
-    }
-
-
-    index = getClosestPluginIndex(distance_array);
-
-//    if(Plugin_Sockets[index]->IsActive())
-//        GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, TEXT("Socket Active ") + FString::FromInt(index));
-//    else
-//        GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("Socket InActive ") + FString::FromInt(index));
-
-
-    return Plugin_Sockets[index];
-}
 

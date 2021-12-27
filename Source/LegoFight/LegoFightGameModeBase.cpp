@@ -21,6 +21,7 @@ void ALegoFightGameModeBase::BeginPlay()
     Super::BeginPlay();
     UE_LOG(LogTemp, Warning, TEXT("ALegoFightGameModeBase::BeginPlay"));
 
+
 //    UGameplayStatics::OpenLevel(this, "login_level", true);
 //    Controller_ = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 

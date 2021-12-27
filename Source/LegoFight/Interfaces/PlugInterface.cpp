@@ -2,6 +2,291 @@
 
 
 #include "PlugInterface.h"
+#include "../Brick.h"
+#include "../Vehicles/LegoCarChasis.h"
+#include <vector>
+#include "Engine/Engine.h"
+#include "UObject/Object.h"
 
 
 // Add default functionality here for any IPlugInterface functions that are not pure virtual.
+void IPlugInterface::setupPluginPoints(const FVector &Begining_Pivot, int PluginNumberWidth, int PluginNumberHeight)
+{
+
+    FString scene_name("scene");
+    USceneComponent *scene;
+    FVector offset = FVector(0,0,0);
+
+    int counter = 0;
+
+    int plugin_number = PluginNumberWidth * PluginNumberHeight;
+
+    for(int i=0; i < plugin_number; i++)
+    {
+
+        scene_name = "Scene";
+        scene_name.AppendInt(i);
+
+        scene = CreatePluginPoint(scene_name);
+
+        Plugin_Points.Push(scene);
+    }
+
+    // place Plugin Pivots
+    for(int i=0; i<PluginNumberHeight; i++)
+    {
+        for(int k = 0; k<PluginNumberWidth; k++)
+        {
+            Plugin_Points[counter++]->SetRelativeLocation(Begining_Pivot + offset);
+            offset.Y += (BRICK_LENGHT / 2);
+        }
+
+        offset.X -= (BRICK_LENGHT / 2);
+        offset.Y = 0;
+    }
+
+}
+
+
+
+float IPlugInterface::calculateDistance(const FVector &Vector1, const FVector &Vector2)
+{
+    FVector delta = Vector1 - Vector2;
+
+    return delta.Size();
+
+    return 0.f;
+}
+
+
+
+bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMaterial *Possible_Material, UMaterial *ImPossible_Material,
+                             ABrick *Interactable_Brick, const FHitResult &OutHit, const FRotator &OffetRotation,ABrick *OverlappedBrick)
+{
+
+    FVector plugin = getPlugin(OutHit.ImpactPoint);
+    FRotator plugin_rotation = getPluginRotation();
+
+    Ghost_Brick->SetStaticMesh(Interactable_Brick->getBrickMesh());
+    Ghost_Brick->SetWorldScale3D(FVector(0.9f, 0.9f, 0.9f));
+
+
+    if(plugin != FVector(0,0,0))
+    {
+
+
+        Ghost_Brick->SetVisibility(true);
+
+        Ghost_Brick->SetWorldLocationAndRotation(plugin,
+                                                     plugin_rotation);
+
+        Ghost_Brick->AddLocalRotation(OffetRotation);
+
+        if(Interactable_Brick->Sub_Type == Semi)
+            Ghost_Brick->AddLocalOffset(FVector(0,0, -19.0f));
+
+        Ghost_Brick->AddLocalOffset(FVector(0,0, 2.0f));
+
+
+        if(Ghost_Brick->IsOverlappingActor(OverlappedBrick))
+        {
+            Ghost_Brick->AddLocalOffset(FVector(0,0, -2.0f));
+
+            Ghost_Brick->SetMaterial(0, ImPossible_Material);
+            return true;
+        }
+        else
+        {
+            Ghost_Brick->AddLocalOffset(FVector(0,0, -2.0f));
+
+            Ghost_Brick->SetMaterial(0, Possible_Material);
+            return true;
+        }
+    }
+    else
+    {
+
+        Ghost_Brick->SetVisibility(false);
+        return false;
+    }
+
+    return true;
+}
+
+
+
+FVector IPlugInterface::getPlugin(const FVector &ImpactPoint)
+{
+
+    if(Plugin_Points.Num() == 0)
+        return FVector(0,0,0);
+
+    float distance;
+    std::vector<float> distance_array;
+
+
+    for(int i=0; i<Plugin_Points.Num(); i++)
+    {
+        distance = calculateDistance(ImpactPoint, (Plugin_Points[i]->GetComponentLocation()));
+
+        distance_array.push_back(distance);
+    }
+
+    Current_Plugin_Index = getClosestPluginIndex(distance_array);
+
+    return Plugin_Points[Current_Plugin_Index]->GetComponentLocation();
+
+}
+
+
+
+int IPlugInterface::getClosestPluginIndex(const std::vector<float> &Array)
+{
+
+    float dist = 4000000;
+    int index = 0;
+
+    for(int i=0; i<Array.size(); i++)
+    {
+        if(Array[i] < dist)
+        {
+            index = i;
+            dist = Array[i];
+        }
+    }
+
+    return index;
+
+}
+
+
+void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation)
+{
+
+    FVector plug_location;
+    FRotator plug_rotation;
+
+    if(PluginIndex < 0)
+        PluginIndex = Current_Plugin_Index;
+
+
+    if(PluginIndex < Plugin_Points.Num())
+    {
+        plug_location = Plugin_Points[PluginIndex]->GetComponentLocation();
+        plug_rotation = Plugin_Points[PluginIndex]->GetComponentRotation();
+
+        if(Object->Type_ == Lego_Car_Seat)
+        {
+            if(Owner_Car != nullptr)
+                Owner_Car->addSeatToCar(Cast<ACarSeat>(Object));
+            else if(Cast<ALegoCarChasis>(this))
+                Cast<ALegoCarChasis>(this)->addSeatToCar(Cast<ACarSeat>(Object));
+        }
+
+
+        if(Cast<AWeapon>(Object))
+        {
+            if(Owner_Car != nullptr)
+                Owner_Car->addWeaponToInventory(Cast<AWeapon>(Object));
+            else if(Cast<ALegoCarChasis>(this))
+                Cast<ALegoCarChasis>(this)->addWeaponToInventory(Cast<AWeapon>(Object));
+        }
+
+        if(Owner_Car != nullptr)
+            Object->Owner_Car = Owner_Car;
+        else if(Cast<ALegoCarChasis>(this))
+            Object->Owner_Car = Cast<ALegoCarChasis>(this);
+
+        const FDetachmentTransformRules &attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+                                                               EDetachmentRule::KeepWorld,
+                                                               EDetachmentRule::KeepWorld, false);
+        Object->DetachFromActor(attachment_rules);
+
+        Object->enablePhysics(true);
+        Object->SetActorEnableCollision(true);
+
+        Object->SetActorLocationAndRotation(plug_location, plug_rotation,
+                                            false, 0, ETeleportType::None);
+
+        Object->AddActorLocalRotation(OffsetRotation);
+
+        if(Object->Sub_Type == Semi)
+            Object->AddActorLocalOffset(FVector(0,0, -19.0f));
+
+        Object->enablePhysics(false);
+
+        Object->AttachToActor(Cast<AActor>(this), FAttachmentTransformRules(EAttachmentRule::KeepWorld,
+                                                               EAttachmentRule::KeepWorld,
+                                                               EAttachmentRule::KeepWorld, true));
+
+        Object->Collision_Box->SetCollisionProfileName(FName("BlockAll"));
+
+        Plugged_Bricks_OnIt.push_back(Object);
+        Object->Own_Plugin_Index = PluginIndex;
+        Object->Offset_Rotation = OffsetRotation;
+
+    }
+}
+
+
+
+void IPlugInterface::autoPlugin(AActor *BelowBrick)
+{
+
+    if(Cast<ABrick>(BelowBrick))
+    {
+        ABrick *below_brick = Cast<ABrick>(BelowBrick);
+        FVector plugin = below_brick->getPlugin(Cast<ABrick>(this)->GetActorLocation());
+        FRotator plugin_rotation = Cast<ABrick>(this)->GetActorRotation();
+
+
+        if(Cast<ABrick>(this)->Sub_Type == Semi)
+            plugin += FVector(0,0, -19.0f);
+
+
+    //    SetActorLocationAndRotation(plugin, plugin_rotation);
+
+        below_brick->plugTheBrick(Cast<ABrick>(this), -1, plugin_rotation);
+    }
+    else if(Cast<ALegoCarChasis>(BelowBrick))
+    {
+        ALegoCarChasis *below_vehicle = Cast<ALegoCarChasis>(BelowBrick);
+        FVector plugin = below_vehicle->getPlugin(Cast<ABrick>(this)->GetActorLocation());
+        FRotator plugin_rotation = Cast<ABrick>(this)->GetActorRotation();
+
+
+        if(Cast<ABrick>(this)->Sub_Type == Semi)
+            plugin += FVector(0,0, -19.0f);
+
+
+    //    SetActorLocationAndRotation(plugin, plugin_rotation);
+
+        below_vehicle->plugTheBrick(Cast<ABrick>(this), -1, plugin_rotation);
+    }
+}
+
+
+
+FRotator IPlugInterface::getPluginRotation()
+{
+    if(Plugin_Points.Num()!= 0)
+        return Plugin_Points[Current_Plugin_Index]->GetComponentRotation();
+    else
+        return FRotator(0,0,0);
+}
+
+
+
+void IPlugInterface::releaseAll()
+{
+    for(int i=0; i<Plugged_Bricks_OnIt.size(); i++)
+        Plugged_Bricks_OnIt[i]->releaseAll();
+
+    Cast<ABrick>(this)->enablePhysics(true);
+
+    const FDetachmentTransformRules &detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+                                                           EDetachmentRule::KeepWorld,
+                                                           EDetachmentRule::KeepWorld, true);
+    Cast<AActor>(this)->DetachFromActor(detachment_rules);
+}
+
