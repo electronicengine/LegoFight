@@ -40,8 +40,8 @@ void APathFinder::updateOwnerLocation(const FVector &Location)
 {
     float distance = (GetActorLocation() - Location).Size();
 
-//    if(distance >= 500000)
-//        GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity / 1.5f;
+    if(distance >= 500000)
+        GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity / 1.5f;
 }
 
 

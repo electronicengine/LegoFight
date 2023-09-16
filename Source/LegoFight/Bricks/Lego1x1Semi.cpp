@@ -10,33 +10,33 @@
 
 ALego1x1Semi::ALego1x1Semi()
 {
-    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-    PrimaryActorTick.bCanEverTick = false;
+    //// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    //PrimaryActorTick.bCanEverTick = false;
 
-    static ConstructorHelpers::FClassFinder<ADestrictable>
-             DestructibleBP(TEXT("Blueprint'/Game/bricks/destructibles/BP_1x1SemiDest.BP_1x1SemiDest_C'"));
-    Destructible_Container = DestructibleBP.Class;
 
-    static ConstructorHelpers::FObjectFinder<UStaticMesh>
-            static_mesh_asset(TEXT("StaticMesh'/Game/bricks/meshes/lego_1x1_semi.lego_1x1_semi'"));
-    UStaticMesh* mesh = static_mesh_asset.Object;
-    Brick_Mesh = static_mesh_asset.Object;
-    Brick->SetStaticMesh(mesh);
+    //Destructible_Container = ADestrictable::StaticClass();
 
-    static ConstructorHelpers::FObjectFinder<UMaterial>
-            material_asset(TEXT("Material'/Game/bricks/materials/brick_material.brick_material'"));
-    UMaterial *material = material_asset.Object;
-    Brick->SetMaterial(0, material);
+    //static ConstructorHelpers::FObjectFinder<UStaticMesh>
+    //        static_mesh_asset(TEXT("StaticMesh'/Game/bricks/meshes/lego_1x1_semi.lego_1x1_semi'"));
+    //UStaticMesh* mesh = static_mesh_asset.Object;
+    //Brick_Mesh = static_mesh_asset.Object;
+    //Brick->SetStaticMesh(mesh);
 
-    Collision_Box->SetRelativeLocation(FVector(0,0,2.33f));
-    Collision_Box->SetRelativeScale3D(FVector(0.77f, 0.77f, 0.12f));
+    //static ConstructorHelpers::FObjectFinder<UMaterial>
+    //    material_asset(TEXT("Material'/Game/bricks/materials/brick_material.brick_material'"));
+    //Material = material_asset.Object;
+    //Brick->SetMaterial(0, Material);
 
-    setupPluginPoints(FVector(25, -25.0f, 31.5f), 3, 3);
+    //Collision_Box->SetRelativeLocation(FVector(0,0, 5.085279f));
+    //Collision_Box->SetRelativeScale3D(FVector(0.77f, 0.77f, 0.140004f));
 
-    Type_ = Lego1x1_Semi;
-    Sub_Type = Semi;
+    //setupPluginPoints(FVector(25, -25.0f, 31.5f), 3, 3);
 
-    Current_Plugin_Index = 0;
-    Healt_ = 10;
+    //Type_ = Lego1x1_Semi;
+    //Sub_Type = Semi;
+    //Height_Offset = 20;
+
+    //Current_Plugin_Index = 0;
+    //Healt_ = 10;
 
 }

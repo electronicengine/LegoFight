@@ -12,7 +12,7 @@ ACarSeat::ACarSeat()
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = false;
 
-    Type_ = Lego_Car_Seat;
+    Type_ = CarSeat2x2;
     Sub_Type = Comp;
 
 

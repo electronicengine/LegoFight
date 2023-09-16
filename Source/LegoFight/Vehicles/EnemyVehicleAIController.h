@@ -52,7 +52,7 @@ private:
 
 
 protected:
-    virtual void OnPossess(APawn* Pawn) override;
+    virtual void OnPossess(APawn* InPawn) override;
 
 public:
 

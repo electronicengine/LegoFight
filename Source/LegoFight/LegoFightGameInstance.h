@@ -22,10 +22,32 @@
 #include "Guns/MeleeWeapon.h"
 #include "Guns/PhysicsWeapon.h"
 #include "Vehicles/EnemyLegoVehicle.h"
-
+#include <map>
 
 #include "LegoFightGameInstance.generated.h"
 
+
+struct BrickOptions {
+
+    FString Name;
+    FLinearColor Color;
+    UStaticMesh* Mesh;
+    UMaterial* Material;
+    FVector CollisionBox_Location;
+    FVector CollisionBox_Scale3D;
+    FVector Plug_Pivot_Location;
+    int Pivot_Height;
+    int Pivot_Width;
+    int Health;
+
+    int Height_Offset;
+    FVector SidePlug_Pivot_Location;
+
+    BrickType Type;
+    BrickSubType SubType;
+
+
+};
 
 /**
  * 
@@ -46,35 +68,36 @@ class LEGOFIGHT_API ULegoFightGameInstance : public UGameInstance
     TSubclassOf<class UUserWidget> Character_Panel_Container;
 
     BrickType Selected_Brick;
+    FLinearColor Selected_Color;
 
     UPROPERTY(EditAnywhere, Category = "Vehicle")
     TSubclassOf<AEnemyLegoVehicle> Lego_Enemy_Vehicle_Container;
     UPROPERTY(EditAnywhere, Category = "Vehicle")
     TSubclassOf<AEnemyLegoVehicle> Lego_Vehicle_Container;
 
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego1x1Trapezoid> Lego1x1Trapezoid_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego1x1Triangle> Lego1x1Triangle_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego1x1Comp> Lego1x1Comp_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego2x1Comp> Lego2x1Comp_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego2x2Comp> Lego2x2Comp_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego3x1Comp> Lego3x1Comp_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego3x2Comp> Lego3x2Comp_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego1x1Semi> Lego1x1Semi_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego2x1Semi> Lego2x1Semi_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego2x2Semi> Lego2x2Semi_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego3x1Semi> Lego3x1Semi_Container;
-    UPROPERTY(EditAnywhere, Category = "Brick")
+    UPROPERTY(EditAnywhere, Category = "General")
     TSubclassOf<ALego3x2Semi> Lego3x2Semi_Container;
 
     UPROPERTY(EditAnywhere, Category = "Weapon")
@@ -86,10 +109,19 @@ class LEGOFIGHT_API ULegoFightGameInstance : public UGameInstance
     UPROPERTY(EditAnywhere, Category = "Weapon")
     TSubclassOf<AMeleeWeapon> Ax_Container;
 
+    std::map<BrickType, FString> BrickType_Names;
+    std::map<FString, UStaticMesh*> Brick_Meshes;
+    std::map<BrickType, BrickOptions> Brick_Options;
 
+    UMaterial *Default_Brick_Material;
+    
 
 public:
     ULegoFightGameInstance();
+
+    void initializeBrickOptions();
+
+
 
     UUserWidget *loadInvantoryPanel();
     UUserWidget *loadCharacterPanel();
@@ -97,5 +129,8 @@ public:
     ALegoCarChasis *spawnVehicle(int Type, const FVector &SpawnLocation, const FRotator &SpawnRotation);
 
     void selectCurrentProductBrick(BrickType Type);
+    void selectCurrentProductBrickColor(FLinearColor Color);
+
+    UTexture2D* texture;
 
 };

@@ -23,7 +23,7 @@ ABullet::ABullet()
     Bullet_Mesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh>
-            static_mesh_asset(TEXT("StaticMesh'/Game/bricks/meshes/lego_1x1_all.lego_1x1_all'"));
+            static_mesh_asset(TEXT("StaticMesh'/Game/bricks/meshes/High2x2.High2x2'"));
     UStaticMesh* mesh = static_mesh_asset.Object;
     mesh = static_mesh_asset.Object;
     Bullet_Mesh->SetStaticMesh(mesh);

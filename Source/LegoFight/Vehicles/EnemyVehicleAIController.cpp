@@ -47,9 +47,9 @@ void AEnemyVehicleAIController::setupPerception()
 
 
 
-void AEnemyVehicleAIController::OnPossess(APawn *Pawn)
+void AEnemyVehicleAIController::OnPossess(APawn *InPawn)
 {
-    Super::OnPossess(Pawn);
+    Super::OnPossess(InPawn);
 }
 
 
@@ -98,16 +98,16 @@ void AEnemyVehicleAIController::BeginPlay()
 {
     Super::BeginPlay();
 
-    Owner_Pawn = Cast<AEnemyLegoVehicle>(GetPawn());
+    APawn * pwn = Cast<APawn>(GetPawn());
 
-    if (GetPerceptionComponent() != nullptr)
+    if (GetPerceptionComponent() != nullptr && pwn != nullptr)
     {
 
-//        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("AICube Controller Set"));
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("AICube Controller Set"));
     }
     else
     {
-//        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Some Problem Occured"));
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Some Problem Occured"));
 
     }
 
@@ -129,8 +129,7 @@ void AEnemyVehicleAIController::OnPerceptionUpdated(const TArray<AActor*>& Updat
 
             if(TargetVehicle->Team_Id == 1)
             {
-
-                enemy_number_nearby++;
+                enemy_number_nearby = 1;
                 Enemy_Found = true;
                 Enemy_Location = TargetVehicle->GetActorLocation();
 

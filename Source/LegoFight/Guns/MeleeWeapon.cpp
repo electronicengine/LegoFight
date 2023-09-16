@@ -6,7 +6,7 @@
 
 AMeleeWeapon::AMeleeWeapon()
 {
-    Type_ = Lego_Melee_Weapon;
+    Type_ = (BrickType)0;
 }
 
 

@@ -48,6 +48,46 @@ void IPlugInterface::setupPluginPoints(const FVector &Begining_Pivot, int Plugin
 }
 
 
+void IPlugInterface::setupSidePlugPoints(const FVector& Begining_Pivot, int PluginNumberWidth, int PluginNumberHeight)
+{
+
+    FString scene_name("sidescene");
+    USceneComponent* scene;
+    FVector offset = FVector(0, 0, 0);
+
+    int counter = Plugin_Points.Num();
+
+    int plugin_number = PluginNumberWidth * PluginNumberHeight;
+
+    for (int i = 0; i < plugin_number; i++)
+    {
+
+        scene_name = "sidescene";
+        scene_name.AppendInt(i);
+
+        scene = CreatePluginPoint(scene_name);
+        scene->SetRelativeRotation(FRotator(0, 0, 90));
+
+        Plugin_Points.Push(scene);
+    }
+
+    scene = CreatePluginPoint("last");
+
+
+    // place Plugin Pivots
+    for (int i = 0; i < PluginNumberHeight; i++)
+    {
+        for (int k = 0; k < PluginNumberWidth; k++)
+        {
+            Plugin_Points[counter++]->SetRelativeLocation(Begining_Pivot + offset);
+            offset.Z += (BRICK_LENGHT / 2);
+        }
+
+        offset.X -= (BRICK_LENGHT / 2);
+        offset.Z = 0;
+    }
+}
+
 
 float IPlugInterface::calculateDistance(const FVector &Vector1, const FVector &Vector2)
 {
@@ -82,23 +122,16 @@ bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMateria
 
         Ghost_Brick->AddLocalRotation(OffetRotation);
 
-        if(Interactable_Brick->Sub_Type == Semi)
-            Ghost_Brick->AddLocalOffset(FVector(0,0, -19.0f));
-
-        Ghost_Brick->AddLocalOffset(FVector(0,0, 2.0f));
+        Ghost_Brick->AddLocalOffset(FVector(0, 0, (Interactable_Brick->Height_Offset + 2.0f) * -1));
 
 
         if(Ghost_Brick->IsOverlappingActor(OverlappedBrick))
         {
-            Ghost_Brick->AddLocalOffset(FVector(0,0, -2.0f));
-
             Ghost_Brick->SetMaterial(0, ImPossible_Material);
             return true;
         }
         else
         {
-            Ghost_Brick->AddLocalOffset(FVector(0,0, -2.0f));
-
             Ghost_Brick->SetMaterial(0, Possible_Material);
             return true;
         }
@@ -174,8 +207,9 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
     {
         plug_location = Plugin_Points[PluginIndex]->GetComponentLocation();
         plug_rotation = Plugin_Points[PluginIndex]->GetComponentRotation();
+        
 
-        if(Object->Type_ == Lego_Car_Seat)
+        if(Object->Type_ == CarSeat2x2)
         {
             if(Owner_Car != nullptr)
                 Owner_Car->addSeatToCar(Cast<ACarSeat>(Object));
@@ -202,7 +236,6 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
                                                                EDetachmentRule::KeepWorld, false);
         Object->DetachFromActor(attachment_rules);
 
-        Object->enablePhysics(true);
         Object->SetActorEnableCollision(true);
 
         Object->SetActorLocationAndRotation(plug_location, plug_rotation,
@@ -210,16 +243,15 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
 
         Object->AddActorLocalRotation(OffsetRotation);
 
-        if(Object->Sub_Type == Semi)
-            Object->AddActorLocalOffset(FVector(0,0, -19.0f));
+        Object->AddActorLocalOffset(FVector(0, 0, (Object->Height_Offset) * -1));
 
-        Object->enablePhysics(false);
+
+        Object->enablePhysics(true);
+        Object->setCollisionProfile("BlockAll");
 
         Object->AttachToActor(Cast<AActor>(this), FAttachmentTransformRules(EAttachmentRule::KeepWorld,
                                                                EAttachmentRule::KeepWorld,
                                                                EAttachmentRule::KeepWorld, true));
-
-        Object->Collision_Box->SetCollisionProfileName(FName("BlockAll"));
 
         Plugged_Bricks_OnIt.push_back(Object);
         Object->Own_Plugin_Index = PluginIndex;

@@ -62,9 +62,9 @@ void ALegoCharacter::setupMesh()
             ghost_impossible_asset(TEXT("Material'/Game/bricks/materials/ghost_impossible.ghost_impossible'"));
     Ghost_Imposible_Material = ghost_impossible_asset.Object;
 
-    static ConstructorHelpers::FClassFinder<ADestrictable>
-             bullet(TEXT("Class'/Script/LegoFight.Bullet_C'"));
-    Bullet_Container = bullet.Class;
+    //static ConstructorHelpers::FClassFinder<ADestrictable>
+    //         bullet(TEXT("Class'/Script/LegoFight.Bullet_C'"));
+    //Bullet_Container = bullet.Class;
 
 }
 
@@ -240,8 +240,16 @@ void ALegoCharacter::OnDelegateOverlap(UPrimitiveComponent *OverlappedComp, AAct
         {
             ABrick *brick = Cast<ABrick>(OtherActor);
 
-            if(brick != nullptr)
-                Object_NearBy = brick;
+          if (brick != nullptr) {
+
+              if (brick->Owner_Car != nullptr) {
+                  Object_NearBy = brick->Owner_Car;
+              }
+              else {
+                  Object_NearBy = brick;
+              }
+
+            }
         }
 
     }
@@ -350,7 +358,11 @@ void ALegoCharacter::equip()
 {
 
 
-   if(Cast<ABrick>(Object_NearBy))
+    if (Cast<ALegoCarChasis>(Object_NearBy))
+    {
+        enteredToCar();
+
+    }else if(Cast<ABrick>(Object_NearBy))
     {
 
         if(Grabbable_Brick == Cast<ABrick>(Object_NearBy))
@@ -375,12 +387,7 @@ void ALegoCharacter::equip()
         }
 
 
-    }
-    else if(Cast<ALegoCarChasis>(Object_NearBy))
-    {
-       enteredToCar();
-    }
-    else
+    }else
     {
         if(Grabbable_Brick != nullptr)
             dropObject(Grabbable_Brick);
@@ -423,7 +430,7 @@ void ALegoCharacter::grapObject(ABrick *Object)
 
 
         Object->enablePhysics(false);
-        Object->Collision_Box->SetCollisionProfileName(FName("OverlapAll"));
+        Object->setCollisionProfile("OverlapAll");
 
         Object->SetActorRotation(FRotator(0,0,0));
 
@@ -448,6 +455,7 @@ void ALegoCharacter::dropObject(ABrick *Object)
                                                                EDetachmentRule::KeepWorld, true);
         Object->DetachFromActor(attachment_rules);
         Object->enablePhysics(true);
+        Object->setCollisionProfile("BlockAll");
 //        Object->SetActorEnableCollision(true);
 
         Grabbable_Brick = nullptr;
@@ -456,6 +464,8 @@ void ALegoCharacter::dropObject(ABrick *Object)
     }
 
     Keeping_Bricks = false;
+
+
 
 }
 
@@ -584,6 +594,7 @@ void ALegoCharacter::save()
         save_game->SaveObject = save_game->serializeJsonObject(json);
 
         UGameplayStatics::SaveGameToSlot(save_game, FString("myslot"), 0);
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("saved"));
 
     }
 

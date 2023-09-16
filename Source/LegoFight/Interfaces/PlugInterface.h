@@ -45,6 +45,7 @@ public:
 
         bool plugged;
         int Current_Plugin_Index;
+        float Height_Offset;
         int Own_Plugin_Index;
         uint8 Plugin_Number_Width;
         uint8 Plugin_Number_Height;
@@ -55,6 +56,8 @@ public:
 
         virtual USceneComponent *CreatePluginPoint(FString Name) = 0;
         void setupPluginPoints(const FVector &Begining_Pivot, int PluginNumberWidth, int PluginNumberHeight);
+        void setupSidePlugPoints(const FVector& Begining_Pivot, int PluginNumberWidth, int PluginNumberHeight);
+
         float calculateDistance(const FVector &Vector1, const FVector &Vector2);
         int getClosestPluginIndex(const std::vector<float> &Array);
         FVector getPlugin(const FVector &ImpactPoint);

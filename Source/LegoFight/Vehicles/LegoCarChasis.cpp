@@ -19,13 +19,15 @@ ALegoCarChasis::ALegoCarChasis()
 {
 
 
+    //static ConstructorHelpers::FObjectFinder<USkeletalMesh>
+    //        mesh_asset(TEXT("SkeletalMesh'/Game/vehicles/skeleton/lego_car_chasis_1.lego_car_chasis_1'"));
     static ConstructorHelpers::FObjectFinder<USkeletalMesh>
-            mesh_asset(TEXT("SkeletalMesh'/Game/vehicles/skeleton/lego_car_chasis_1.lego_car_chasis_1'"));
+        mesh_asset(TEXT("SkeletalMesh'/Game/vehicles/skeleton/lego_car1.lego_car1'"));
     USkeletalMesh* mesh = mesh_asset.Object;
     GetMesh()->SetSkeletalMesh(mesh);
 
     static ConstructorHelpers::FClassFinder<UAnimInstance>
-             anim_bp(TEXT("AnimBlueprint'/Game/vehicles/anim/BP_LegoCarAnim.BP_LegoCarAnim_C'"));
+             anim_bp(TEXT("AnimBlueprint'/Game/vehicles/anim/legocar1_anim.legocar1_anim_C'"));
     GetMesh()->AnimClass = anim_bp.Class;
 
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
@@ -38,16 +40,18 @@ ALegoCarChasis::ALegoCarChasis()
 
     setupMaterials();
     setupWheels();
-    setupPluginPoints(FVector(258.8, -122.7, 37.7f), 11, 23);
+    //setupPluginPoints(FVector(258.8, -122.7, 37.7f), 11, 23);
+    setupPluginPoints(FVector(100.5f, -25.0f, 27.7f), 3, 9);
     Weapon_Camera_Used = false;
     Current_Plugin_Index = 0;
     Car_Seat = nullptr;
     Current_Camera_Index = 0;
     Team_Id = 1;
 
-    Plugin_Number_Width = 11;
-    Plugin_Number_Height = 23;
+    Plugin_Number_Width = 3;
+    Plugin_Number_Height = 9;
     Plugin_Number = Plugin_Number_Width * Plugin_Number_Height;
+
 }
 
 
@@ -64,25 +68,25 @@ void ALegoCarChasis::setupWheels()
 
     tire.WheelClass = front_tire.Class;
     tire.BoneName = FName("front_left");
-    tire.AdditionalOffset = FVector(173.104965f, -187.788605f, -57.286331f);
+    //tire.AdditionalOffset = FVector(173.104965f, -187.788605f, -57.286331f);
     tire.bDisableSteering = false;
     CTyres.Add(tire);
 
     tire.WheelClass = front_tire.Class;
     tire.BoneName = FName("front_right");
-    tire.AdditionalOffset = FVector(172.294922f, 190.490829f, -57.286308f);
+    //tire.AdditionalOffset = FVector(172.294922f, 190.490829f, -57.286308f);
     tire.bDisableSteering = false;
     CTyres.Add(tire);
 
     tire.WheelClass = back_tire.Class;
     tire.BoneName = FName("back_left");
-    tire.AdditionalOffset = FVector(-204.372986f, 190.490829f, -57.286308f);
+    //tire.AdditionalOffset = FVector(-204.372986f, 190.490829f, -57.286308f);
     tire.bDisableSteering = true;
     CTyres.Add(tire);
 
     tire.WheelClass = back_tire.Class;
     tire.BoneName = FName("back_right");
-    tire.AdditionalOffset = FVector(-204.372986f, -202.227158f, -57.286331f);
+    //tire.AdditionalOffset = FVector(-204.372986f, -202.227158f, -57.286331f);
     tire.bDisableSteering = true;
     CTyres.Add(tire);
 
@@ -98,15 +102,23 @@ void ALegoCarChasis::setupMaterials()
     static ConstructorHelpers::FObjectFinder<UMaterial>
             material_asset0(TEXT("Material'/Game/vehicles/materials/chasis_material.chasis_material'"));
     UMaterial *chasis_material = material_asset0.Object;
-    GetMesh()->SetMaterial(0, chasis_material);
 
     static ConstructorHelpers::FObjectFinder<UMaterial>
             material_asset1(TEXT("Material'/Game/vehicles/materials/wheel_material.wheel_material'"));
-    UMaterial *wheel_material = material_asset1.Object;
-    GetMesh()->SetMaterial(1, wheel_material);
+    UMaterial* wheel_material = material_asset1.Object;
+
+
+    static ConstructorHelpers::FObjectFinder<UMaterial>
+        material_asset2(TEXT("Material'/Game/vehicles/materials/root_material.root_material'"));
+    UMaterial* root_material = material_asset2.Object;
+
+
+
+    GetMesh()->SetMaterial(0, root_material);
+    GetMesh()->SetMaterial(1, chasis_material);
     GetMesh()->SetMaterial(2, wheel_material);
-    GetMesh()->SetMaterial(3, wheel_material);
-    GetMesh()->SetMaterial(4, wheel_material);
+    //GetMesh()->SetMaterial(3, wheel_material);
+    //GetMesh()->SetMaterial(4, wheel_material);
 
 }
 
@@ -147,14 +159,14 @@ bool ALegoCarChasis::carHasPassenger()
 
 void ALegoCarChasis::enterCar(ALegoCharacter *LegoChar)
 {
-    if(LegoChar != nullptr && Car_Seat != nullptr)
-    {
+    //if(LegoChar != nullptr && Car_Seat != nullptr)
+    //{
 
         Passenger_ = LegoChar;
 
         AController* lego_man_controller = Passenger_->GetController();
 
-        Passenger_->SetActorRotation(Car_Seat->GetActorRotation());
+        //Passenger_->SetActorRotation(Car_Seat->GetActorRotation());
 
         Passenger_->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
         Passenger_->GetMesh()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
@@ -162,10 +174,10 @@ void ALegoCarChasis::enterCar(ALegoCharacter *LegoChar)
 
         lego_man_controller->Possess(this);
 
-        Passenger_->AttachToActor(Car_Seat, FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
+ /*       Passenger_->AttachToActor(Car_Seat, FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
                                                                          EAttachmentRule::KeepWorld,
-                                                                         EAttachmentRule::KeepWorld, true), TEXT("seat"));
-    }
+                                                                         EAttachmentRule::KeepWorld, true), TEXT("seat"));*/
+    //}
 
 //    GetMesh()->SetSimulatePhysics(true);
 
@@ -299,10 +311,10 @@ void ALegoCarChasis::equip()
 
 void ALegoCarChasis::addWeaponToInventory(AWeapon *Weapon)
 {
-    if(Weapon->Type_ == Lego_Fire_Weapon)
+    //if(Weapon->Type_ == Lego_Fire_Weapon)
         Armed_Fire_Weapons.Push(Cast<AFireWeapon>(Weapon));
-    else
-        Armed_Melee_Weapons.Push(Cast<AMeleeWeapon>(Weapon));
+    //else
+    //    Armed_Melee_Weapons.Push(Cast<AMeleeWeapon>(Weapon));
 }
 
 

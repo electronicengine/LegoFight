@@ -12,6 +12,7 @@
 #include "Interfaces/PlugInterface.h"
 #include <vector>
 #include <map>
+#include <queue>
 
 #include "Brick.generated.h"
 
@@ -20,30 +21,59 @@
 
 
 class ALegoCarChasis;
+enum BrickColor {
+    White = 1000,
+    Gray,
+    Black,
+    Yellow,
+    Orange,
+    Green,
+    Brown,
+    Red,
+    Purple,
+    Blue,
+    Cyan
+
+};
+
+
 
 enum BrickType
 {
-    Lego_Hammer,
-    Lego_Ax,
-    Lego_Machine_Gun,
-    Lego_Cannon,
-    Lego_Physics_Weapon,
-    Lego_Melee_Weapon,
-    Lego_Fire_Weapon,
-    Lego_Car_Seat,
-    Lego1x1_Comp,
-    Lego1x1_Semi,
-    Lego1x1_Even,
-    Lego1x1_Trapezoid,
-    Lego1x1_Triangle,
-    Lego2x1_Comp,
-    Lego2x1_Semi,
-    Lego2x2_Comp,
-    Lego2x2_Semi,
-    Lego3x1_Comp,
-    Lego3x1_Semi,
-    Lego3x2_Comp,
-    Lego3x2_Semi,
+    Low1x1,
+    High1x1,
+    Low2x1,
+    High2x1,
+    Low4x1,
+    Low2x2,
+    High2x2,
+    Low4x2,
+    High4x2,
+    Low4x4,
+    High4x4,
+    Low6x2,
+    High6x2,
+    Low6x4,
+    High6x4,
+    Trapezoid2x2,
+    Triangle2x2,
+    Blend2x2,
+
+    CarHook1x1,
+    CarFar1x1,
+    CarFender4x2,
+    CarBodyWork2x1,
+    CarHood2x2,
+    CarChassis1,
+    CarSeat2x2,
+
+    Embrasure2x1,
+    CompleteTrack,
+
+    Hammer2x2,
+    Ax2x2,
+    MachineGun2x2,
+    Cannon2x2,
 
 };
 
@@ -62,31 +92,40 @@ enum VehicleType
 };
 
 
+struct BrickOptions;
+
 UCLASS()
 class LEGOFIGHT_API ABrick : public AActor, public IBuiltInInterface, public IPlugInterface
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ABrick();
+    GENERATED_BODY()
+
+        FVector Brick_Color;
+
+public:
+    // Sets default values for this actor's properties
+    ABrick();
+
+    std::queue<USceneComponent*> plugs;
 
     UPROPERTY(EditAnywhere)
-    UStaticMeshComponent *Brick;
+        UStaticMeshComponent* Brick;
 
     /** Projectile class to spawn */
-    UPROPERTY(EditDefaultsOnly, Category="Bullet")
-    TSubclassOf<class ADestrictable> Destructible_Container;
+    UPROPERTY(EditDefaultsOnly, Category = "Bullet")
+        TSubclassOf<class ADestrictable> Destructible_Container;
 
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    UStaticMesh *Brick_Mesh;
+        UStaticMesh* Brick_Mesh;
 
 
     UPROPERTY(EditAnywhere)
-    UBoxComponent *Collision_Box;
+        UMaterial* Material;
 
+    UPROPERTY(EditAnywhere)
+        USceneComponent* Default_Root;
     int Healt_;
+
 
 protected:
 
@@ -102,9 +141,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
     void enablePhysics(bool Value);
+    void setCollisionProfile(FString Profile);
+
     UStaticMesh *getBrickMesh();
     void addDamage(int Value);
     void breakBrick();
+    void setMaterialColor(FLinearColor Color);
+    void setBrickTypeOptions(BrickOptions& Options);
 
     BrickType Type_;
     BrickSubType Sub_Type;
@@ -116,7 +159,7 @@ public:
     UFUNCTION()
     void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-
+    UStaticMesh* test_mesh;
     bool First_Hit;
 
 };

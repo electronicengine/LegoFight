@@ -56,10 +56,8 @@ void AEnemyLegoVehicle::moveLocation(const FVector &Location)
 
     AAIController *path_finder_controller = Cast<AAIController>(Path_Finder->GetController());
 
-    if(path_finder_controller)
+    if(path_finder_controller != nullptr)
     {
-
-
         fire();
         path_finder_controller->MoveToLocation(Location);
     }

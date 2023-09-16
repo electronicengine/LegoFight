@@ -2,13 +2,12 @@
 
 
 #include "FireWeapon.h"
-#include "Unix/UnixPlatformTime.h"
 
 
 
 AFireWeapon::AFireWeapon()
 {
-    Type_ = Lego_Fire_Weapon;
+    Type_ = (BrickType)0;
 
     Barrel_ = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel"));
     Barrel_->SetupAttachment(Brick);

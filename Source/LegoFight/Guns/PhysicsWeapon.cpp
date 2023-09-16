@@ -6,7 +6,7 @@
 
 APhysicsWeapon::APhysicsWeapon()
 {
-    Type_ = Lego_Physics_Weapon;
+    Type_ = (BrickType)0;
 
 }
 
