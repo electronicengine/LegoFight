@@ -13,6 +13,12 @@
 #include "Engine/World.h"
 #include "Components/Image.h"
 #include "Slate/SlateBrushAsset.h"
+#include "Styling/SlateBrush.h"
+#include "SlateBasics.h"
+#include "Widgets/Images/SImage.h"
+#include "Runtime/Engine/Classes/Engine/Texture2D.h"
+
+#include "../Brick.h"
 
 
 
@@ -21,59 +27,133 @@ bool UInventoryWidget::Initialize()
     Super::Initialize();
    // Button_1x1Triangle->OnClicked.AddDynamic(this, &UInventoryWidget::Button_1x1TriangleClicked);
 
+    Colors["Black"] = FLinearColor(0.005f, 0.005f, 0.005f);
+    Colors["Gray"] = FLinearColor(0.1f, 0.1f, 0.1f);
+    Colors["White"] = FLinearColor(0.7, 0.7, 0.7);
+    Colors["Yellow"] = FLinearColor(0.8125, 0.740577, 0.0);
+    Colors["Orange"] = FLinearColor(1.0, 0.309655, 0.0);
+    Colors["Brown"] = FLinearColor(0.3125, 0.062512, 0.0);
+    Colors["Red"] = FLinearColor(0.765625, 0.0, 0.005185);
+    Colors["Purple"] = FLinearColor(0.5, 0.0, 0.30656);
+    Colors["Blue"] = FLinearColor(0.0, 0.002649, 0.619792);
+    Colors["Cyan"] = FLinearColor(0.0, 0.445146, 0.604167);
+    Colors["Green"] = FLinearColor(0.039721, 0.401042, 0.0);
 
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::General, Button_General_Category));
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Vehicle, Button_Vehicle_Category));
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Weapon, Button_Weapon_Category));
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Building, Button_Building_Category));
 
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::CarFender4x2, Button_CarFender4x2));
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::CarChassis1, Button_CarChassis1));
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::CarFar1x1, Button_CarFar1x1));
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::CarHook1x1, Button_CarHook1x1));
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::CarHood2x2, Button_CarHood2x2));
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::CarSeat2x2, Button_CarSeat2x2));
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::CarBodyWork2x1, Button_CarBodyWork2x1));
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::CompleteTrack, Button_CompleteTrack));
-    VehicleBrick_Buttons.push_back(std::make_pair(BrickType::Embrasure2x1, Button_Embrasure2x1));
+    UButton* btn;
+    UTexture2D* btn_texture;
+    FString name_appendix;
+    TArray<UObject*> general_brick_assets;
+    EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/general/"), general_brick_assets, EngineUtils::ATL_Regular);
+    int i = 0;
+    for (auto asset : general_brick_assets)
+    {
+        btn_texture = Cast<UTexture2D>(asset);
+        name_appendix = FString::FromInt(i++);
 
-    WeaponBrick_Buttons.push_back(std::make_pair(BrickType::Cannon2x2, Button_Cannon2x2));
-    WeaponBrick_Buttons.push_back(std::make_pair(BrickType::MachineGun2x2, Button_MachineGun2x2));
-    WeaponBrick_Buttons.push_back(std::make_pair(BrickType::Ax2x2, Button_Ax2x2));
-    WeaponBrick_Buttons.push_back(std::make_pair(BrickType::Hammer2x2, Button_Hammer2x2));
+        btn = NewObject<UButton>(UButton::StaticClass());
+        btn->AppendName(name_appendix);
 
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Low1x1, Button_Low1x1));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::High1x1, Button_High1x1));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Low2x1, Button_Low2x1));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::High2x1, Button_High2x1));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Low4x1, Button_Low4x1));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Low2x2, Button_Low2x2));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::High2x2, Button_High2x2));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Low4x2, Button_Low4x2));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::High4x2, Button_High4x2));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Low4x4, Button_Low4x4));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::High4x4, Button_High4x4));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Low6x2, Button_Low6x2));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::High6x2, Button_High6x2));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Low6x4, Button_Low6x4));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::High6x4, Button_High6x4));
+        // Set the button's background image using the slate brush
+        btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
 
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Trapezoid2x2, Button_Trapezoid2x2));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Triangle2x2, Button_Triangle2x2));
-    GeneralBrick_Buttons.push_back(std::make_pair(BrickType::Blend2x2, Button_Blend2x2));
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
 
-    Color_Buttons.push_back(std::make_pair(BrickColor::White, Button_White));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Gray, Button_Gray));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Black, Button_Black));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Yellow, Button_Yellow));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Orange, Button_Orange));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Brown, Button_Brown));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Red, Button_Red));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Green, Button_Green));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Purple, Button_Purple));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Blue, Button_Blue));
-    Color_Buttons.push_back(std::make_pair(BrickColor::Cyan, Button_Cyan));
+        btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
 
+        box->AddChild(btn);
+        GeneralBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
+    }
+
+    TArray<UObject*> vehicle_assets;
+    EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/vehicles/"), vehicle_assets, EngineUtils::ATL_Regular);
+    for (auto asset : vehicle_assets)
+    {
+        btn_texture = Cast<UTexture2D>(asset);
+        name_appendix = FString::FromInt(i++);
+
+        btn = NewObject<UButton>(UButton::StaticClass());
+        btn->AppendName(name_appendix);
+
+        // Set the button's background image using the slate brush
+        btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
+
+        btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+
+        box->AddChild(btn);
+        VehicleBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
+    }
+
+    TArray<UObject*> weapon_assets;
+    EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/weapons/"), weapon_assets, EngineUtils::ATL_Regular);
+    for (auto asset : weapon_assets)
+    {
+        btn_texture = Cast<UTexture2D>(asset);
+        name_appendix = FString::FromInt(i++);
+
+        btn = NewObject<UButton>(UButton::StaticClass());
+        btn->AppendName(name_appendix);
+
+        // Set the button's background image using the slate brush
+        btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
+
+        btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+
+        box->AddChild(btn);
+        WeaponBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
+    }
+
+    TArray<UObject*> color_assets;
+    EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/colors/"), color_assets, EngineUtils::ATL_Regular);
+    for (auto asset : color_assets)
+    {
+        btn_texture = Cast<UTexture2D>(asset);
+        name_appendix = FString::FromInt(i++);
+
+        btn = NewObject<UButton>(UButton::StaticClass());
+        btn->AppendName(name_appendix);
+
+        // Set the button's background image using the slate brush
+        btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
+
+        btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+
+        box->AddChild(btn);
+        Color_Buttons.push_back(std::make_pair(asset->GetName(), btn));
+    }
+  
+
+    Game_Instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
 
     Current_Category_Buttons = &GeneralBrick_Buttons;
     setVisibilityCategoryButtons(GeneralBrick_Buttons, true);
@@ -81,9 +161,6 @@ bool UInventoryWidget::Initialize()
     setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
     setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
     setVisibilityCategoryButtons(Color_Buttons, false);
-
-
-    Game_Instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
 
     return true;
 }
@@ -166,7 +243,7 @@ void UInventoryWidget::checkCategory()
 
 }
 
-void UInventoryWidget::setVisibilityCategoryButtons(const std::vector<std::pair<int, UButton*>>& CategoryButtons, bool Visible)
+void UInventoryWidget::setVisibilityCategoryButtons(const std::vector<std::pair<FString, UButton*>>& CategoryButtons, bool Visible)
 {
     for (int i = 0; i < CategoryButtons.size(); i++) {
         if (Visible) {
@@ -184,7 +261,7 @@ void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
     if (GetVisibility() == ESlateVisibility::Visible) {
 
         checkCategory();
-        std::vector<std::pair<int, UButton*>>& category = *Current_Category_Buttons;
+        std::vector<std::pair<FString, UButton*>>& category = *Current_Category_Buttons;
 
         if (category == Color_Buttons) {
             for (int i = 0; i < category.size(); i++) {
@@ -192,8 +269,7 @@ void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
                 if (category[i].second != nullptr) {
                     if (category[i].second->IsPressed()) {
 
-                        //Game_Instance->selectCurrentProductBrickColor((BrickColor)category[i].first);
-                        Game_Instance->selectCurrentProductBrickColor(FLinearColor(0.4f,0.2f, 0.3f));
+                        Game_Instance->selectCurrentProductColor(Colors[category[i].first]);
                         removeWidget();
                     }
                 }
@@ -206,10 +282,9 @@ void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 
                 if (category[i].second != nullptr) {
                     if (category[i].second->IsPressed()) {
-                        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green,
-                            FString::FromInt(category[i].first));
+                        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green,category[i].first);
 
-                        Game_Instance->selectCurrentProductBrick((BrickType)category[i].first);
+                        Game_Instance->selectCurrentProductItem(category[i].first);
                         
                         setVisibilityCategoryButtons(GeneralBrick_Buttons, false);
                         setVisibilityCategoryButtons(VehicleBrick_Buttons, false);

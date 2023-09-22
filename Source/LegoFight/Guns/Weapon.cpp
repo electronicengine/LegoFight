@@ -17,6 +17,7 @@ AWeapon::AWeapon()
     Sub_Type = Semi;
     Healt_ = 900000;
 
+
 }
 
 
@@ -34,5 +35,19 @@ void AWeapon::useWeapon()
 
 
 
+}
+
+void AWeapon::fire()
+{
+    Barrel_Location = Brick->GetSocketLocation("barrel");
+    Barrel_Rotation = Brick->GetSocketRotation("barrel");
+
+    ABullet* bullet_ptr;
+
+    bullet_ptr = GetWorld()->SpawnActor<ABullet>(ABullet::StaticClass(), Barrel_Location, Barrel_Rotation);
+    FVector direction = Barrel_Rotation.Vector();
+    
+    if (bullet_ptr != nullptr)
+        bullet_ptr->addFireImpulse(direction, 50000);
 }
 

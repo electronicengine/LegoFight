@@ -38,7 +38,7 @@ enum BrickColor {
 
 
 
-enum BrickType
+enum ItemType
 {
     Low1x1,
     High1x1,
@@ -64,13 +64,13 @@ enum BrickType
     CarFender4x2,
     CarBodyWork2x1,
     CarHood2x2,
-    CarChassis1,
+    Embrasure2x1,
     CarSeat2x2,
 
-    Embrasure2x1,
+    CarChassis1 = 100,
     CompleteTrack,
 
-    Hammer2x2,
+    Hammer2x2 = 200,
     Ax2x2,
     MachineGun2x2,
     Cannon2x2,
@@ -92,7 +92,7 @@ enum VehicleType
 };
 
 
-struct BrickOptions;
+struct ItemOptions;
 
 UCLASS()
 class LEGOFIGHT_API ABrick : public AActor, public IBuiltInInterface, public IPlugInterface
@@ -147,9 +147,9 @@ public:
     void addDamage(int Value);
     void breakBrick();
     void setMaterialColor(FLinearColor Color);
-    void setBrickTypeOptions(BrickOptions& Options);
+    void setBrickTypeOptions(ItemOptions& Options);
 
-    BrickType Type_;
+    ItemType Type_;
     BrickSubType Sub_Type;
 
 
@@ -158,7 +158,6 @@ public:
 
     UFUNCTION()
     void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
     UStaticMesh* test_mesh;
     bool First_Hit;
 

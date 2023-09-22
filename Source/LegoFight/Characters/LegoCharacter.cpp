@@ -64,7 +64,7 @@ void ALegoCharacter::setupMesh()
 
     //static ConstructorHelpers::FClassFinder<ADestrictable>
     //         bullet(TEXT("Class'/Script/LegoFight.Bullet_C'"));
-    //Bullet_Container = bullet.Class;
+    Bullet_Container = ABullet::StaticClass();
 
 }
 
@@ -323,7 +323,7 @@ void ALegoCharacter::fire()
     bullet_ptr = GetWorld()->SpawnActor<ABullet>(Bullet_Container,  spawn_location, spawn_rotation);
 
     if(bullet_ptr != nullptr)
-        bullet_ptr->addFireImpulse(Aim_Camera->GetForwardVector().Rotation().Vector(), 400000);
+        bullet_ptr->addFireImpulse(Aim_Camera->GetForwardVector().Rotation().Vector(), 10000);
 }
 
 
@@ -564,8 +564,8 @@ void ALegoCharacter::buyBrick()
 
 
     ULegoFightGameInstance *game_instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
-    Grabbable_Brick = game_instance->spawnBrick(-1, FVector(0,0,0), FRotator(0,0,0));
-
+    Grabbable_Brick = Cast<ABrick>(game_instance->spawnItem(FVector(0,0,0), FRotator(0,0,0)));
+  
     if(Grabbable_Brick != nullptr)
     {
 

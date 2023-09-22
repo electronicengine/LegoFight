@@ -122,7 +122,7 @@ bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMateria
 
         Ghost_Brick->AddLocalRotation(OffetRotation);
 
-        Ghost_Brick->AddLocalOffset(FVector(0, 0, (Interactable_Brick->Height_Offset + 2.0f) * -1));
+        Ghost_Brick->AddLocalOffset(FVector(0, 0, (Interactable_Brick->Height_Offset) * -1));
 
 
         if(Ghost_Brick->IsOverlappingActor(OverlappedBrick))

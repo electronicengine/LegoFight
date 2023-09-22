@@ -9,6 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "../Brick.h"
+#include "../Guns/Bullet.h"
 #include "Materials/Material.h"
 #include "LegoCharacter.generated.h"
 

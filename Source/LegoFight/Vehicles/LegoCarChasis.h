@@ -13,8 +13,6 @@
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "CarSeat.h"
 #include "../Guns/Weapon.h"
-#include "../Guns/FireWeapon.h"
-#include "../Guns/MeleeWeapon.h"
 #include "../Characters/LegoCharacter.h"
 #include "../Brick.h"
 #include "../Interfaces/BuiltInInterface.h"
@@ -45,8 +43,7 @@ class LEGOFIGHT_API ALegoCarChasis : public AWheeledVehicle, public IBuiltInInte
 
     ACarSeat *Car_Seat;
 
-    TArray<AFireWeapon *> Armed_Fire_Weapons;
-    TArray<AMeleeWeapon *> Armed_Melee_Weapons;
+    TArray<AWeapon *> Weapons;
 
     bool Weapon_Camera_Used;
     int Current_Camera_Index;

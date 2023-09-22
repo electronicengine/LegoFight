@@ -27,8 +27,9 @@ class LEGOFIGHT_API AWeapon : public ABrick
 
      UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
      UCameraComponent* Camera;
-
-
+    FVector Barrel_Location;
+    FRotator Barrel_Rotation;
+    USceneComponent* barrel;
      ACharacter *User_;
 public:
 
@@ -36,5 +37,6 @@ public:
 
     void useWeapon();
 	
+    void fire();
 	
 };

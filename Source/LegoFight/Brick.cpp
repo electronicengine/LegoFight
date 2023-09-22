@@ -5,8 +5,9 @@
 #include <vector>
 #include "Engine/Engine.h"
 #include "Vehicles/LegoCarChasis.h"
-#include "Bricks/Lego1x1Comp.h"
 #include "LegoFightGameInstance.h"
+#include "Kismet/KismetSystemLibrary.h"
+
 #include "Materials/MaterialInstanceDynamic.h"
 
 
@@ -23,14 +24,13 @@ ABrick::ABrick()
     SetRootComponent(Brick);
     Brick->SetSimulatePhysics(true);
     Brick->SetCollisionProfileName(FName("BlockAll"));
-    Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+    //Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 
 
     plugged = false;
 
 
 
-    Brick->OnComponentHit.AddDynamic(this, &ABrick::OnHit);
 
 
     for (int i = 0; i < 100; i++) {
@@ -118,16 +118,12 @@ UStaticMesh *ABrick::getBrickMesh()
 
 void ABrick::addDamage(int Value)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("breakBrick"));
+    Healt_ -= Value;
 
-    if(Healt_ == 0)
+    if(Healt_ <= 0)
         breakBrick();
-    else
-    {
-        Healt_ -=Value;
 
-        if(Healt_ <= 0)
-            breakBrick();
-    }
 
 }
 
@@ -165,13 +161,65 @@ void ABrick::setMaterialColor(FLinearColor Color)
     Brick_Color = FVector(Color);
 }
 
-void ABrick::setBrickTypeOptions(BrickOptions &Options)
+void ABrick::setBrickTypeOptions(ItemOptions&Options)
 {
+    float pivot_loc_x;
+    float pivot_loc_y;
+    float pivot_loc_z;
+    int pivot_width;
+    int pivot_height;
+    int offset;
+
 
     Brick->SetStaticMesh(Options.Mesh);
     Brick_Mesh = Options.Mesh;
     Brick->SetMaterial(0, Options.Material);
     Material = Options.Material;
+
+
+    FVector Origin;
+    FVector BoxExtent;
+    float SphereRadius;
+
+    UKismetSystemLibrary::GetComponentBounds(Brick, Origin, BoxExtent, SphereRadius);
+
+    GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Cyan, FString("Origin: ") + Origin.ToString());
+    GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Red, FString("Extend: ") + BoxExtent.ToString());
+    GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Green, FString("Radius: ") + FString::SanitizeFloat(SphereRadius));
+
+    if (Options.Name.Find("weapon") > 0) {
+
+        Height_Offset = 20;
+
+    }else if (Options.Name == FString(VERSION_STRINGIFY(CarBodyWork2x1))) {
+        GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Cyan, FString(VERSION_STRINGIFY(CarBodyWork2x1)));
+
+        pivot_loc_x = 25;
+        pivot_loc_y = -25;
+        pivot_loc_z = 30.7f;
+        pivot_width = 7;
+        pivot_height = 7;
+
+        offset = 20;
+        setupPluginPoints(FVector(25, -25, 30.7f), 3, 3);
+        setupSidePlugPoints(FVector(50.1f, 55, -13.85f), 3, 9);
+        Height_Offset = offset;
+    }
+    else {
+
+        pivot_loc_x = Origin.X + BoxExtent.X;
+        pivot_loc_y = (Origin.Y + BoxExtent.Y) * -1;
+        pivot_loc_z = Origin.Z + BoxExtent.Z + 15;
+        pivot_width = (BoxExtent.Y / 12.5) + 1;
+        pivot_height = (BoxExtent.X / 12.5) + 1;
+        offset = 2 * (int)(17 - BoxExtent.Z) + 2;
+
+        setupPluginPoints(FVector(pivot_loc_x, pivot_loc_y, pivot_loc_z), pivot_width, pivot_height);
+        Height_Offset = offset;
+
+    }
+
+
 
 
     Destructible_Container = ADestrictable::StaticClass();
@@ -183,12 +231,13 @@ void ABrick::setBrickTypeOptions(BrickOptions &Options)
 
     Current_Plugin_Index = 0;
 
-    setupPluginPoints(Options.Plug_Pivot_Location, Options.Pivot_Width, Options.Pivot_Height);
-    Height_Offset = Options.Height_Offset;
 
     Brick->CreateDynamicMaterialInstance(0);
     Brick->SetVectorParameterValueOnMaterials(FName("BaseColor"), FVector(Options.Color));
     Brick_Color = FVector(Options.Color);
+
+    Brick->OnComponentHit.AddDynamic(this, &ABrick::OnHit);
+
 }
 
 
@@ -234,7 +283,7 @@ void ABrick::OnHit(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveC
     }
     else
     {
-        AMeleeWeapon *weapon = Cast<AMeleeWeapon>(this);
+        AWeapon *weapon = Cast<AWeapon>(this);
 
         if(weapon != nullptr)
         {

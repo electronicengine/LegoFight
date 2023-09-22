@@ -10,7 +10,7 @@
 #include <string>
 #include "Destrictable.generated.h"
 
-enum BrickType;
+enum ItemType;
 UCLASS()
 class LEGOFIGHT_API ADestrictable : public AActor
 {
@@ -34,6 +34,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void setColor(FVector ColorVec);
-	void setMesh(BrickType Type);
-	
+	void setMesh(ItemType Type);
+
 };

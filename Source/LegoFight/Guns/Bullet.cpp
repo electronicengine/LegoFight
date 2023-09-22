@@ -17,10 +17,9 @@ ABullet::ABullet()
     Bullet_Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Bullet_Mesh"));
     SetRootComponent(Bullet_Mesh);
     Bullet_Mesh->SetSimulatePhysics(true);
-
+    Bullet_Mesh->SetNotifyRigidBodyCollision(true);
     Bullet_Mesh->SetCollisionProfileName(FName("BlockAll"));
 
-    Bullet_Mesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh>
             static_mesh_asset(TEXT("StaticMesh'/Game/bricks/meshes/High2x2.High2x2'"));
@@ -28,15 +27,18 @@ ABullet::ABullet()
     mesh = static_mesh_asset.Object;
     Bullet_Mesh->SetStaticMesh(mesh);
 
-    static ConstructorHelpers::FObjectFinder<UMaterial>
-            material_asset(TEXT("Material'/Game/Guns/materials/bulet_material.bulet_material'"));
-    UMaterial *material = material_asset.Object;
-    Bullet_Mesh->SetMaterial(0, material);
+    //static ConstructorHelpers::FObjectFinder<UMaterial>
+    //        material_asset(TEXT("Material'/Game/Guns/materials/bulet_material.bulet_material'"));
+    //UMaterial *material = material_asset.Object;
+    //Bullet_Mesh->SetMaterial(0, material);
 
     Bullet_Mesh->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 
 
     InitialLifeSpan = 10;
+
+    Bullet_Mesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
+
 }
 
 

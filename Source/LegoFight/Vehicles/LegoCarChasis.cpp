@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/UObjectGlobals.h"
@@ -257,7 +258,7 @@ void ALegoCarChasis::interact()
 {
 
 
-    if(Current_Camera_Index >= Armed_Fire_Weapons.Num())
+    if(Current_Camera_Index >= Weapons.Num())
     {
         Current_Camera_Index = 0;
         APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
@@ -267,7 +268,7 @@ void ALegoCarChasis::interact()
     }
     else
     {
-        Armed_Fire_Weapons[Current_Camera_Index]->useWeapon();
+        Weapons[Current_Camera_Index]->useWeapon();
         Weapon_Camera_Used = true;
         Current_Camera_Index++;
 
@@ -284,7 +285,7 @@ void ALegoCarChasis::fire()
 
     static int weapon_index;
 
-    if(Armed_Fire_Weapons.Num() != 0)
+    if(Weapons.Num() != 0)
     {
 
         if(Current_Camera_Index == 0)
@@ -294,8 +295,8 @@ void ALegoCarChasis::fire()
 
 
 
-        if(Armed_Fire_Weapons[weapon_index] != nullptr)
-            Armed_Fire_Weapons[weapon_index]->fire();
+        if(Weapons[weapon_index] != nullptr)
+            Weapons[weapon_index]->fire();
     }
 
 }
@@ -311,8 +312,9 @@ void ALegoCarChasis::equip()
 
 void ALegoCarChasis::addWeaponToInventory(AWeapon *Weapon)
 {
+
     //if(Weapon->Type_ == Lego_Fire_Weapon)
-        Armed_Fire_Weapons.Push(Cast<AFireWeapon>(Weapon));
+        Weapons.Push(Cast<AWeapon>(Weapon));
     //else
     //    Armed_Melee_Weapons.Push(Cast<AMeleeWeapon>(Weapon));
 }

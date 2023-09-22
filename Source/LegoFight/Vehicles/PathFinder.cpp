@@ -4,6 +4,7 @@
 #include "PathFinder.h"
 #include "EnemyLegoVehicle.h"
 #include "Engine/Engine.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 APathFinder::APathFinder()
@@ -40,8 +41,9 @@ void APathFinder::updateOwnerLocation(const FVector &Location)
 {
     float distance = (GetActorLocation() - Location).Size();
 
+    UCharacterMovementComponent* movement_comp = GetCharacterMovement();
     if(distance >= 500000)
-        GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity / 1.5f;
+        movement_comp->Velocity = movement_comp->Velocity / 1.5f;
 }
 
 

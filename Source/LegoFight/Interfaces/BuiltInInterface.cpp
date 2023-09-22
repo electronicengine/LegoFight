@@ -74,13 +74,13 @@ void IBuiltInInterface::buildFromConstructionInfo(const ConstructionInfo &Info, 
 
     if(Info.Type_ >= 30)
     {
-        vehicle = GameInstance->spawnVehicle(Info.Type_, BuildLocation + FVector(0,0,10.0f), FRotator(0,0,0));
+        //vehicle = GameInstance->spawnVehicle(Info.Type_, BuildLocation + FVector(0,0,10.0f), FRotator(0,0,0));
     }
     else
     {
         if(MainBrick == nullptr)
         {
-            main_brick = GameInstance->spawnBrick(Info.Type_, FVector(0,0,0), FRotator(0,0,0));
+            //main_brick = GameInstance->spawnBrick(Info.Type_, FVector(0,0,0), FRotator(0,0,0));
         }
         else
         {
@@ -93,19 +93,19 @@ void IBuiltInInterface::buildFromConstructionInfo(const ConstructionInfo &Info, 
     for(int i=0; i<Info.Plugged_Bricks_OnIt.size(); i++)
     {
 
-        ABrick *brick = GameInstance->spawnBrick(Info.Plugged_Bricks_OnIt[i].Type_, FVector(0,0,0), FRotator(0,0,0));
+        //ABrick *brick = GameInstance->spawnBrick(Info.Plugged_Bricks_OnIt[i].Type_, FVector(0,0,0), FRotator(0,0,0));
 
         if(vehicle != nullptr)
         {
-            vehicle->plugTheBrick(brick, Info.Plugged_Bricks_OnIt[i].Plugin_Index, Info.Plugged_Bricks_OnIt[i].Offset_Rotation);
+            //vehicle->plugTheBrick(brick, Info.Plugged_Bricks_OnIt[i].Plugin_Index, Info.Plugged_Bricks_OnIt[i].Offset_Rotation);
         }
         else if(main_brick != nullptr)
         {
-            main_brick->plugTheBrick(brick, Info.Plugged_Bricks_OnIt[i].Plugin_Index, Info.Plugged_Bricks_OnIt[i].Offset_Rotation);
+            //main_brick->plugTheBrick(brick, Info.Plugged_Bricks_OnIt[i].Plugin_Index, Info.Plugged_Bricks_OnIt[i].Offset_Rotation);
         }
 
 
-        buildFromConstructionInfo(Info.Plugged_Bricks_OnIt[i], BuildLocation, GameInstance, brick);
+        //buildFromConstructionInfo(Info.Plugged_Bricks_OnIt[i], BuildLocation, GameInstance, brick);
 
     }
 }

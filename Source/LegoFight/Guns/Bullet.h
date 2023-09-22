@@ -29,10 +29,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
     void addFireImpulse(FVector Direction, float Strenght);
 
-    // FUNCTIONS
-    UFUNCTION()
-    void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+private:
 
-	
+    // FUNCTIONS
+
+	UFUNCTION()
+		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	
 };
