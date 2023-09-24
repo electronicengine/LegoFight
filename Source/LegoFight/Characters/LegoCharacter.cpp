@@ -212,7 +212,7 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
     PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ALegoCharacter::fire);
     PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ALegoCharacter::aimStart);
-    PlayerInputComponent->BindAction("Aim", IE_Released, this, &ALegoCharacter::aimEnd);
+    //PlayerInputComponent->BindAction("Aim", IE_Released, this, &ALegoCharacter::aimEnd);
 
     PlayerInputComponent->BindAction("Inventory", IE_Pressed, this, &ALegoCharacter::openInventoryWidget);
     PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ALegoCharacter::equip);
@@ -222,9 +222,9 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
     PlayerInputComponent->BindAction("Save", IE_Pressed, this, &ALegoCharacter::save);
     PlayerInputComponent->BindAction("Load", IE_Pressed, this, &ALegoCharacter::load);
 
-
-
 }
+
+
 
 void ALegoCharacter::OnDelegateOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
@@ -265,6 +265,7 @@ void ALegoCharacter::OnGhostOverLap(UPrimitiveComponent *OverlappedComp, AActor 
     {
         Ghost_Overlapped_Brick = overlapped_brick;
     }
+
 }
 
 
@@ -273,7 +274,6 @@ void ALegoCharacter::moveForward(float Value)
     if((Controller) && Value != 0.0f)
     {
         const FVector direction = FRotationMatrix(FRotator(0, Controller->GetControlRotation().Yaw, 0)).GetUnitAxis(EAxis::X);
-
 
         AddMovementInput(direction, Value);
     }
@@ -330,10 +330,15 @@ void ALegoCharacter::fire()
 
 void ALegoCharacter::aimStart()
 {
+    if (Aiming_) {
+        aimEnd();
+    }
+    else {
+        Camera->SetActive(false);
+        Aim_Camera->SetActive(true);
+        Aiming_ = true;
 
-    Camera->SetActive(false);
-    Aim_Camera->SetActive(true);
-    Aiming_ = true;
+    }
 
 }
 
@@ -453,6 +458,7 @@ void ALegoCharacter::dropObject(ABrick *Object)
         const FDetachmentTransformRules &attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
                                                                EDetachmentRule::KeepWorld,
                                                                EDetachmentRule::KeepWorld, true);
+
         Object->DetachFromActor(attachment_rules);
         Object->enablePhysics(true);
         Object->setCollisionProfile("BlockAll");
@@ -464,8 +470,6 @@ void ALegoCharacter::dropObject(ABrick *Object)
     }
 
     Keeping_Bricks = false;
-
-
 
 }
 

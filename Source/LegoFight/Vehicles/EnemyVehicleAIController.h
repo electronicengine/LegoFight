@@ -40,7 +40,6 @@ private:
 
     void setupPerception();
 
-    AEnemyLegoVehicle *Owner_Pawn;
     FVector Enemy_Location;
     ALegoCarChasis *TargetVehicle;
 
@@ -48,6 +47,7 @@ private:
 //    std::vector<std::function<int()>()>Task_Sequence_Attack;
     int Current_Task_Index;
     int Enemy_Found;
+    APawn* OwnerChar;
 
 
 
@@ -66,7 +66,10 @@ public:
     int attackToUser();
     int goRandomLocation();
     int turnArround();
+    bool IsPointReached(const FVector& Point, const TArray<FVector>& ReachedPoints);
+    bool moveTo(const FVector& Target);
 
+    TQueue<FVector> PathPointQueue;
 
     UFUNCTION()
     void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);

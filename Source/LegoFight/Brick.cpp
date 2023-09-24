@@ -7,6 +7,7 @@
 #include "Vehicles/LegoCarChasis.h"
 #include "LegoFightGameInstance.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Containers/UnrealString.h"
 
 #include "Materials/MaterialInstanceDynamic.h"
 
@@ -187,23 +188,15 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
     GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Red, FString("Extend: ") + BoxExtent.ToString());
     GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Green, FString("Radius: ") + FString::SanitizeFloat(SphereRadius));
 
-    if (Options.Name.Find("weapon") > 0) {
+    if (Options.Name.Find(WEAPON_APPENDIX) > 0) {
 
         Height_Offset = 20;
 
-    }else if (Options.Name == FString(VERSION_STRINGIFY(CarBodyWork2x1))) {
-        GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Cyan, FString(VERSION_STRINGIFY(CarBodyWork2x1)));
+    }else if (Options.Name.Find(SIDED_APPENDIX) > 0) {
 
-        pivot_loc_x = 25;
-        pivot_loc_y = -25;
-        pivot_loc_z = 30.7f;
-        pivot_width = 7;
-        pivot_height = 7;
-
-        offset = 20;
         setupPluginPoints(FVector(25, -25, 30.7f), 3, 3);
         setupSidePlugPoints(FVector(50.1f, 55, -13.85f), 3, 9);
-        Height_Offset = offset;
+        Height_Offset = 20;
     }
     else {
 

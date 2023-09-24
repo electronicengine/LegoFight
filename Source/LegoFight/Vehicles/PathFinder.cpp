@@ -5,6 +5,8 @@
 #include "EnemyLegoVehicle.h"
 #include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AIController.h"
+#include "EnemyVehicleAIController.h"
 
 // Sets default values
 APathFinder::APathFinder()
@@ -12,13 +14,29 @@ APathFinder::APathFinder()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = false;
 
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshContainer(TEXT("SkeletalMesh'/Game/vehicles/skeleton/lego_car1.lego_car1'"));
+	if (MeshContainer.Succeeded())
+	{
+		
+		GetMesh()->SetSkeletalMesh(MeshContainer.Object);
+	}
+
+	GetMesh()->SetWorldScale3D(FVector(0.1f, 0.1f, 0.1f));
+	GetMesh()->SetCollisionProfileName("NoCollision");
+	GetCapsuleComponent()->SetCollisionProfileName("IgnoreOnlyPawn");
+
+	// Set the Auto Possess AI property
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AIControllerClass = AEnemyVehicleAIController::StaticClass();
+	
+
 }
 
 // Called when the game starts or when spawned
 void APathFinder::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame

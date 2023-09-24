@@ -16,7 +16,6 @@ class LEGOFIGHT_API APathFinder : public ACharacter
 
 
     AEnemyLegoVehicle *Own_Vehicle;
-
 public:
 	// Sets default values for this character's properties
 	APathFinder();

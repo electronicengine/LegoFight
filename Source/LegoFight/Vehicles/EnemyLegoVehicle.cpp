@@ -24,6 +24,9 @@ AEnemyLegoVehicle::AEnemyLegoVehicle()
 
     Overlap_Box->OnComponentBeginOverlap.AddDynamic(this, &AEnemyLegoVehicle::OnDelegateOverlap);
 
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+    AIControllerClass = AEnemyVehicleAIController::StaticClass();
+
 }
 
 
@@ -34,8 +37,8 @@ void AEnemyLegoVehicle::BeginPlay()
 
     FVector spawn_loc = GetActorLocation() + FVector(150, 0, 0);
 
-    Path_Finder = GetWorld()->SpawnActor<APathFinder>(Path_Finder_Container, spawn_loc, FRotator(0,0,0));
-
+    //Path_Finder = GetWorld()->SpawnActor<APathFinder>(APathFinder::StaticClass(), spawn_loc, FRotator(0, 0, 0));
+    
     
 }
 
@@ -45,7 +48,7 @@ void AEnemyLegoVehicle::Tick(float DeltaTime)
 {
 
     Super::Tick(DeltaTime);
-    followThePathFinder();
+    //followThePathFinder();
 
 }
 
@@ -53,14 +56,14 @@ void AEnemyLegoVehicle::Tick(float DeltaTime)
 
 void AEnemyLegoVehicle::moveLocation(const FVector &Location)
 {
+    followThePathFinder(Location);
+    //AAIController *path_finder_controller = Cast<AAIController>(Path_Finder->GetController());
 
-    AAIController *path_finder_controller = Cast<AAIController>(Path_Finder->GetController());
-
-    if(path_finder_controller != nullptr)
-    {
-        fire();
-        path_finder_controller->MoveToLocation(Location);
-    }
+    //if(path_finder_controller != nullptr)
+    //{
+    //    fire();
+    //    path_finder_controller->MoveToLocation(Location);
+    //}
 
 }
 
@@ -80,22 +83,22 @@ void AEnemyLegoVehicle::OnDelegateOverlap(UPrimitiveComponent *OverlappedComp, A
 
 
 
-void AEnemyLegoVehicle::followThePathFinder()
+void AEnemyLegoVehicle::followThePathFinder(const FVector& Location)
 {
 
     static FRotator error_rot;
     static FVector error_dest;
-    static float stop_distance = 0;
+    static float stop_distance = 100;
 
-    if(Path_Finder != nullptr)
-        Destination_Location = Path_Finder->GetActorLocation();
-
+    Destination_Location = Location;
     GetVehicleMovement()->SetHandbrakeInput(false);
 
-    DrawDebugLine(GetWorld(), GetActorLocation(), Destination_Location, FColor::Cyan);
+    DrawDebugLine(GetWorld(), GetActorLocation(), Destination_Location, FColor::Red);
 
     error_rot = (UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Destination_Location) - GetActorRotation());
     error_dest = Destination_Location - GetActorLocation();
+
+
 
     if((error_rot.Yaw < -95))
     {
@@ -109,7 +112,7 @@ void AEnemyLegoVehicle::followThePathFinder()
         moveRight(-1.0f);
 
     }
-    else if((error_rot.Yaw <= 10.0f && error_rot.Yaw >= -10.0f))
+    else if((error_rot.Yaw <= 30.0f && error_rot.Yaw >= -30.0f))
     {
         moveForward(1.0f);
 
@@ -128,6 +131,8 @@ void AEnemyLegoVehicle::followThePathFinder()
 
     if(error_dest.Size() <= stop_distance)
     {
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::SanitizeFloat(stop_distance));
+
         if(Crash_Target)
         {
             moveForward(1);
@@ -142,10 +147,10 @@ void AEnemyLegoVehicle::followThePathFinder()
     }
     else
     {
-        stop_distance = (GetVehicleMovement()->GetEngineRotationSpeed()) / 3.3;
+        //stop_distance = (GetVehicleMovement()->GetEngineRotationSpeed()) / 3.3;
     }
 
-    if(error_dest.Size() <= 500 || error_dest.Size() <= 500)
+    if(error_dest.Size() <= 100)
     {
 
         if(Crash_Target)
@@ -161,7 +166,5 @@ void AEnemyLegoVehicle::followThePathFinder()
 
     }
 
-    if(Path_Finder != nullptr)
-        Path_Finder->updateOwnerLocation(GetActorLocation());
 
 }

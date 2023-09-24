@@ -33,7 +33,7 @@ class LEGOFIGHT_API AEnemyLegoVehicle : public ALegoCarChasis
     UPROPERTY(EditAnywhere)
     UBoxComponent *Overlap_Box;
 
-    void followThePathFinder();
+    void followThePathFinder(const FVector& Location);
 
 public:
     AEnemyLegoVehicle();

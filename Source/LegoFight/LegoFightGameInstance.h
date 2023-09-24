@@ -18,6 +18,8 @@
 #define MELEE_WEAPON_APPENDIX   "melee"
 #define VEHICLE_APPENDIX        "vehicle"
 #define ENEMY_APPENDIX          "enemy"
+#define SIDED_APPENDIX          "sided"
+
 
 
 
