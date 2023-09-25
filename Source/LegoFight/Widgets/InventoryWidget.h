@@ -17,6 +17,21 @@
 
 class ULegoFightGameInstance;
 enum BrickColor;
+static std::map<FString, FLinearColor> Colors = {
+
+    {"Black", FLinearColor(0.005f, 0.005f, 0.005f)},
+    {"Gray", FLinearColor(0.1f, 0.1f, 0.1f)},
+    {"White", FLinearColor(0.7, 0.7, 0.7)},
+    {"Yellow", FLinearColor(0.8125, 0.740577, 0.0)},
+    {"Orange", FLinearColor(1.0, 0.309655, 0.0)},
+    {"Brown", FLinearColor(0.3125, 0.062512, 0.0)},
+    {"Red",FLinearColor(0.765625, 0.0, 0.005185)},
+    {"Purple", FLinearColor(0.5, 0.0, 0.30656)},
+    {"Blue", FLinearColor(0.0, 0.002649, 0.619792)},
+    {"Cyan", FLinearColor(0.0, 0.445146, 0.604167)},
+    {"Green",FLinearColor(0.039721, 0.401042, 0.0)},
+
+};
 
 enum BrickMenuCategory {
     General,
@@ -70,7 +85,6 @@ class LEGOFIGHT_API UInventoryWidget : public UUserWidget
   
     BrickMenuCategory Current_Category;
 
-    std::map<FString, FLinearColor> Colors;
 
     void removeWidget();
     void checkCategory();

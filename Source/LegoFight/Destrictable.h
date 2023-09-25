@@ -34,6 +34,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void setColor(FVector ColorVec);
-	void setMesh(ItemType Type);
+	void setMesh(FString Name);
 
 };

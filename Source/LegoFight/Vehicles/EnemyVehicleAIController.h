@@ -27,10 +27,10 @@ private:
     float AISightRadius = 16000.0f;
 
     UPROPERTY(EditAnywhere, Category = AI)
-    float AISightAge = 5.0f;
+    float AISightAge = 20.0f;
 
     UPROPERTY(EditAnywhere, Category = AI)
-    float AILoseSightRadius = 140.0f;
+    float AILoseSightRadius = 300.0f;
 
     UPROPERTY(EditAnywhere, Category = AI)
     float AIFieldOfView = 180.0f;

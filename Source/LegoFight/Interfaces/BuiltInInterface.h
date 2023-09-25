@@ -14,10 +14,11 @@ struct ConstructionInfo
 {
     int Plugin_Index;
     FRotator Offset_Rotation;
-    int Type_;
-    int Sub_Type;
-    class ABrick *Brick_;
-    std::vector<struct ConstructionInfo> Plugged_Bricks_OnIt;
+    FVector Offset_Location;
+    FString Item_Name;
+    FLinearColor Item_Color;
+    class AActor *Item;
+    std::vector<struct ConstructionInfo> Plugged_Items;
 };
 
 

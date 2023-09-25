@@ -7,6 +7,7 @@
 #include <vector>
 #include "Engine/Engine.h"
 #include "UObject/Object.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 
 // Add default functionality here for any IPlugInterface functions that are not pure virtual.
@@ -101,14 +102,17 @@ float IPlugInterface::calculateDistance(const FVector &Vector1, const FVector &V
 
 
 bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMaterial *Possible_Material, UMaterial *ImPossible_Material,
-                             ABrick *Interactable_Brick, const FHitResult &OutHit, const FRotator &OffetRotation,ABrick *OverlappedBrick)
+                             ABrick *Interactable_Brick, const FHitResult &OutHit, const FRotator &OffetRotation, const FVector& OffetLocation, ABrick *OverlappedBrick)
 {
 
     FVector plugin = getPlugin(OutHit.ImpactPoint);
     FRotator plugin_rotation = getPluginRotation();
 
+    plugin += OffetLocation;
+
+
     Ghost_Brick->SetStaticMesh(Interactable_Brick->getBrickMesh());
-    Ghost_Brick->SetWorldScale3D(FVector(0.9f, 0.9f, 0.9f));
+    Ghost_Brick->SetWorldScale3D(FVector(0.85f, 0.85f, 0.85f));
 
 
     if(plugin != FVector(0,0,0))
@@ -123,7 +127,6 @@ bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMateria
         Ghost_Brick->AddLocalRotation(OffetRotation);
 
         Ghost_Brick->AddLocalOffset(FVector(0, 0, (Interactable_Brick->Height_Offset) * -1));
-
 
         if(Ghost_Brick->IsOverlappingActor(OverlappedBrick))
         {
@@ -193,7 +196,7 @@ int IPlugInterface::getClosestPluginIndex(const std::vector<float> &Array)
 }
 
 
-void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation)
+void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation, const FVector &OffsetLocation)
 {
 
     FVector plug_location;
@@ -208,14 +211,15 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
         plug_location = Plugin_Points[PluginIndex]->GetComponentLocation();
         plug_rotation = Plugin_Points[PluginIndex]->GetComponentRotation();
         
+        plug_location += OffsetLocation;
 
-        if(Object->Type_ == CarSeat2x2)
-        {
-            if(Owner_Car != nullptr)
-                Owner_Car->addSeatToCar(Cast<ACarSeat>(Object));
-            else if(Cast<ALegoCarChasis>(this))
-                Cast<ALegoCarChasis>(this)->addSeatToCar(Cast<ACarSeat>(Object));
-        }
+        //if(Object->Type_ == CarSeat2x2)
+        //{
+        //    if(Owner_Car != nullptr)
+        //        Owner_Car->addSeatToCar(Cast<ACarSeat>(Object));
+        //    else if(Cast<ALegoCarChasis>(this))
+        //        Cast<ALegoCarChasis>(this)->addSeatToCar(Cast<ACarSeat>(Object));
+        //}
 
 
         if(Cast<AWeapon>(Object))
@@ -253,9 +257,10 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
                                                                EAttachmentRule::KeepWorld,
                                                                EAttachmentRule::KeepWorld, true));
 
-        Plugged_Bricks_OnIt.push_back(Object);
+        Plugged_Items_OnIt.push_back(Object);
         Object->Own_Plugin_Index = PluginIndex;
         Object->Offset_Rotation = OffsetRotation;
+        Object->Offset_Location = OffsetLocation;
 
     }
 }
@@ -271,14 +276,9 @@ void IPlugInterface::autoPlugin(AActor *BelowBrick)
         FVector plugin = below_brick->getPlugin(Cast<ABrick>(this)->GetActorLocation());
         FRotator plugin_rotation = Cast<ABrick>(this)->GetActorRotation();
 
-
-        if(Cast<ABrick>(this)->Sub_Type == Semi)
-            plugin += FVector(0,0, -19.0f);
-
-
     //    SetActorLocationAndRotation(plugin, plugin_rotation);
 
-        below_brick->plugTheBrick(Cast<ABrick>(this), -1, plugin_rotation);
+        below_brick->plugTheBrick(Cast<ABrick>(this), -1, plugin_rotation, FVector(0, 0, 0));
     }
     else if(Cast<ALegoCarChasis>(BelowBrick))
     {
@@ -287,13 +287,9 @@ void IPlugInterface::autoPlugin(AActor *BelowBrick)
         FRotator plugin_rotation = Cast<ABrick>(this)->GetActorRotation();
 
 
-        if(Cast<ABrick>(this)->Sub_Type == Semi)
-            plugin += FVector(0,0, -19.0f);
-
-
     //    SetActorLocationAndRotation(plugin, plugin_rotation);
 
-        below_vehicle->plugTheBrick(Cast<ABrick>(this), -1, plugin_rotation);
+        below_vehicle->plugTheBrick(Cast<ABrick>(this), -1, plugin_rotation, FVector(0,0,0));
     }
 }
 
@@ -307,12 +303,33 @@ FRotator IPlugInterface::getPluginRotation()
         return FRotator(0,0,0);
 }
 
+bool IPlugInterface::checkPluginPointAvailable(FVector& Point)
+{
+
+
+
+    for (int i = 0; i < Plugin_Points.Num(); i++) {
+
+        int abs = (Point - Plugin_Points[i]->GetComponentLocation()).Size();
+        if ( abs == 0) {
+
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Blue,
+                FString::FromInt((Point - Plugin_Points[i]->GetComponentLocation()).Size()));
+
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 
 void IPlugInterface::releaseAll()
 {
-    for(int i=0; i<Plugged_Bricks_OnIt.size(); i++)
-        Plugged_Bricks_OnIt[i]->releaseAll();
+    for(int i=0; i< Plugged_Items_OnIt.size(); i++)
+        Plugged_Items_OnIt[i]->releaseAll();
 
     Cast<ABrick>(this)->enablePhysics(true);
 

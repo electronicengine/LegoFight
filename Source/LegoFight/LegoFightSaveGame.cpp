@@ -21,14 +21,16 @@ TSharedPtr<FJsonObject> ULegoFightSaveGame::convertConstructionInfoToJson(const 
 
     json->SetNumberField("Plugin_Index", Info.Plugin_Index);
     json->SetStringField("Offset_Rotation", Info.Offset_Rotation.ToString());
-    json->SetNumberField("Type", Info.Type_);
-    json->SetNumberField("Sub_Type", Info.Sub_Type);
+    json->SetStringField("Offset_Location", Info.Offset_Location.ToString());
 
-    for(int i=0; i<Info.Plugged_Bricks_OnIt.size(); i++)
+    json->SetStringField("Item_Name", Info.Item_Name);
+    json->SetStringField("Item_Color", Info.Item_Color.ToString());
+
+    for(int i=0; i<Info.Plugged_Items.size(); i++)
     {
 
         TSharedPtr<FJsonObject> brick_info = MakeShareable(new FJsonObject);
-        brick_info = convertConstructionInfoToJson(Info.Plugged_Bricks_OnIt[i]);
+        brick_info = convertConstructionInfoToJson(Info.Plugged_Items[i]);
 
         plugged_bricks_onit.Push(MakeShareable(new FJsonValueObject(brick_info)));
 
@@ -63,9 +65,9 @@ ConstructionInfo ULegoFightSaveGame::convertJsonToConstructionInfo(const TShared
 
     main_brick_info.Plugin_Index = Json->GetIntegerField("Plugin_Index");
     main_brick_info.Offset_Rotation.InitFromString(Json->GetStringField("Offset_Rotation"));
-    main_brick_info.Type_ = Json->GetIntegerField("Type");
-    main_brick_info.Sub_Type = Json->GetIntegerField("Sub_Type");
-
+    main_brick_info.Offset_Location.InitFromString(Json->GetStringField("Offset_Location"));
+    main_brick_info.Item_Name = Json->GetStringField("Item_Name");
+    main_brick_info.Item_Color.InitFromString(Json->GetStringField("Item_Color"));
 
 
     for(int i=0; i<plugged_bricks_onit.Num(); i++)
@@ -74,7 +76,7 @@ ConstructionInfo ULegoFightSaveGame::convertJsonToConstructionInfo(const TShared
 
         brick_info = convertJsonToConstructionInfo(plugged_bricks_onit[i]->AsObject());
 
-        main_brick_info.Plugged_Bricks_OnIt.push_back(brick_info);
+        main_brick_info.Plugged_Items.push_back(brick_info);
     }
 
 

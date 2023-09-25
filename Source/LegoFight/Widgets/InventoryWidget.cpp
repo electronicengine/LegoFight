@@ -27,18 +27,6 @@ bool UInventoryWidget::Initialize()
     Super::Initialize();
    // Button_1x1Triangle->OnClicked.AddDynamic(this, &UInventoryWidget::Button_1x1TriangleClicked);
 
-    Colors["Black"] = FLinearColor(0.005f, 0.005f, 0.005f);
-    Colors["Gray"] = FLinearColor(0.1f, 0.1f, 0.1f);
-    Colors["White"] = FLinearColor(0.7, 0.7, 0.7);
-    Colors["Yellow"] = FLinearColor(0.8125, 0.740577, 0.0);
-    Colors["Orange"] = FLinearColor(1.0, 0.309655, 0.0);
-    Colors["Brown"] = FLinearColor(0.3125, 0.062512, 0.0);
-    Colors["Red"] = FLinearColor(0.765625, 0.0, 0.005185);
-    Colors["Purple"] = FLinearColor(0.5, 0.0, 0.30656);
-    Colors["Blue"] = FLinearColor(0.0, 0.002649, 0.619792);
-    Colors["Cyan"] = FLinearColor(0.0, 0.445146, 0.604167);
-    Colors["Green"] = FLinearColor(0.039721, 0.401042, 0.0);
-
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::General, Button_General_Category));
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Vehicle, Button_Vehicle_Category));
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Weapon, Button_Weapon_Category));
@@ -125,6 +113,7 @@ bool UInventoryWidget::Initialize()
         box->AddChild(btn);
         WeaponBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
     }
+
 
     TArray<UObject*> color_assets;
     EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/colors/"), color_assets, EngineUtils::ATL_Regular);

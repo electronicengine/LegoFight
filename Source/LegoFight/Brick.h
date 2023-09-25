@@ -99,7 +99,6 @@ class LEGOFIGHT_API ABrick : public AActor, public IBuiltInInterface, public IPl
 {
     GENERATED_BODY()
 
-        FVector Brick_Color;
 
 public:
     // Sets default values for this actor's properties
@@ -149,8 +148,8 @@ public:
     void setMaterialColor(FLinearColor Color);
     void setBrickTypeOptions(ItemOptions& Options);
 
-    ItemType Type_;
-    BrickSubType Sub_Type;
+    FString Brick_Name;
+    FVector Brick_Color;
 
 
     std::vector<float> Distance_Array;

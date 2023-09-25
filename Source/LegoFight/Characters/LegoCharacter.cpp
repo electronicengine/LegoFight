@@ -65,7 +65,7 @@ void ALegoCharacter::setupMesh()
     //static ConstructorHelpers::FClassFinder<ADestrictable>
     //         bullet(TEXT("Class'/Script/LegoFight.Bullet_C'"));
     Bullet_Container = ABullet::StaticClass();
-
+    Offset_Step = 0;
 }
 
 
@@ -109,6 +109,7 @@ ALegoCharacter::ALegoCharacter()
     OffSet_Rotation.Roll = 0;
     OffSet_Rotation.Yaw = 0;
     OffSet_Rotation.Pitch = 0;
+    OffSet_Location = FVector(0, 0, 0);
 
 }
 
@@ -141,7 +142,6 @@ void ALegoCharacter::Tick(float DeltaTime)
 
         FCollisionQueryParams CollisionParams;
 
-
         Tick_Count++;
         GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
 
@@ -152,11 +152,17 @@ void ALegoCharacter::Tick(float DeltaTime)
             if(Grabbable_Brick != nullptr)
             {
                 ABrick *target_brick = Cast<ABrick>(OutHit.Actor);
+
+                if (Target_Brick != target_brick) {
+                    OffSet_Location = FVector(0, 0, 0);
+                    OffSet_Rotation = FRotator(0, 0, 0);
+                }
+                
                 Target_Brick = target_brick;
                 Target_Car = nullptr;
 
                 Brick_Plugable = target_brick->highLightPlugin(Ghost_Component, Ghost_Possible_Material, Ghost_Imposible_Material,
-                                              Grabbable_Brick, OutHit, OffSet_Rotation, Ghost_Overlapped_Brick);
+                                              Grabbable_Brick, OutHit, OffSet_Rotation, OffSet_Location, Ghost_Overlapped_Brick);
             }
             else if(Grabbable_Brick == nullptr)
             {
@@ -172,7 +178,7 @@ void ALegoCharacter::Tick(float DeltaTime)
             if(Grabbable_Brick != nullptr)
             {
                 Brick_Plugable = Target_Car->highLightPlugin(Ghost_Component, Ghost_Possible_Material, Ghost_Imposible_Material,
-                                              Grabbable_Brick, OutHit, OffSet_Rotation,  Ghost_Overlapped_Brick);
+                                              Grabbable_Brick, OutHit, OffSet_Rotation, OffSet_Location, Ghost_Overlapped_Brick);
             }
 
         }
@@ -216,6 +222,8 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
     PlayerInputComponent->BindAction("Inventory", IE_Pressed, this, &ALegoCharacter::openInventoryWidget);
     PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ALegoCharacter::equip);
+    PlayerInputComponent->BindAction("OffSetItem", IE_Pressed, this, &ALegoCharacter::offSetItem);
+
     PlayerInputComponent->BindAction("Plug", IE_Pressed, this, &ALegoCharacter::plugObject);
     PlayerInputComponent->BindAction("TurnObject", IE_Pressed, this, &ALegoCharacter::turnObject);
     PlayerInputComponent->BindAction("Buy", IE_Pressed, this, &ALegoCharacter::buyBrick);
@@ -401,6 +409,41 @@ void ALegoCharacter::equip()
 
 }
 
+void ALegoCharacter::offSetItem()
+{
+
+
+    int offset = 0;
+
+    if (Ghost_Component) {
+        Offset_Step += 1;
+
+        if(Pivot_Width != 0)
+            offset = Offset_Step % Pivot_Width;
+        else 
+            offset = 0;
+        
+
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, FString::FromInt(Pivot_Width));
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::FromInt(Offset_Step));
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::FromInt(offset));
+
+
+        if (Ghost_Component->IsVisible()) {
+            OffSet_Location += OffSet_Rotation.RotateVector(FVector(0, -1 * 25, 0));
+
+        }
+
+
+        if (offset == 0) {
+            OffSet_Location = FVector(0, 0, 0);
+            Offset_Step = 0;
+        }
+
+
+    }
+}
+
 
 
 void ALegoCharacter::interact()
@@ -419,10 +462,13 @@ void ALegoCharacter::interact()
 
 void ALegoCharacter::turnObject()
 {
-    if(OffSet_Rotation.Yaw == 360)
-        OffSet_Rotation.Yaw = 0;
+    if (OffSet_Location == FVector(0, 0, 0)) {
+        if (OffSet_Rotation.Yaw == 360)
+            OffSet_Rotation.Yaw = 0;
 
-    OffSet_Rotation.Yaw += 90;
+        OffSet_Rotation.Yaw += 90;
+    }
+
 }
 
 
@@ -444,6 +490,14 @@ void ALegoCharacter::grapObject(ABrick *Object)
                                                                          EAttachmentRule::KeepWorld, true), TEXT("grab_socket"));
         Ghost_Component->SetStaticMesh(Object->getBrickMesh());
         Keeping_Bricks = true;
+
+        FVector Origin;
+        FVector BoxExtent;
+        float SphereRadius;
+
+        UKismetSystemLibrary::GetComponentBounds(Ghost_Component, Origin, BoxExtent, SphereRadius);
+        Pivot_Width = (BoxExtent.Y / 12.5);
+
 
     }
 }
@@ -485,11 +539,11 @@ void ALegoCharacter::plugObject()
             if(Target_Brick != nullptr)
             {
 
-                Target_Brick->plugTheBrick(Grabbable_Brick, -1, OffSet_Rotation);
+                Target_Brick->plugTheBrick(Grabbable_Brick, -1, OffSet_Rotation, OffSet_Location);
             }
             else if(Target_Car != nullptr)
             {
-                Target_Car->plugTheBrick(Grabbable_Brick, -1, OffSet_Rotation);
+                Target_Car->plugTheBrick(Grabbable_Brick, -1, OffSet_Rotation, OffSet_Location);
             }
 
             Grabbable_Brick = nullptr;
@@ -586,12 +640,12 @@ void ALegoCharacter::save()
 
     ULegoFightSaveGame *save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
 
-    AEnemyLegoVehicle *enemy = Cast<AEnemyLegoVehicle>(Target_Car);
+    ALegoCarChasis *vehicle = Cast<ALegoCarChasis>(Target_Car);
 
 
-    if(enemy)
+    if(vehicle)
     {
-        ConstructionInfo info = enemy->compileConstructInfo(enemy);
+        ConstructionInfo info = vehicle->compileConstructInfo(vehicle);
 
         TSharedPtr<FJsonObject> json = save_game->convertConstructionInfoToJson(info);
 

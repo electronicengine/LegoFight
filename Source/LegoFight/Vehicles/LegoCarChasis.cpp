@@ -42,7 +42,7 @@ ALegoCarChasis::ALegoCarChasis()
     setupMaterials();
     setupWheels();
     //setupPluginPoints(FVector(258.8, -122.7, 37.7f), 11, 23);
-    setupPluginPoints(FVector(100.5f, -25.0f, 27.7f), 3, 9);
+    setupPluginPoints(FVector(85.0f, -12.5f, 30.7f), 3, 9);
     Weapon_Camera_Used = false;
     Current_Plugin_Index = 0;
     Car_Seat = nullptr;

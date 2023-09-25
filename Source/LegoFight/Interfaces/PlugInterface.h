@@ -41,7 +41,7 @@ public:
 
         TArray<USceneComponent *> Plugin_Points;
 
-        std::vector<ABrick *> Plugged_Bricks_OnIt;
+        std::vector<ABrick *> Plugged_Items_OnIt;
 
         bool plugged;
         int Current_Plugin_Index;
@@ -52,7 +52,7 @@ public:
         uint8 Plugin_Number;
         ALegoCarChasis *Owner_Car;
         FRotator Offset_Rotation;
-
+        FVector Offset_Location;
 
         virtual USceneComponent *CreatePluginPoint(FString Name) = 0;
         void setupPluginPoints(const FVector &Begining_Pivot, int PluginNumberWidth, int PluginNumberHeight);
@@ -61,12 +61,13 @@ public:
         float calculateDistance(const FVector &Vector1, const FVector &Vector2);
         int getClosestPluginIndex(const std::vector<float> &Array);
         FVector getPlugin(const FVector &ImpactPoint);
-        void plugTheBrick(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation);
+        void plugTheBrick(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation, const FVector& OffsetLocation);
 
 
         bool highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMaterial *Possible_Material, UMaterial *ImPossible_Material,
-                                     ABrick *Interactable_Brick, const FHitResult &OutHit, const FRotator &OffetRotation,ABrick *OverlappedBrick);
+                                     ABrick *Interactable_Brick, const FHitResult &OutHit, const FRotator &OffetRotation, const FVector& OffetLocation,  ABrick *OverlappedBrick);
         FRotator getPluginRotation();
+        bool checkPluginPointAvailable(FVector &Point);
         void autoPlugin(AActor *TargetBrick);
 
         void releaseAll();

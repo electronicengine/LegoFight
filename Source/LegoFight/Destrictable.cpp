@@ -3,6 +3,7 @@
 
 #include "Destrictable.h"
 #include "Brick.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 // Sets default values
 ADestrictable::ADestrictable()
@@ -30,18 +31,18 @@ ADestrictable::ADestrictable()
 
 
     //enter mesh Paths
-    Mesh_Paths[ItemType::High2x2] = "/Game/bricks/destructables/High2x2";
-    Mesh_Paths[ItemType::Low2x2] = "/Game/bricks/destructables/Low2x2";
-    Mesh_Paths[ItemType::Triangle2x2] = "/Game/bricks/destructables/Triangle2x2";
-    Mesh_Paths[ItemType::Trapezoid2x2] = "/Game/bricks/destructables/Trapezoid2x2";
-    Mesh_Paths[ItemType::High4x2] = "/Game/bricks/destructables/High4x2";
-    Mesh_Paths[ItemType::Low4x2] = "/Game/bricks/destructables/Low4x2";
-    Mesh_Paths[ItemType::High4x4] = "/Game/bricks/destructables/High4x4";
-    Mesh_Paths[ItemType::Low4x4] = "/Game/bricks/destructables/Low4x4";
-    Mesh_Paths[ItemType::High6x2] = "/Game/bricks/destructables/High6x2";
-    Mesh_Paths[ItemType::Low6x2] = "/Game/bricks/destructables/Low6x2";
-    Mesh_Paths[ItemType::High6x4] = "/Game/bricks/destructables/High6x4";
-    Mesh_Paths[ItemType::Low6x4] = "/Game/bricks/destructables/Low6x4";   
+    //Mesh_Paths[ItemType::High2x2] = "/Game/bricks/destructables/High2x2";
+    //Mesh_Paths[ItemType::Low2x2] = "/Game/bricks/destructables/Low2x2";
+    //Mesh_Paths[ItemType::Triangle2x2] = "/Game/bricks/destructables/Triangle2x2";
+    //Mesh_Paths[ItemType::Trapezoid2x2] = "/Game/bricks/destructables/Trapezoid2x2";
+    //Mesh_Paths[ItemType::High4x2] = "/Game/bricks/destructables/High4x2";
+    //Mesh_Paths[ItemType::Low4x2] = "/Game/bricks/destructables/Low4x2";
+    //Mesh_Paths[ItemType::High4x4] = "/Game/bricks/destructables/High4x4";
+    //Mesh_Paths[ItemType::Low4x4] = "/Game/bricks/destructables/Low4x4";
+    //Mesh_Paths[ItemType::High6x2] = "/Game/bricks/destructables/High6x2";
+    //Mesh_Paths[ItemType::Low6x2] = "/Game/bricks/destructables/Low6x2";
+    //Mesh_Paths[ItemType::High6x4] = "/Game/bricks/destructables/High6x4";
+    //Mesh_Paths[ItemType::Low6x4] = "/Game/bricks/destructables/Low6x4";   
 
 }
 
@@ -69,14 +70,13 @@ void ADestrictable::setColor(FVector ColorVec)
 
 }
 
-void ADestrictable::setMesh(ItemType Type)
+void ADestrictable::setMesh(FString Name)
 {
     TArray<UObject*> MeshAssets;
-    GEngine->AddOnScreenDebugMessage(-1, -5, FColor::Orange, FString(Mesh_Paths[(int)Type].c_str()));
-
-    EngineUtils::FindOrLoadAssetsByPath(FString(Mesh_Paths[(int)Type].c_str()), MeshAssets, EngineUtils::ATL_Regular);
-    GEngine->AddOnScreenDebugMessage(-1, -5, FColor::Orange, FString::FromInt((int)Type));
-
+    FString meshes_path = "/Game/bricks/destructables/";
+    meshes_path += Name;
+    
+    EngineUtils::FindOrLoadAssetsByPath(meshes_path, MeshAssets, EngineUtils::ATL_Regular);
     int i = 0;
     for (auto asset : MeshAssets)
     {
@@ -88,4 +88,5 @@ void ADestrictable::setMesh(ItemType Type)
         Pieces[i++]->SetMaterial(0, Material);
     }
 }
+
 

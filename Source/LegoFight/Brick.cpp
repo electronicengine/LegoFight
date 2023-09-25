@@ -19,7 +19,6 @@ ABrick::ABrick()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = false;
     Destructible_Container = ADestrictable::StaticClass();
-    Type_ = High2x2;
 
     Brick = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Brick"));
     SetRootComponent(Brick);
@@ -98,12 +97,14 @@ void ABrick::Tick(float DeltaTime)
 
 void ABrick::enablePhysics(bool Value)
 {
-    Brick->SetSimulatePhysics(Value);
+    if(Brick)
+        Brick->SetSimulatePhysics(Value);
 }
 
 void ABrick::setCollisionProfile(FString Profile)
 {
-    Brick->SetCollisionProfileName(FName(Profile));
+    if (Brick)
+        Brick->SetCollisionProfileName(FName(Profile));
 
 }
 
@@ -138,17 +139,19 @@ void ABrick::breakBrick()
     FVector spawn_location = Brick->GetComponentLocation();
     FRotator spawn_rotation = Brick->GetComponentRotation();
 
-    dest_ptr = GetWorld()->SpawnActor<ADestrictable>(Destructible_Container, spawn_location, spawn_rotation);
-    dest_ptr->setMesh(Type_);
+    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, Brick_Name);
+
+    dest_ptr = GetWorld()->SpawnActor<ADestrictable>(ADestrictable::StaticClass(), spawn_location, spawn_rotation);
+    dest_ptr->setMesh(Brick_Name);
     dest_ptr->setColor(Brick_Color);
 
 //    const FDetachmentTransformRules &detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
 //                                                           EDetachmentRule::KeepWorld,
 //                                                           EDetachmentRule::KeepWorld, true);
-    for(int i=0; i<Plugged_Bricks_OnIt.size(); i++)
+    for(int i=0; i<Plugged_Items_OnIt.size(); i++)
     {
-        if(Plugged_Bricks_OnIt[i] != nullptr)
-            Plugged_Bricks_OnIt[i]->releaseAll();
+        if(Plugged_Items_OnIt[i] != nullptr)
+            Plugged_Items_OnIt[i]->releaseAll();
     }
 
 
@@ -184,9 +187,10 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
     UKismetSystemLibrary::GetComponentBounds(Brick, Origin, BoxExtent, SphereRadius);
 
-    GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Cyan, FString("Origin: ") + Origin.ToString());
-    GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Red, FString("Extend: ") + BoxExtent.ToString());
-    GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Green, FString("Radius: ") + FString::SanitizeFloat(SphereRadius));
+
+    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, Origin.ToString());
+    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, BoxExtent.ToString());
+
 
     if (Options.Name.Find(WEAPON_APPENDIX) > 0) {
 
@@ -200,12 +204,12 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
     }
     else {
 
-        pivot_loc_x = Origin.X + BoxExtent.X;
-        pivot_loc_y = (Origin.Y + BoxExtent.Y) * -1;
-        pivot_loc_z = Origin.Z + BoxExtent.Z + 15;
+        pivot_loc_x = 0;
+        pivot_loc_y = 0;
+        pivot_loc_z = 30.7f;
         pivot_width = (BoxExtent.Y / 12.5) + 1;
         pivot_height = (BoxExtent.X / 12.5) + 1;
-        offset = 2 * (int)(17 - BoxExtent.Z) + 2;
+        offset = 2 * (int)(17 - BoxExtent.Z);
 
         setupPluginPoints(FVector(pivot_loc_x, pivot_loc_y, pivot_loc_z), pivot_width, pivot_height);
         Height_Offset = offset;
@@ -228,7 +232,7 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
     Brick->CreateDynamicMaterialInstance(0);
     Brick->SetVectorParameterValueOnMaterials(FName("BaseColor"), FVector(Options.Color));
     Brick_Color = FVector(Options.Color);
-
+    Brick_Name = Options.Name;
     Brick->OnComponentHit.AddDynamic(this, &ABrick::OnHit);
 
 }

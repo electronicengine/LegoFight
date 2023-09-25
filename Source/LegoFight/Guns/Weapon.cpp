@@ -14,7 +14,6 @@ AWeapon::AWeapon()
     Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     Camera->SetupAttachment(Brick);
 
-    Sub_Type = Semi;
     Healt_ = 900000;
 
 

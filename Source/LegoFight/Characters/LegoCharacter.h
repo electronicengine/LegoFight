@@ -64,7 +64,9 @@ class LEGOFIGHT_API ALegoCharacter : public ACharacter
     int Tick_Count;
 
     FRotator OffSet_Rotation;
-
+    FVector OffSet_Location;
+    int Offset_Step;
+    int Pivot_Width;
     void setupMesh();
 
 public:
@@ -110,6 +112,8 @@ public:
     void aimStart();
     void aimEnd();
     void equip();
+    void offSetItem();
+
     void interact();
     void turnObject();
 

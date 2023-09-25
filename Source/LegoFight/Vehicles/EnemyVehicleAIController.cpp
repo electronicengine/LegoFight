@@ -25,7 +25,7 @@ AEnemyVehicleAIController::AEnemyVehicleAIController()
     Enemy_Found = false;
     Current_Task_Index = 0;
 
-
+    
 }
 
 
@@ -44,6 +44,7 @@ void AEnemyVehicleAIController::setupPerception()
     SightConfig->DetectionByAffiliation.bDetectEnemies = true;
     SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
     SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+
 
     GetPerceptionComponent()->SetDominantSense(*SightConfig->GetSenseImplementation());
     GetPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &AEnemyVehicleAIController::OnPerceptionUpdated);
@@ -236,8 +237,8 @@ void AEnemyVehicleAIController::OnPerceptionUpdated(const TArray<AActor*>& Updat
                 Enemy_Found = true;
                 Enemy_Location = TargetVehicle->GetActorLocation();
 
-                if(TargetVehicle->carHasPassenger())
-                    attackToUser();
+                /*if(TargetVehicle->carHasPassenger())
+                    attackToUser();*/
                 
             }
 

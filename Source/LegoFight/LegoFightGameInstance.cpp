@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/Button.h"
+#include "Vehicles/EnemyVehicleAIController.h"
 
 ULegoFightGameInstance::ULegoFightGameInstance()
 {
@@ -88,7 +89,7 @@ UUserWidget *ULegoFightGameInstance::loadInvantoryPanel()
 
         Invantory_Panel->SetVisibility(ESlateVisibility::Visible);
 
-        //controller->SetInputMode(FInputModeUIOnly());
+        controller->SetInputMode(FInputModeUIOnly());
     }
     else {
 
@@ -100,6 +101,8 @@ UUserWidget *ULegoFightGameInstance::loadInvantoryPanel()
         }
         else {
             Invantory_Panel->SetVisibility(ESlateVisibility::Visible);
+            controller->SetInputMode(FInputModeUIOnly());
+
             controller->bShowMouseCursor = true;
         }
 
@@ -161,8 +164,10 @@ ALegoCarChasis *ULegoFightGameInstance::spawnVehicle(const FString& Name, const 
 {
     ALegoCarChasis *vehicle;
 
-    if (Name.Find(ENEMY_APPENDIX)) {
+    if (Name.Find(ENEMY_APPENDIX) >= 0) {
+
         vehicle = GetWorld()->SpawnActor<AEnemyLegoVehicle>(AEnemyLegoVehicle::StaticClass(), SpawnLocation + FVector(0, 0, 100.0f), SpawnRotation);
+
 
     }
     else {
