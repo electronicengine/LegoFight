@@ -237,8 +237,8 @@ void AEnemyVehicleAIController::OnPerceptionUpdated(const TArray<AActor*>& Updat
                 Enemy_Found = true;
                 Enemy_Location = TargetVehicle->GetActorLocation();
 
-                /*if(TargetVehicle->carHasPassenger())
-                    attackToUser();*/
+                if(TargetVehicle->carHasPassenger())
+                    attackToUser();
                 
             }
 

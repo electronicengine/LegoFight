@@ -108,9 +108,6 @@ bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMateria
     FVector plugin = getPlugin(OutHit.ImpactPoint);
     FRotator plugin_rotation = getPluginRotation();
 
-    plugin += OffetLocation;
-
-
     Ghost_Brick->SetStaticMesh(Interactable_Brick->getBrickMesh());
     Ghost_Brick->SetWorldScale3D(FVector(0.85f, 0.85f, 0.85f));
 
@@ -127,6 +124,8 @@ bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMateria
         Ghost_Brick->AddLocalRotation(OffetRotation);
 
         Ghost_Brick->AddLocalOffset(FVector(0, 0, (Interactable_Brick->Height_Offset) * -1));
+        Ghost_Brick->AddLocalOffset(OffetLocation);
+
 
         if(Ghost_Brick->IsOverlappingActor(OverlappedBrick))
         {
@@ -211,8 +210,6 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
         plug_location = Plugin_Points[PluginIndex]->GetComponentLocation();
         plug_rotation = Plugin_Points[PluginIndex]->GetComponentRotation();
         
-        plug_location += OffsetLocation;
-
         //if(Object->Type_ == CarSeat2x2)
         //{
         //    if(Owner_Car != nullptr)
@@ -246,6 +243,7 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
                                             false, 0, ETeleportType::None);
 
         Object->AddActorLocalRotation(OffsetRotation);
+        Object->AddActorLocalOffset(OffsetLocation);
 
         Object->AddActorLocalOffset(FVector(0, 0, (Object->Height_Offset) * -1));
 
@@ -328,14 +326,19 @@ bool IPlugInterface::checkPluginPointAvailable(FVector& Point)
 
 void IPlugInterface::releaseAll()
 {
-    for(int i=0; i< Plugged_Items_OnIt.size(); i++)
-        Plugged_Items_OnIt[i]->releaseAll();
+    if (this) {
+        for (int i = 0; i < Plugged_Items_OnIt.size(); i++) {
+            if (Plugged_Items_OnIt[i])
+                Plugged_Items_OnIt[i]->releaseAll();
+        }
 
-    Cast<ABrick>(this)->enablePhysics(true);
+        Cast<ABrick>(this)->enablePhysics(true);
 
-    const FDetachmentTransformRules &detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
-                                                           EDetachmentRule::KeepWorld,
-                                                           EDetachmentRule::KeepWorld, true);
-    Cast<AActor>(this)->DetachFromActor(detachment_rules);
+        const FDetachmentTransformRules& detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+            EDetachmentRule::KeepWorld,
+            EDetachmentRule::KeepWorld, true);
+        Cast<AActor>(this)->DetachFromActor(detachment_rules);
+    }
 }
+
 

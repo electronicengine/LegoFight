@@ -15,7 +15,7 @@ ADestrictable::ADestrictable()
 	Default_Root = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultRoot"));
 	SetRootComponent(Default_Root);
     static ConstructorHelpers::FObjectFinder<UMaterial>
-        material_asset(TEXT("Material'/Game/bricks/materials/brick_material.brick_material'"));
+        material_asset(TEXT("Material'/Game/vehicles/materials/root_material.root_material'"));
     Material = material_asset.Object;
 
     for (int i = 0; i < 100; i++) {

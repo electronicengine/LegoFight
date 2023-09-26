@@ -52,7 +52,7 @@ ALegoCarChasis::ALegoCarChasis()
     Plugin_Number_Width = 3;
     Plugin_Number_Height = 9;
     Plugin_Number = Plugin_Number_Width * Plugin_Number_Height;
-
+    Healt = 40;
 }
 
 
@@ -327,6 +327,40 @@ void ALegoCarChasis::addSeatToCar(ACarSeat *Seat)
 
     if(Seat != nullptr)
         Car_Seat = Seat;
+}
+
+void ALegoCarChasis::addDamage(int Value)
+{
+        Healt -= Value;
+
+        if (Healt <= 0)
+            breakBrick();
+    
+}
+
+void ALegoCarChasis::breakBrick()
+{
+    ADestrictable* dest_ptr;
+    FVector spawn_location = GetMesh()->GetComponentLocation();
+    FRotator spawn_rotation = GetMesh()->GetComponentRotation();
+
+    //GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, Brick_Name);
+
+    dest_ptr = GetWorld()->SpawnActor<ADestrictable>(ADestrictable::StaticClass(), spawn_location, spawn_rotation);
+    dest_ptr->setMesh("lego_car1");
+    //dest_ptr->setColor(Brick_Color);
+
+    //    const FDetachmentTransformRules &detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+    //                                                           EDetachmentRule::KeepWorld,
+    //                                                           EDetachmentRule::KeepWorld, true);
+
+    for (int i = 0; i < Plugged_Items_OnIt.size(); i++)
+    {
+        if (Plugged_Items_OnIt[i] != nullptr)
+            Plugged_Items_OnIt[i]->releaseAll();
+    }
+
+    Destroy();
 }
 
 

@@ -17,57 +17,61 @@
 
 ConstructionInfo IBuiltInInterface::compileConstructInfo(AActor *Object)
 {
+    ConstructionInfo build_info;
 
-    ALegoCarChasis* vehicle = Cast<ALegoCarChasis>(Object);
+    if (Object) {
+        ALegoCarChasis* vehicle = Cast<ALegoCarChasis>(Object);
 
-   ConstructionInfo build_info;
 
-    if(vehicle)
-    {
-
-        if (Cast<AEnemyLegoVehicle>(vehicle)) {
-            build_info.Item_Name = "enemy_vehicle";
-        }
-        else {
-            build_info.Item_Name = "vehicle";
-        }
-        build_info.Item_Color = Colors["White"];
-        build_info.Plugin_Index = 0;
-        build_info.Offset_Rotation = vehicle->Offset_Rotation;
-        build_info.Offset_Location = vehicle->Offset_Location;
-
-        for(int i=0; i< vehicle->Plugged_Items_OnIt.size(); i++)
-        {
-            ConstructionInfo brick_info;
-            brick_info = compileConstructInfo(vehicle->Plugged_Items_OnIt[i]);
-
-            build_info.Plugged_Items.push_back(brick_info);
-        }
-
-    }else
-    {
-        ABrick *brick = Cast<ABrick>(Object);
-        if(brick)
+        if (vehicle)
         {
 
-            build_info.Item_Name = brick->Brick_Name;
-            build_info.Item_Color = brick->Brick_Color;
+            if (Cast<AEnemyLegoVehicle>(vehicle)) {
+                build_info.Item_Name = "enemy_vehicle";
+            }
+            else {
+                build_info.Item_Name = "vehicle";
+            }
+            build_info.Item_Color = Colors["White"];
+            build_info.Plugin_Index = 0;
+            build_info.Offset_Rotation = vehicle->Offset_Rotation;
+            build_info.Offset_Location = vehicle->Offset_Location;
 
-            build_info.Plugin_Index = brick->Own_Plugin_Index;
-            build_info.Offset_Rotation = brick->Offset_Rotation;
-            build_info.Offset_Location = brick->Offset_Location;
-
-            for(int i=0; i<brick->Plugged_Items_OnIt.size(); i++)
+            for (int i = 0; i < vehicle->Plugged_Items_OnIt.size(); i++)
             {
                 ConstructionInfo brick_info;
-                brick_info = compileConstructInfo(brick->Plugged_Items_OnIt[i]);
+                brick_info = compileConstructInfo(vehicle->Plugged_Items_OnIt[i]);
 
                 build_info.Plugged_Items.push_back(brick_info);
             }
 
         }
+        else
+        {
+            ABrick* brick = Cast<ABrick>(Object);
+            if (brick)
+            {
 
+                build_info.Item_Name = brick->Brick_Name;
+                build_info.Item_Color = brick->Brick_Color;
+
+                build_info.Plugin_Index = brick->Own_Plugin_Index;
+                build_info.Offset_Rotation = brick->Offset_Rotation;
+                build_info.Offset_Location = brick->Offset_Location;
+
+                for (int i = 0; i < brick->Plugged_Items_OnIt.size(); i++)
+                {
+                    ConstructionInfo brick_info;
+                    brick_info = compileConstructInfo(brick->Plugged_Items_OnIt[i]);
+
+                    build_info.Plugged_Items.push_back(brick_info);
+                }
+
+            }
+
+        }
     }
+   
 
     return build_info;
 }

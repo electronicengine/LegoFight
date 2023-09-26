@@ -7,6 +7,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/UObjectGlobals.h"
+#include "../Vehicles/LegoCarChasis.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -47,12 +48,16 @@ void ABullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 {
 
     ABrick* brick = Cast<ABrick>(OtherActor);
+    ALegoCarChasis * vehicle = Cast<ALegoCarChasis>(OtherActor);
 
-    if(brick != nullptr )
+    if(brick) 
     {
-        brick->addDamage(10);
+        brick->addDamage(1);
 //        Destroy();
 
+    }
+    else if (vehicle) {
+        vehicle->addDamage(1);
     }
 
 }

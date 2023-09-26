@@ -38,5 +38,8 @@ public:
     void useWeapon();
 	
     void fire();
+
+    virtual void Tick(float DeltaTime) override;
+
 	
 };

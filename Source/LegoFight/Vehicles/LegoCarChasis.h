@@ -47,7 +47,7 @@ class LEGOFIGHT_API ALegoCarChasis : public AWheeledVehicle, public IBuiltInInte
 
     bool Weapon_Camera_Used;
     int Current_Camera_Index;
-
+    int Healt;
     void setupWheels();
     void setupMaterials();
 
@@ -79,7 +79,8 @@ public:
 
     void addWeaponToInventory(AWeapon *Weapon);
     void addSeatToCar(ACarSeat *Seat);
-
+    void addDamage(int Value);
+    void breakBrick();
 
 
     UPROPERTY(EditAnywhere, Category="Team")

@@ -133,13 +133,12 @@ void ABrick::addDamage(int Value)
 
 void ABrick::breakBrick()
 {
-    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("breakBrick"));
 
     ADestrictable *dest_ptr;
     FVector spawn_location = Brick->GetComponentLocation();
     FRotator spawn_rotation = Brick->GetComponentRotation();
 
-    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, Brick_Name);
+    //GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, Brick_Name);
 
     dest_ptr = GetWorld()->SpawnActor<ADestrictable>(ADestrictable::StaticClass(), spawn_location, spawn_rotation);
     dest_ptr->setMesh(Brick_Name);
@@ -187,20 +186,22 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
     UKismetSystemLibrary::GetComponentBounds(Brick, Origin, BoxExtent, SphereRadius);
 
-
-    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, Origin.ToString());
     GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, BoxExtent.ToString());
 
-
-    if (Options.Name.Find(WEAPON_APPENDIX) > 0) {
+    if (Options.Name.Find(WEAPON_APPENDIX) >= 0) {
 
         Height_Offset = 20;
 
-    }else if (Options.Name.Find(SIDED_APPENDIX) > 0) {
+    }else if (Options.Name.Find(SIDED_APPENDIX) >= 0) {
 
         setupPluginPoints(FVector(25, -25, 30.7f), 3, 3);
-        setupSidePlugPoints(FVector(50.1f, 55, -13.85f), 3, 9);
+        setupSidePlugPoints(FVector(50.1f, 44, -6.0f), 3, 9);
         Height_Offset = 20;
+    }
+    else if (Options.Name == "CarFender4x2") {
+        Height_Offset = 20;
+        setupPluginPoints(FVector(0, 0, 29.0f), 3, 3);
+
     }
     else {
 
@@ -209,10 +210,12 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
         pivot_loc_z = 30.7f;
         pivot_width = (BoxExtent.Y / 12.5) + 1;
         pivot_height = (BoxExtent.X / 12.5) + 1;
-        offset = 2 * (int)(17 - BoxExtent.Z);
+        offset = 2 * (int)(18 - BoxExtent.Z);
 
         setupPluginPoints(FVector(pivot_loc_x, pivot_loc_y, pivot_loc_z), pivot_width, pivot_height);
         Height_Offset = offset;
+        
+
 
     }
 
@@ -251,8 +254,6 @@ void ABrick::setLegoCarOwner(ALegoCarChasis *Car)
 
 void ABrick::OnHit(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
 {
-
-    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("First_Hit"));
 
     if(First_Hit != false)
     {

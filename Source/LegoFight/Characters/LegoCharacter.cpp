@@ -430,7 +430,7 @@ void ALegoCharacter::offSetItem()
 
 
         if (Ghost_Component->IsVisible()) {
-            OffSet_Location += OffSet_Rotation.RotateVector(FVector(0, -1 * 25, 0));
+            OffSet_Location -= FVector(0, 25, 0);
 
         }
 
@@ -496,7 +496,13 @@ void ALegoCharacter::grapObject(ABrick *Object)
         float SphereRadius;
 
         UKismetSystemLibrary::GetComponentBounds(Ghost_Component, Origin, BoxExtent, SphereRadius);
-        Pivot_Width = (BoxExtent.Y / 12.5);
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, BoxExtent.ToString());
+
+        if(BoxExtent.Y >= BoxExtent.X)
+            Pivot_Width = (BoxExtent.Y / 12.5);
+        else
+            Pivot_Width = (BoxExtent.X / 12.5);
+
 
 
     }
@@ -620,16 +626,18 @@ void ALegoCharacter::openInventoryWidget()
 void ALegoCharacter::buyBrick()
 {
 
+    if (Grabbable_Brick == nullptr) {
+        ULegoFightGameInstance* game_instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
+        Grabbable_Brick = Cast<ABrick>(game_instance->spawnItem(FVector(0, 0, 0), FRotator(0, 0, 0)));
 
-    ULegoFightGameInstance *game_instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
-    Grabbable_Brick = Cast<ABrick>(game_instance->spawnItem(FVector(0,0,0), FRotator(0,0,0)));
-  
-    if(Grabbable_Brick != nullptr)
-    {
+        if (Grabbable_Brick != nullptr)
+        {
 
-        grapObject(Grabbable_Brick);
-        Brick_Just_Plug = false;
+            grapObject(Grabbable_Brick);
+            Brick_Just_Plug = false;
+        }
     }
+
 
 }
 

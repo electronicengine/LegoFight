@@ -52,12 +52,12 @@ void ULegoFightGameInstance::initializeItemOptions()
         
     for (auto mesh : General_Brick_Meshes)
     {
-        Item_Options[mesh.first] = { mesh.first, Selected_Color, General_Brick_Meshes[mesh.first], Default_Brick_Material };
+        Item_Options[mesh.first] = { mesh.first, Selected_Color, General_Brick_Meshes[mesh.first], Default_Brick_Material,10 };
     }
 
     for (auto mesh : Weapon_Meshes)
     {
-        Item_Options[mesh.first] = { mesh.first, Selected_Color, Weapon_Meshes[mesh.first], Default_Brick_Material };
+        Item_Options[mesh.first] = { mesh.first, Selected_Color, Weapon_Meshes[mesh.first], Default_Brick_Material, 100 };
     }
 
    

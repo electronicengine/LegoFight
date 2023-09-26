@@ -19,6 +19,9 @@
 #define VEHICLE_APPENDIX        "vehicle"
 #define ENEMY_APPENDIX          "enemy"
 #define SIDED_APPENDIX          "sided"
+#define LOW_APPENDIX            "Low"
+#define HIGH_APPENDIX           "High"
+
 
 
 

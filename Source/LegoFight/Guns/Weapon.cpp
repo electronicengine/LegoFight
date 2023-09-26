@@ -8,17 +8,38 @@
 
 AWeapon::AWeapon()
 {
-    PrimaryActorTick.bCanEverTick = false;
-
+    PrimaryActorTick.bCanEverTick = true;
 
     Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     Camera->SetupAttachment(Brick);
 
     Healt_ = 900000;
+    
 
 
 }
 
+void AWeapon::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if (Owner_Car) {
+        if (Owner_Car->carHasPassenger()) {
+
+            // Get the player controller
+            APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+            if (PlayerController)
+            {
+                // Get the player's camera rotation
+                FRotator CameraRotation = PlayerController->GetControlRotation();
+
+                // Set the actor's rotation to match the camera rotation
+                SetActorRotation(CameraRotation);
+            }
+        }
+    }
+
+}
 
 
 void AWeapon::useWeapon()
@@ -30,7 +51,6 @@ void AWeapon::useWeapon()
     controller->SetViewTargetWithBlend(this);
 
 //        controller->Possess(Cast<APawn>(this));
-
 
 
 
