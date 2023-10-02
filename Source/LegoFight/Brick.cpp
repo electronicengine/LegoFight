@@ -147,11 +147,13 @@ void ABrick::breakBrick()
 //    const FDetachmentTransformRules &detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
 //                                                           EDetachmentRule::KeepWorld,
 //                                                           EDetachmentRule::KeepWorld, true);
-    for(int i=0; i<Plugged_Items_OnIt.size(); i++)
-    {
-        if(Plugged_Items_OnIt[i] != nullptr)
-            Plugged_Items_OnIt[i]->releaseAll();
-    }
+    
+ 
+    releaseAllItemsOnIt();
+
+    Plugged_Items_OnIt.clear();
+    
+
 
 
     Destroy();

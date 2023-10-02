@@ -101,32 +101,13 @@ int AEnemyVehicleAIController::attackToUser()
 
     //                // Follow the path (you can use this path for steering and throttle control)
 
-
-
-
                    if (NavigationPath->PathPoints.Num() >= 2) {
                        //DrawDebugSphere(GetWorld(), NavigationPath->PathPoints[0], 10, 32, FColor::Green, false, -1, 0, 1);
                        DrawDebugSphere(GetWorld(), NavigationPath->PathPoints[1], 10, 32, FColor::Red, false, -1, 0, 1);
                        moveTo(NavigationPath->PathPoints[1]);
+
                    }
 
-
-
-                    //for (FVector PathPoint : NavigationPath->PathPoints)
-                    //{
-
-
-    //                //    if (FVector(PathPoint - TargetLocation).Size() < 5) {
-
-                    //    }
-                    //    else {
-
-                    //    }
-                    //    GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, 
-                    //        FString::FromInt(NavigationPath->PathPoints.Num()));
-
-                    //   
-                    //}
                 }
             }
         }

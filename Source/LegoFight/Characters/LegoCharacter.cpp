@@ -331,7 +331,7 @@ void ALegoCharacter::fire()
     bullet_ptr = GetWorld()->SpawnActor<ABullet>(Bullet_Container,  spawn_location, spawn_rotation);
 
     if(bullet_ptr != nullptr)
-        bullet_ptr->addFireImpulse(Aim_Camera->GetForwardVector().Rotation().Vector(), 10000);
+        bullet_ptr->addFireImpulse(Aim_Camera->GetForwardVector().Rotation().Vector(), 30000);
 }
 
 
@@ -646,23 +646,11 @@ void ALegoCharacter::buyBrick()
 void ALegoCharacter::save()
 {
 
-    ULegoFightSaveGame *save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
 
     ALegoCarChasis *vehicle = Cast<ALegoCarChasis>(Target_Car);
+    ULegoFightGameInstance* game_instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
+    game_instance->savePanel(vehicle, Aim_Impact_Point);
 
-
-    if(vehicle)
-    {
-        ConstructionInfo info = vehicle->compileConstructInfo(vehicle);
-
-        TSharedPtr<FJsonObject> json = save_game->convertConstructionInfoToJson(info);
-
-        save_game->SaveObject = save_game->serializeJsonObject(json);
-
-        UGameplayStatics::SaveGameToSlot(save_game, FString("myslot"), 0);
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("saved"));
-
-    }
 
 
 }
@@ -672,17 +660,17 @@ void ALegoCharacter::load()
 {
 
 //    construction_info = save_game->Construction_Info;
-    ULegoFightGameInstance *game_instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
+    //ULegoFightGameInstance *game_instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
 
-    ULegoFightSaveGame *save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
-    save_game =  Cast<ULegoFightSaveGame>(UGameplayStatics::LoadGameFromSlot(FString("myslot"), 0));
+    //ULegoFightSaveGame *save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
+    //save_game =  Cast<ULegoFightSaveGame>(UGameplayStatics::LoadGameFromSlot(FString("myslot"), 0));
 
-    TSharedPtr<FJsonObject> de_json = save_game->deserializeJsonObject(save_game->SaveObject);
-    ConstructionInfo de_info = save_game->convertJsonToConstructionInfo(de_json);
+    //TSharedPtr<FJsonObject> de_json = save_game->deserializeJsonObject(save_game->SaveObject);
+    //ConstructionInfo de_info = save_game->convertJsonToConstructionInfo(de_json);
 
-    IBuiltInInterface::buildFromConstructionInfo(de_info, Aim_Impact_Point, game_instance);
+    //IBuiltInInterface::buildFromConstructionInfo(de_info, Aim_Impact_Point, game_instance);
 
-    GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("loaded"));
+    //GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("loaded"));
 
 
 

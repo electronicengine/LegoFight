@@ -293,6 +293,8 @@ void IPlugInterface::autoPlugin(AActor *BelowBrick)
 
 
 
+
+
 FRotator IPlugInterface::getPluginRotation()
 {
     if(Plugin_Points.Num()!= 0)
@@ -324,21 +326,27 @@ bool IPlugInterface::checkPluginPointAvailable(FVector& Point)
 
 
 
-void IPlugInterface::releaseAll()
+void IPlugInterface::releaseAllItemsOnIt()
 {
-    if (this) {
-        for (int i = 0; i < Plugged_Items_OnIt.size(); i++) {
-            if (Plugged_Items_OnIt[i])
-                Plugged_Items_OnIt[i]->releaseAll();
-        }
 
-        Cast<ABrick>(this)->enablePhysics(true);
+    std::list<ABrick *>::iterator i;
+    for(i=Plugged_Items_OnIt.begin(); i!=Plugged_Items_OnIt.end(); i++){
+        (*i)->releaseAllItemsOnIt();
+    }
+
+    Plugged_Items_OnIt.clear();
+
+    ABrick *brick = Cast<ABrick>(this);
+    if (brick) {
+        brick->enablePhysics(true);
 
         const FDetachmentTransformRules& detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
             EDetachmentRule::KeepWorld,
             EDetachmentRule::KeepWorld, true);
-        Cast<AActor>(this)->DetachFromActor(detachment_rules);
+        Cast<AActor>(brick)->DetachFromActor(detachment_rules);
     }
+
+
 }
 
 

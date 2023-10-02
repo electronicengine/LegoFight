@@ -29,8 +29,6 @@ AEnemyLegoVehicle::AEnemyLegoVehicle()
     AIControllerClass = AEnemyVehicleAIController::StaticClass();
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-
-
 }
 
 
@@ -63,5 +61,29 @@ void AEnemyLegoVehicle::OnDelegateOverlap(UPrimitiveComponent *OverlappedComp, A
         if(user_car->Team_Id == 1)
             GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("crashed user"));
     }
+}
+
+
+void AEnemyLegoVehicle::fireToEnemy(FRotator &ToEnemyRot)
+{
+
+
+    static int weapon_index;
+
+    if (Weapons.Num() != 0)
+    {
+
+        if (Current_Camera_Index == 0)
+            weapon_index = 0;
+        else
+            weapon_index = Current_Camera_Index - 1;
+
+
+        if (Weapons[weapon_index] != nullptr) {
+            Weapons[weapon_index]->aimToRotation(ToEnemyRot);
+            Weapons[weapon_index]->fire();
+        }
+    }
+
 }
 

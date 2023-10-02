@@ -36,24 +36,23 @@ class LEGOFIGHT_API ALegoCarChasis : public AWheeledVehicle, public IBuiltInInte
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UCameraComponent* Camera;
 
-    UPROPERTY(EditAnywhere)
 
-
-    ALegoCharacter *Passenger_;
-
-    ACarSeat *Car_Seat;
-
-    TArray<AWeapon *> Weapons;
-
-    bool Weapon_Camera_Used;
-    int Current_Camera_Index;
-    int Healt;
     void setupWheels();
     void setupMaterials();
 
 protected:
     virtual USceneComponent *CreatePluginPoint(FString Name) override;
 
+    UPROPERTY(EditAnywhere)
+        ALegoCharacter* Passenger_;
+
+    ACarSeat* Car_Seat;
+
+    TArray<AWeapon*> Weapons;
+
+    bool Weapon_Camera_Used;
+    int Current_Camera_Index;
+    int Healt;
 
 public:
 

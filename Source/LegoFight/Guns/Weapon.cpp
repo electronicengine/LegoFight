@@ -41,6 +41,11 @@ void AWeapon::Tick(float DeltaTime)
 
 }
 
+void AWeapon::aimToRotation(FRotator& Rot)
+{
+    SetActorRotation(Rot);
+}
+
 
 void AWeapon::useWeapon()
 {

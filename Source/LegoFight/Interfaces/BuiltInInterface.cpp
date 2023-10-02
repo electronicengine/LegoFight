@@ -37,10 +37,11 @@ ConstructionInfo IBuiltInInterface::compileConstructInfo(AActor *Object)
             build_info.Offset_Rotation = vehicle->Offset_Rotation;
             build_info.Offset_Location = vehicle->Offset_Location;
 
-            for (int i = 0; i < vehicle->Plugged_Items_OnIt.size(); i++)
+
+            for (ABrick* var : vehicle->Plugged_Items_OnIt)
             {
                 ConstructionInfo brick_info;
-                brick_info = compileConstructInfo(vehicle->Plugged_Items_OnIt[i]);
+                brick_info = compileConstructInfo(var);
 
                 build_info.Plugged_Items.push_back(brick_info);
             }
@@ -59,10 +60,11 @@ ConstructionInfo IBuiltInInterface::compileConstructInfo(AActor *Object)
                 build_info.Offset_Rotation = brick->Offset_Rotation;
                 build_info.Offset_Location = brick->Offset_Location;
 
-                for (int i = 0; i < brick->Plugged_Items_OnIt.size(); i++)
+
+                for (ABrick * var : brick->Plugged_Items_OnIt)
                 {
                     ConstructionInfo brick_info;
-                    brick_info = compileConstructInfo(brick->Plugged_Items_OnIt[i]);
+                    brick_info = compileConstructInfo(var);
 
                     build_info.Plugged_Items.push_back(brick_info);
                 }

@@ -11,6 +11,7 @@
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include <vector>
 #include <map>
+#include <list>
 #include "PlugInterface.generated.h"
 
 #define BRICK_LENGHT        50
@@ -41,7 +42,7 @@ public:
 
         TArray<USceneComponent *> Plugin_Points;
 
-        std::vector<ABrick *> Plugged_Items_OnIt;
+        std::list<ABrick *> Plugged_Items_OnIt;
 
         bool plugged;
         int Current_Plugin_Index;
@@ -69,7 +70,6 @@ public:
         FRotator getPluginRotation();
         bool checkPluginPointAvailable(FVector &Point);
         void autoPlugin(AActor *TargetBrick);
-
-        void releaseAll();
+        void releaseAllItemsOnIt();
 
 };

@@ -39,6 +39,8 @@ public:
 	
     void fire();
 
+    void aimToRotation(FRotator &Rotation);
+
     virtual void Tick(float DeltaTime) override;
 
 	

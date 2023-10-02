@@ -7,6 +7,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/Button.h"
 #include "Vehicles/EnemyVehicleAIController.h"
+#include "Widgets/SaveAndLoadGameWidget.h"
+#include "LegoFightSaveGame.h"
 
 ULegoFightGameInstance::ULegoFightGameInstance()
 {
@@ -64,6 +66,60 @@ void ULegoFightGameInstance::initializeItemOptions()
 }
 
 
+
+UUserWidget* ULegoFightGameInstance::savePanel(ALegoCarChasis* Vehicle, FVector ImpactPoint)
+{
+    APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    ULegoFightSaveGame* save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
+
+    Save_Vehicle = Vehicle;
+    Impact_Point = ImpactPoint;
+
+    if(Save_Vehicle)
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Save_Vehicle ok"));
+
+
+    if (Save_Panel == nullptr)
+    {
+        if (Char_Panel != nullptr)
+        {
+            Char_Panel->RemoveFromParent();
+            Char_Panel = nullptr;
+        }
+
+        Save_Panel = CreateWidget<UUserWidget>(this, Save_Panel_Container);
+
+        Save_Panel->AddToViewport();
+
+
+        controller->bShowMouseCursor = true;
+        controller->bEnableClickEvents = true;
+        controller->bEnableMouseOverEvents = true;
+        controller->bEnableTouchEvents = true;
+
+        Save_Panel->SetVisibility(ESlateVisibility::Visible);
+
+        controller->SetInputMode(FInputModeUIOnly());
+    }
+    else {
+
+        if (Save_Panel->GetVisibility() == ESlateVisibility::Visible)
+        {
+            Save_Panel->SetVisibility(ESlateVisibility::Collapsed);
+            controller->SetInputMode(FInputModeGameOnly());
+            controller->bShowMouseCursor = false;
+        }
+        else {
+            Save_Panel->SetVisibility(ESlateVisibility::Visible);
+            controller->SetInputMode(FInputModeUIOnly());
+
+            controller->bShowMouseCursor = true;
+        }
+
+    }
+
+    return Save_Panel;
+}
 
 UUserWidget *ULegoFightGameInstance::loadInvantoryPanel()
 {
@@ -229,4 +285,55 @@ void ULegoFightGameInstance::selectCurrentProductItem(const FString & ItemName)
 void ULegoFightGameInstance::selectCurrentProductColor(FLinearColor Color)
 {
     Selected_Color = Color;
+}
+
+bool ULegoFightGameInstance::saveGame(FString Name)
+{
+    ULegoFightSaveGame* save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
+
+    if(Save_Vehicle)
+    {
+        ConstructionInfo info = Save_Vehicle->compileConstructInfo(Save_Vehicle);
+
+        TSharedPtr<FJsonObject> json = save_game->convertConstructionInfoToJson(info);
+
+        save_game->SaveObject = save_game->serializeJsonObject(json);
+
+        UGameplayStatics::SaveGameToSlot(save_game, Name, 0);
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("saved"));
+        return true;
+
+    }
+    else {
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Save_Vehicle non"));
+
+        return false;
+    }
+
+}
+
+bool ULegoFightGameInstance::loadGame(FString Name)
+{
+
+    //    construction_info = save_game->Construction_Info;
+    ULegoFightGameInstance* game_instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
+
+    ULegoFightSaveGame* save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
+    save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::LoadGameFromSlot(Name, 0));
+    if (save_game) {
+        TSharedPtr<FJsonObject> de_json = save_game->deserializeJsonObject(save_game->SaveObject);
+        ConstructionInfo de_info = save_game->convertJsonToConstructionInfo(de_json);
+
+        IBuiltInInterface::buildFromConstructionInfo(de_info, Impact_Point, game_instance);
+
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("loaded"));
+    }
+    else {
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, Name);
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, "save game non");
+
+    }
+
+
+    return false;
 }

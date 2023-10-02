@@ -41,6 +41,9 @@ public:
     UFUNCTION()
     void OnDelegateOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 
+    void fireToEnemy(FRotator& ToEnemyRot);
+
+
     FVector Destination_Location;
 
 };

@@ -11,7 +11,8 @@ UCLASS()
 class LEGOFIGHT_API ABullet : public AActor
 {
 	GENERATED_BODY()
-	
+
+		bool First_Hit;
 public:	
 	// Sets default values for this actor's properties
 	ABullet();

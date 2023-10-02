@@ -50,6 +50,10 @@ class LEGOFIGHT_API ULegoFightGameInstance : public UGameInstance
     UPROPERTY(EditAnywhere, Category = "UI")
     TSubclassOf<class UUserWidget> Invantory_Panel_Container;
 
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<class UUserWidget> Save_Panel_Container;
+
+    UUserWidget* Save_Panel;
     UUserWidget* Invantory_Panel;
     UUserWidget* Char_Panel;
 
@@ -75,7 +79,9 @@ public:
 
     void initializeItemOptions();
 
-
+    ALegoCarChasis* Save_Vehicle;
+    FVector Impact_Point;
+    UUserWidget* savePanel(ALegoCarChasis* Vehicle, FVector ImpactPoint);
 
     UUserWidget *loadInvantoryPanel();
     UUserWidget *loadCharacterPanel();
@@ -86,6 +92,8 @@ public:
 
     void selectCurrentProductItem(const FString& ItemName);
     void selectCurrentProductColor(FLinearColor Color);
+    bool saveGame(FString Name);
+    bool loadGame(FString Name);
 
     UTexture2D* texture;
 

@@ -39,7 +39,7 @@ ABullet::ABullet()
     InitialLifeSpan = 10;
 
     Bullet_Mesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
-
+    First_Hit = false;
 }
 
 
@@ -49,15 +49,18 @@ void ABullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 
     ABrick* brick = Cast<ABrick>(OtherActor);
     ALegoCarChasis * vehicle = Cast<ALegoCarChasis>(OtherActor);
+    if (!First_Hit) {
+        if (brick)
+        {
+            brick->addDamage(3);
+            //        Destroy();
+            First_Hit = true;
 
-    if(brick) 
-    {
-        brick->addDamage(1);
-//        Destroy();
-
-    }
-    else if (vehicle) {
-        vehicle->addDamage(1);
+        }
+        else if (vehicle) {
+            vehicle->addDamage(3);
+            First_Hit = true;
+        }
     }
 
 }
