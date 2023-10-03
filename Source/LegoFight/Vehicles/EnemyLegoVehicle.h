@@ -31,7 +31,7 @@ class LEGOFIGHT_API AEnemyLegoVehicle : public ALegoCarChasis
 
 public:
     AEnemyLegoVehicle();
-    bool Crash_Target;
+    bool CrashedTo_Target;
 
     virtual void BeginPlay() override;
 

@@ -40,6 +40,7 @@ public:
     void fire();
 
     void aimToRotation(FRotator &Rotation);
+    void removeOwner();
 
     virtual void Tick(float DeltaTime) override;
 

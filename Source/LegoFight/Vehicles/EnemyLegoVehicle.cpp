@@ -12,7 +12,7 @@
 
 AEnemyLegoVehicle::AEnemyLegoVehicle()
 {
-    Crash_Target = false;
+    CrashedTo_Target = false;
 
     Team_Id = 0;
 
@@ -58,8 +58,9 @@ void AEnemyLegoVehicle::OnDelegateOverlap(UPrimitiveComponent *OverlappedComp, A
 
     if(user_car != nullptr)
     {
-        if(user_car->Team_Id == 1)
-            GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("crashed user"));
+        if (user_car->Team_Id == 1) {
+            CrashedTo_Target = true;
+        }
     }
 }
 
@@ -67,23 +68,25 @@ void AEnemyLegoVehicle::OnDelegateOverlap(UPrimitiveComponent *OverlappedComp, A
 void AEnemyLegoVehicle::fireToEnemy(FRotator &ToEnemyRot)
 {
 
+    static int last = 0; 
+    int now = time(NULL);
 
     static int weapon_index;
 
-    if (Weapons.Num() != 0)
-    {
+    if (now - last >= 1) {
 
-        if (Current_Camera_Index == 0)
-            weapon_index = 0;
-        else
-            weapon_index = Current_Camera_Index - 1;
+        if (Weapons.size() != 0)
+        {
 
+            for(std::pair<int, AWeapon*> weapon : Weapons) {
+                weapon.second->aimToRotation(ToEnemyRot);
+                weapon.second->fire();
 
-        if (Weapons[weapon_index] != nullptr) {
-            Weapons[weapon_index]->aimToRotation(ToEnemyRot);
-            Weapons[weapon_index]->fire();
+            }
         }
-    }
 
+        last = now;
+
+    }
 }
 

@@ -25,7 +25,7 @@ AEnemyVehicleAIController::AEnemyVehicleAIController()
     Enemy_Found = false;
     Current_Task_Index = 0;
 
-    
+    Jobs.push_back(std::bind(&AEnemyVehicleAIController::crashToEnemy, this));
 }
 
 
@@ -75,11 +75,11 @@ void AEnemyVehicleAIController::Tick(float DeltaSeconds)
 
 
 
-int AEnemyVehicleAIController::attackToUser()
+bool AEnemyVehicleAIController::crashToEnemy()
 {
-
     FVector TargetLocation = Enemy_Location;
     FVector CurrentLocation = GetPawn()->GetActorLocation();
+    AEnemyLegoVehicle* vehicle = Cast<AEnemyLegoVehicle>(GetPawn());
 
     DrawDebugLine(GetWorld(), CurrentLocation, TargetLocation, FColor::Cyan, false, -1, 0, 1);
     UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
@@ -99,22 +99,51 @@ int AEnemyVehicleAIController::attackToUser()
                 {
                     TArray<FVector> ReachedPoints;
 
-    //                // Follow the path (you can use this path for steering and throttle control)
+                    //                // Follow the path (you can use this path for steering and throttle control)
 
-                   if (NavigationPath->PathPoints.Num() >= 2) {
-                       //DrawDebugSphere(GetWorld(), NavigationPath->PathPoints[0], 10, 32, FColor::Green, false, -1, 0, 1);
-                       DrawDebugSphere(GetWorld(), NavigationPath->PathPoints[1], 10, 32, FColor::Red, false, -1, 0, 1);
-                       moveTo(NavigationPath->PathPoints[1]);
-
-                   }
+                    if (NavigationPath->PathPoints.Num() >= 2) {
+                        //DrawDebugSphere(GetWorld(), NavigationPath->PathPoints[0], 10, 32, FColor::Green, false, -1, 0, 1);
+                        DrawDebugSphere(GetWorld(), NavigationPath->PathPoints[1], 10, 32, FColor::Red, false, -1, 0, 1);
+                        moveTo(NavigationPath->PathPoints[1]);
+                    }
 
                 }
             }
         }
     }
 
-    return 0;
+    
+         if(vehicle->CrashedTo_Target){
+             vehicle->CrashedTo_Target = false;
+             GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("Crashed"));
 
+             return true;
+         }else{
+             return false;
+         }
+
+
+}
+
+
+int AEnemyVehicleAIController::attackToUser()
+{
+    AEnemyLegoVehicle* Vehicle = Cast<AEnemyLegoVehicle>(GetPawn());
+    FVector TargetLocation = Enemy_Location;
+    FVector CurrentLocation = GetPawn()->GetActorLocation();
+
+    FRotator lookup = UKismetMathLibrary::FindLookAtRotation(CurrentLocation, (TargetLocation - FVector(0, 0, 100.0f)));
+    Vehicle->fireToEnemy(lookup);
+
+    if (Jobs.size() >= 1) {
+        std::list<std::function<bool()>>::iterator i = Jobs.begin();
+
+        bool ret = (*i)();
+
+    }
+
+
+    return 0;
 }
 
 bool AEnemyVehicleAIController::IsPointReached(const FVector& Point, const TArray<FVector>& ReachedPoints)
@@ -134,11 +163,11 @@ bool AEnemyVehicleAIController::moveTo(const FVector& Target)
 
     FRotator error_rot = (UKismetMathLibrary::FindLookAtRotation(Vehicle->GetActorLocation(), Target) - Vehicle->GetActorRotation());
 
-    GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::SanitizeFloat(error_rot.Yaw));
+    //GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::SanitizeFloat(error_rot.Yaw));
 
     if (error_rot.Yaw > 70 || error_rot.Yaw < -70)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("back"));
+        //GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("back"));
         Vehicle->GetVehicleMovementComponent()->SetHandbrakeInput(false);
 
         Vehicle->moveForward(-1.0f);
@@ -146,7 +175,7 @@ bool AEnemyVehicleAIController::moveTo(const FVector& Target)
 
     }
     else {
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString("front"));
+        //GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString("front"));
 
         //// Calculate throttle based on the desired direction (you may need to fine-tune this)
         float ThrottleValue = FVector::DotProduct(GetPawn()->GetActorForwardVector(), DesiredDirection);

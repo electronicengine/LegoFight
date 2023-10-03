@@ -44,7 +44,7 @@ ULegoFightGameInstance::ULegoFightGameInstance()
     Default_Brick_Material = material_asset.Object;
 
     initializeItemOptions();
-
+    initializeDestructables();
 
 
 }
@@ -63,6 +63,36 @@ void ULegoFightGameInstance::initializeItemOptions()
     }
 
    
+}
+
+void ULegoFightGameInstance::initializeDestructables()
+{
+
+    for (std::pair<FString, UStaticMesh*> var : General_Brick_Meshes) {
+        TArray<UObject*> MeshAssets;
+        FString meshes_path = "/Game/bricks/destructables/";
+        meshes_path += var.first;
+
+        EngineUtils::FindOrLoadAssetsByPath(meshes_path, MeshAssets, EngineUtils::ATL_Regular);
+        int i = 0;
+        for (auto asset : MeshAssets)
+        {
+            UStaticMesh* mesh = Cast<UStaticMesh>(asset);
+            Destructables[var.first].Push(mesh);
+        }
+    }
+
+    FString meshes_path = "/Game/bricks/destructables/";
+    meshes_path += "lego_car1";
+    TArray<UObject*> MeshAssets;
+
+    EngineUtils::FindOrLoadAssetsByPath(meshes_path, MeshAssets, EngineUtils::ATL_Regular);
+    int i = 0;
+    for (auto asset : MeshAssets)
+    {
+        UStaticMesh* mesh = Cast<UStaticMesh>(asset);
+        Destructables["lego_car1"].Push(mesh);
+    }
 }
 
 

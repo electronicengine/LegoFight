@@ -46,6 +46,22 @@ void AWeapon::aimToRotation(FRotator& Rot)
     SetActorRotation(Rot);
 }
 
+void AWeapon::removeOwner()
+{
+    if (Owner_Car)
+        Owner_Car->removeWeaponToInventory(Weapon_Index);
+
+    Owner_Car = nullptr;
+
+    
+    Brick->SetSimulatePhysics(true);
+    Brick->SetCollisionProfileName(FName("BlockAll"));
+
+    GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString("BlockAll"));
+
+
+}
+
 
 void AWeapon::useWeapon()
 {

@@ -48,7 +48,8 @@ protected:
 
     ACarSeat* Car_Seat;
 
-    TArray<AWeapon*> Weapons;
+    int Current_Weapon_Index;
+    std::map<int, AWeapon*> Weapons;
 
     bool Weapon_Camera_Used;
     int Current_Camera_Index;
@@ -75,8 +76,10 @@ public:
     void fire();
     void equip();
     void exitCar();
+    void jump();
 
-    void addWeaponToInventory(AWeapon *Weapon);
+    int removeWeaponToInventory(int Index);
+    int addWeaponToInventory(AWeapon *Weapon);
     void addSeatToCar(ACarSeat *Seat);
     void addDamage(int Value);
     void breakBrick();

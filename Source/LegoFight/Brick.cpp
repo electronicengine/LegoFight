@@ -47,7 +47,6 @@ ABrick::ABrick()
 
 
 
-
 }
 
 
@@ -56,6 +55,7 @@ void ABrick::BeginPlay()
 {
 	Super::BeginPlay();
     First_Hit = true;
+
 }
 
 
@@ -148,13 +148,11 @@ void ABrick::breakBrick()
 //                                                           EDetachmentRule::KeepWorld,
 //                                                           EDetachmentRule::KeepWorld, true);
     
- 
+    
+    
     releaseAllItemsOnIt();
 
-    Plugged_Items_OnIt.clear();
     
-
-
 
     Destroy();
 }

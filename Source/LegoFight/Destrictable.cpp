@@ -4,6 +4,7 @@
 #include "Destrictable.h"
 #include "Brick.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "LegoFightGameInstance.h"
 
 // Sets default values
 ADestrictable::ADestrictable()
@@ -28,22 +29,6 @@ ADestrictable::ADestrictable()
         Pieces.Push(one_piece);
 
     }
-
-
-    //enter mesh Paths
-    //Mesh_Paths[ItemType::High2x2] = "/Game/bricks/destructables/High2x2";
-    //Mesh_Paths[ItemType::Low2x2] = "/Game/bricks/destructables/Low2x2";
-    //Mesh_Paths[ItemType::Triangle2x2] = "/Game/bricks/destructables/Triangle2x2";
-    //Mesh_Paths[ItemType::Trapezoid2x2] = "/Game/bricks/destructables/Trapezoid2x2";
-    //Mesh_Paths[ItemType::High4x2] = "/Game/bricks/destructables/High4x2";
-    //Mesh_Paths[ItemType::Low4x2] = "/Game/bricks/destructables/Low4x2";
-    //Mesh_Paths[ItemType::High4x4] = "/Game/bricks/destructables/High4x4";
-    //Mesh_Paths[ItemType::Low4x4] = "/Game/bricks/destructables/Low4x4";
-    //Mesh_Paths[ItemType::High6x2] = "/Game/bricks/destructables/High6x2";
-    //Mesh_Paths[ItemType::Low6x2] = "/Game/bricks/destructables/Low6x2";
-    //Mesh_Paths[ItemType::High6x4] = "/Game/bricks/destructables/High6x4";
-    //Mesh_Paths[ItemType::Low6x4] = "/Game/bricks/destructables/Low6x4";   
-
 }
 
 // Called when the game starts or when spawned
@@ -72,13 +57,11 @@ void ADestrictable::setColor(FVector ColorVec)
 
 void ADestrictable::setMesh(FString Name)
 {
-    TArray<UObject*> MeshAssets;
-    FString meshes_path = "/Game/bricks/destructables/";
-    meshes_path += Name;
-    
-    EngineUtils::FindOrLoadAssetsByPath(meshes_path, MeshAssets, EngineUtils::ATL_Regular);
+    ULegoFightGameInstance *instance = Cast<ULegoFightGameInstance>(GetGameInstance());
+    TArray<UStaticMesh*> assets = instance->Destructables[Name];
+
     int i = 0;
-    for (auto asset : MeshAssets)
+    for (UStaticMesh* asset : assets)
     {
         GEngine->AddOnScreenDebugMessage(-1, -5, FColor::Orange, asset->GetName());
 

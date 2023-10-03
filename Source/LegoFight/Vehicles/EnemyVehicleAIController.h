@@ -49,7 +49,7 @@ private:
     int Enemy_Found;
     APawn* OwnerChar;
 
-
+    std::list<std::function<bool()>> Jobs;
 
 protected:
     virtual void OnPossess(APawn* InPawn) override;
@@ -63,6 +63,7 @@ public:
 
     virtual void Tick(float DeltaSeconds) override;
 
+    bool crashToEnemy();
     int attackToUser();
     int goRandomLocation();
     int turnArround();

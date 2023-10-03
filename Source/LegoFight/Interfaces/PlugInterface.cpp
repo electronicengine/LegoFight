@@ -46,6 +46,9 @@ void IPlugInterface::setupPluginPoints(const FVector &Begining_Pivot, int Plugin
         offset.Y = 0;
     }
 
+    Owner_Car = nullptr;
+    Owner_Item = nullptr;
+    Total_Plug_Item = 0;
 }
 
 
@@ -219,18 +222,18 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
         //}
 
 
-        if(Cast<AWeapon>(Object))
-        {
-            if(Owner_Car != nullptr)
-                Owner_Car->addWeaponToInventory(Cast<AWeapon>(Object));
-            else if(Cast<ALegoCarChasis>(this))
-                Cast<ALegoCarChasis>(this)->addWeaponToInventory(Cast<AWeapon>(Object));
-        }
 
-        if(Owner_Car != nullptr)
+
+        if(Owner_Car)
             Object->Owner_Car = Owner_Car;
         else if(Cast<ALegoCarChasis>(this))
             Object->Owner_Car = Cast<ALegoCarChasis>(this);
+        
+        if (Cast<ABrick>(this))
+            Object->Owner_Item = Cast<ABrick>(this);
+        else
+            Object->Owner_Item = nullptr;
+
 
         const FDetachmentTransformRules &attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
                                                                EDetachmentRule::KeepWorld,
@@ -247,19 +250,39 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
 
         Object->AddActorLocalOffset(FVector(0, 0, (Object->Height_Offset) * -1));
 
+        if (Cast<AWeapon>(Object)) {
+            Object->enablePhysics(false);
+            Object->setCollisionProfile("OverlapAll");
+        }
+        else {
+            Object->enablePhysics(true);
+            Object->setCollisionProfile("BlockAll");
+        }
 
-        Object->enablePhysics(true);
-        Object->setCollisionProfile("BlockAll");
 
         Object->AttachToActor(Cast<AActor>(this), FAttachmentTransformRules(EAttachmentRule::KeepWorld,
                                                                EAttachmentRule::KeepWorld,
                                                                EAttachmentRule::KeepWorld, true));
 
-        Plugged_Items_OnIt.push_back(Object);
+        if (Cast<AWeapon>(Object))
+        {
+            int weapon_index = -1;
+            if (Owner_Car != nullptr) {
+                weapon_index = Owner_Car->addWeaponToInventory(Cast<AWeapon>(Object));
+                Object->Weapon_Index = weapon_index;
+            }
+            else if (Cast<ALegoCarChasis>(this)) {
+                weapon_index = Cast<ALegoCarChasis>(this)->addWeaponToInventory(Cast<AWeapon>(Object));
+                Object->Weapon_Index = weapon_index;
+            }
+        }
+
+        Plugged_Items_OnIt.insert(std::make_pair(Total_Plug_Item, Object));
         Object->Own_Plugin_Index = PluginIndex;
+        Object->Item_Index = Total_Plug_Item;
         Object->Offset_Rotation = OffsetRotation;
         Object->Offset_Location = OffsetLocation;
-
+        Total_Plug_Item++;
     }
 }
 
@@ -329,23 +352,51 @@ bool IPlugInterface::checkPluginPointAvailable(FVector& Point)
 void IPlugInterface::releaseAllItemsOnIt()
 {
 
-    std::list<ABrick *>::iterator i;
-    for(i=Plugged_Items_OnIt.begin(); i!=Plugged_Items_OnIt.end(); i++){
-        (*i)->releaseAllItemsOnIt();
-    }
+    //if (Owner_Item) {
+    //    Owner_Item->notifyOwnerPluginisDestroyed(Item_Index);
+    //    Owner_Item = nullptr;
+    //}
+    //else if (Owner_Car) {
+    //    Owner_Car->notifyOwnerPluginisDestroyed(Item_Index);
+    //    Owner_Car = nullptr;
 
-    Plugged_Items_OnIt.clear();
+    //}
 
     ABrick *brick = Cast<ABrick>(this);
     if (brick) {
-        brick->enablePhysics(true);
+
 
         const FDetachmentTransformRules& detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
             EDetachmentRule::KeepWorld,
             EDetachmentRule::KeepWorld, true);
         Cast<AActor>(brick)->DetachFromActor(detachment_rules);
+
+        brick->enablePhysics(true);
+        brick->setCollisionProfile("BlockAll");
+
+        brick->Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+
     }
 
+    //for (std::pair<int, ABrick*> var : Plugged_Items_OnIt)
+    //{
+    //    if (var.second) {
+    //        var.second->releaseAllItemsOnIt();
+    //        if (Cast<AWeapon>(var.second))
+    //            Cast<AWeapon>(var.second)->removeOwner();
+    //    }
+    //}
+
+}
+
+void IPlugInterface::notifyOwnerPluginisDestroyed(int PluginIndex)
+{
+
+    if (Plugged_Items_OnIt.size() > 0) {
+        std::map<int, ABrick*>::iterator i = Plugged_Items_OnIt.begin();
+
+        Plugged_Items_OnIt.erase(PluginIndex);
+    }
 
 }
 

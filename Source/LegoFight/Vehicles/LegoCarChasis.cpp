@@ -49,6 +49,7 @@ ALegoCarChasis::ALegoCarChasis()
     Current_Camera_Index = 0;
     Team_Id = 1;
 
+    Weapon_Index = 0;
     Plugin_Number_Width = 3;
     Plugin_Number_Height = 9;
     Plugin_Number = Plugin_Number_Width * Plugin_Number_Height;
@@ -206,6 +207,15 @@ void ALegoCarChasis::exitCar()
 
 }
 
+void ALegoCarChasis::jump()
+{
+
+    FVector as = GetMesh()->GetForwardVector();
+    FVector asd = as.UpVector;
+
+    GetMesh()->AddImpulse(asd * 1000000);
+}
+
 
 
 void ALegoCarChasis::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
@@ -218,9 +228,11 @@ void ALegoCarChasis::SetupPlayerInputComponent(UInputComponent *PlayerInputCompo
     PlayerInputComponent->BindAxis("Turn", this, &ALegoCarChasis::turn);
     PlayerInputComponent->BindAxis("LookUp", this, &ALegoCarChasis::lookUp);
 
-    PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ALegoCarChasis::fire);
+    PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALegoCarChasis::jump);
+
     PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ALegoCarChasis::equip);
     PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ALegoCarChasis::interact);
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ALegoCarChasis::fire);
 
 }
 
@@ -258,23 +270,6 @@ void ALegoCarChasis::interact()
 {
 
 
-    if(Current_Camera_Index >= Weapons.Num())
-    {
-        Current_Camera_Index = 0;
-        APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
-        controller->SetViewTargetWithBlend(Cast<AActor>(this));
-        Weapon_Camera_Used = false;
-
-    }
-    else
-    {
-        Weapons[Current_Camera_Index]->useWeapon();
-        Weapon_Camera_Used = true;
-        Current_Camera_Index++;
-
-    }
-
-
 
 }
 
@@ -285,18 +280,11 @@ void ALegoCarChasis::fire()
 
     static int weapon_index;
 
-    if(Weapons.Num() != 0)
+    if(Weapons.size() != 0)
     {
 
-        if(Current_Camera_Index == 0)
-            weapon_index = 0;
-        else
-            weapon_index = Current_Camera_Index - 1;
-
-
-
-        if(Weapons[weapon_index] != nullptr)
-            Weapons[weapon_index]->fire();
+        if(Weapons[Current_Weapon_Index])
+            Weapons[Current_Weapon_Index]->fire();
     }
 
 }
@@ -310,13 +298,25 @@ void ALegoCarChasis::equip()
 
 
 
-void ALegoCarChasis::addWeaponToInventory(AWeapon *Weapon)
+int ALegoCarChasis::removeWeaponToInventory(int Index)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString("removeWeaponToInventory : ") + FString::FromInt(Index));
 
-    //if(Weapon->Type_ == Lego_Fire_Weapon)
-        Weapons.Push(Cast<AWeapon>(Weapon));
-    //else
-    //    Armed_Melee_Weapons.Push(Cast<AMeleeWeapon>(Weapon));
+    if (Weapons.size() > 0) {
+        Weapons.erase(Index);
+    }
+
+    return 0;
+}
+
+int ALegoCarChasis::addWeaponToInventory(AWeapon *Weapon)
+{
+    Current_Weapon_Index++;
+
+    Weapons.insert(std::make_pair(Current_Weapon_Index, Weapon));
+
+    return Current_Weapon_Index;
+
 }
 
 

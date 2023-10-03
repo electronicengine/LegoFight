@@ -39,19 +39,22 @@ class LEGOFIGHT_API IPlugInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-
         TArray<USceneComponent *> Plugin_Points;
 
-        std::list<ABrick *> Plugged_Items_OnIt;
+        std::map<int, ABrick *> Plugged_Items_OnIt;
 
         bool plugged;
         int Current_Plugin_Index;
         float Height_Offset;
         int Own_Plugin_Index;
+        int Item_Index;
+        int Weapon_Index;
+        int Total_Plug_Item;
         uint8 Plugin_Number_Width;
         uint8 Plugin_Number_Height;
         uint8 Plugin_Number;
         ALegoCarChasis *Owner_Car;
+        ABrick* Owner_Item;
         FRotator Offset_Rotation;
         FVector Offset_Location;
 
@@ -71,5 +74,6 @@ public:
         bool checkPluginPointAvailable(FVector &Point);
         void autoPlugin(AActor *TargetBrick);
         void releaseAllItemsOnIt();
+        void notifyOwnerPluginisDestroyed(int PluginIndex);
 
 };

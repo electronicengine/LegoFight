@@ -69,6 +69,7 @@ class LEGOFIGHT_API ULegoFightGameInstance : public UGameInstance
     std::map<FString, UStaticMesh*> Weapon_Meshes;
     std::map<FString, UStaticMesh*> Vehicle_Meshes;
 
+
     std::map<FString, ItemOptions> Item_Options;
 
     UMaterial *Default_Brick_Material;
@@ -78,9 +79,12 @@ public:
     ULegoFightGameInstance();
 
     void initializeItemOptions();
+    void initializeDestructables();
 
     ALegoCarChasis* Save_Vehicle;
     FVector Impact_Point;
+    std::map<FString, TArray<UStaticMesh*>> Destructables;
+
     UUserWidget* savePanel(ALegoCarChasis* Vehicle, FVector ImpactPoint);
 
     UUserWidget *loadInvantoryPanel();

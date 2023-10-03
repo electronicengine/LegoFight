@@ -38,10 +38,10 @@ ConstructionInfo IBuiltInInterface::compileConstructInfo(AActor *Object)
             build_info.Offset_Location = vehicle->Offset_Location;
 
 
-            for (ABrick* var : vehicle->Plugged_Items_OnIt)
+            for (std::pair<int, ABrick*> var : vehicle->Plugged_Items_OnIt)
             {
                 ConstructionInfo brick_info;
-                brick_info = compileConstructInfo(var);
+                brick_info = compileConstructInfo(var.second);
 
                 build_info.Plugged_Items.push_back(brick_info);
             }
@@ -61,10 +61,10 @@ ConstructionInfo IBuiltInInterface::compileConstructInfo(AActor *Object)
                 build_info.Offset_Location = brick->Offset_Location;
 
 
-                for (ABrick * var : brick->Plugged_Items_OnIt)
+                for (std::pair<int, ABrick *> var : brick->Plugged_Items_OnIt)
                 {
                     ConstructionInfo brick_info;
-                    brick_info = compileConstructInfo(var);
+                    brick_info = compileConstructInfo(var.second);
 
                     build_info.Plugged_Items.push_back(brick_info);
                 }
