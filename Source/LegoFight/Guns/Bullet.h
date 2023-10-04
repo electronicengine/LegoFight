@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Particles/ParticleSystem.h"
 #include "Bullet.generated.h"
 
 UCLASS()
@@ -20,6 +21,8 @@ public:
     UPROPERTY(EditAnywhere, Category="BulletMesh")
     UStaticMeshComponent *Bullet_Mesh;
 
+	TSubclassOf<class UParticleSystem> Particle;
+	UParticleSystem* Particle_Effect;
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,7 +32,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
     void addFireImpulse(FVector Direction, float Strenght);
-
+	void spawnparticle();
 private:
 
     // FUNCTIONS

@@ -8,6 +8,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/UObjectGlobals.h"
 #include "../Vehicles/LegoCarChasis.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -36,10 +37,19 @@ ABullet::ABullet()
     Bullet_Mesh->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 
 
-    InitialLifeSpan = 10;
+    InitialLifeSpan = 2;
 
     Bullet_Mesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
     First_Hit = false;
+
+
+    static ConstructorHelpers::FObjectFinder<UParticleSystem> particle(TEXT("/Game/effects/effect"));
+    Particle_Effect = particle.Object;
+
+    static ConstructorHelpers::FObjectFinder<UMaterial>
+        material_asset(TEXT("Material'/Game/Guns/materials/bullet_material.bullet_material'"));
+
+    Bullet_Mesh->SetMaterial(0, material_asset.Object);
 }
 
 
@@ -53,14 +63,12 @@ void ABullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
         if (brick)
         {
             brick->addDamage(3);
-            //        Destroy();
-            First_Hit = true;
-
         }
         else if (vehicle) {
             vehicle->addDamage(3);
-            First_Hit = true;
         }
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
+        First_Hit = true;
     }
 
 }
@@ -90,5 +98,15 @@ void ABullet::addFireImpulse(FVector Direction ,float Strenght)
     FVector n = Direction * Strenght;
 
     Bullet_Mesh->AddImpulse(n);
+}
+
+void ABullet::spawnparticle()
+{
+
+    // Load the particle system blueprint
+
+
+
+
 }
 

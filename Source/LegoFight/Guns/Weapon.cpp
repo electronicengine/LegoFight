@@ -23,6 +23,9 @@ void AWeapon::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    if (checkWeaponDetached())
+        return;
+
     if (Owner_Car) {
         if (Owner_Car->carHasPassenger()) {
 
@@ -62,6 +65,20 @@ void AWeapon::removeOwner()
 
 }
 
+bool AWeapon::checkWeaponDetached()
+{
+    if (Owner_Car) {
+        if ((Owner_Car->GetActorLocation() - GetActorLocation()).Size() >= 200) {
+            removeOwner();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    return false;
+}
+
 
 void AWeapon::useWeapon()
 {
@@ -79,15 +96,19 @@ void AWeapon::useWeapon()
 
 void AWeapon::fire()
 {
-    Barrel_Location = Brick->GetSocketLocation("barrel");
-    Barrel_Rotation = Brick->GetSocketRotation("barrel");
 
-    ABullet* bullet_ptr;
+    if (Owner_Car) {
+        ABullet* bullet_ptr;
 
-    bullet_ptr = GetWorld()->SpawnActor<ABullet>(ABullet::StaticClass(), Barrel_Location, Barrel_Rotation);
-    FVector direction = Barrel_Rotation.Vector();
-    
-    if (bullet_ptr != nullptr)
-        bullet_ptr->addFireImpulse(direction, 50000);
+        Barrel_Location = Brick->GetSocketLocation("barrel");
+        Barrel_Rotation = Brick->GetSocketRotation("barrel");
+
+        bullet_ptr = GetWorld()->SpawnActor<ABullet>(ABullet::StaticClass(), Barrel_Location, Barrel_Rotation);
+        FVector direction = Barrel_Rotation.Vector();
+
+        if (bullet_ptr != nullptr)
+            bullet_ptr->addFireImpulse(direction, 50000);
+    }
+
 }
 

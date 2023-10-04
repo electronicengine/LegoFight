@@ -12,6 +12,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/UObjectGlobals.h"
 #include "VehicleAnimInstance.h"
+#include "../Interfaces/InteractInterface.h"
 
 
 
@@ -199,7 +200,7 @@ void ALegoCarChasis::exitCar()
                                                        EDetachmentRule::KeepWorld, true);
     Passenger_->DetachFromActor(attachment_rules);
 
-    Passenger_->exitedFromCar();
+    Cast<IInteractInterface>(Passenger_)->exitedFromCar();
 
     Passenger_ = nullptr;
 
@@ -356,10 +357,7 @@ void ALegoCarChasis::breakBrick()
 
 
 
-    releaseAllItemsOnIt();
-
-
-    Plugged_Items_OnIt.clear();
+    detachItemsOnIt();
 
     Destroy();
 }

@@ -41,6 +41,7 @@ public:
 
     void aimToRotation(FRotator &Rotation);
     void removeOwner();
+    bool checkWeaponDetached();
 
     virtual void Tick(float DeltaTime) override;
 

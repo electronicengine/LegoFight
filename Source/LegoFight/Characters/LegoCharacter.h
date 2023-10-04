@@ -11,6 +11,9 @@
 #include "../Brick.h"
 #include "../Guns/Bullet.h"
 #include "Materials/Material.h"
+#include "../Interfaces/BuilderInterface.h"
+#include "../Interfaces/InteractInterface.h"
+
 #include "LegoCharacter.generated.h"
 
 
@@ -18,9 +21,10 @@ class ALegoCarChasis;
 class AWeapon;
 
 UCLASS()
-class LEGOFIGHT_API ALegoCharacter : public ACharacter
+class LEGOFIGHT_API ALegoCharacter : public ACharacter, public IInteractInterface
 {
 	GENERATED_BODY()
+
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     USpringArmComponent* SpringArm;
@@ -32,14 +36,8 @@ class LEGOFIGHT_API ALegoCharacter : public ACharacter
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UCapsuleComponent* Interaction_Component;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-    UStaticMeshComponent *Ghost_Component;
 
-    UPROPERTY(EditAnywhere)
-    UMaterial *Ghost_Possible_Material;
 
-    UPROPERTY(EditAnywhere)
-    UMaterial *Ghost_Imposible_Material;
 
     /** Projectile class to spawn */
     UPROPERTY(EditDefaultsOnly, Category="Bullet")
@@ -48,46 +46,29 @@ class LEGOFIGHT_API ALegoCharacter : public ACharacter
     UPROPERTY(EditAnywhere, Category="Barrel")
     USceneComponent *Barrel_;
 
-    ABrick *Ghost_Overlapped_Brick;
-    bool Brick_Just_Plug;
-    bool Brick_Plugable;
-    FVector Aim_Impact_Point;
-
-    AActor *Object_NearBy;
-
-    ABrick *Grabbable_Brick;
     AWeapon *Interactable_Weapon;
-    ALegoCarChasis *Interactable_Car;
 
-    ALegoCarChasis *Target_Car;
-    ABrick *Target_Brick;
-    int Tick_Count;
 
-    FRotator OffSet_Rotation;
-    FVector OffSet_Location;
-    int Offset_Step;
-    int Pivot_Width;
     void setupMesh();
 
 public:
 	// Sets default values for this character's properties
 	ALegoCharacter();
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    bool Is_In_Car;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UCameraComponent* Camera;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    bool Is_In_Car;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     bool Is_In_Use_Weapon;
@@ -101,7 +82,8 @@ public:
     void OnDelegateOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 
     UFUNCTION()
-    void OnGhostOverLap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+    void OnGhostOverLap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 
     void moveForward(float Value);
     void moveRight(float Value);
@@ -111,23 +93,7 @@ public:
     void fire();
     void aimStart();
     void aimEnd();
-    void equip();
-    void offSetItem();
 
-    void interact();
-    void turnObject();
-
-    void grapObject(ABrick *Object);
-    void plugObject();
-    void dropObject(ABrick *Object);
-
-    void enteredToCar();
-    void exitedFromCar();
-    void useWeapon();
-    void openInventoryWidget();
-    void buyBrick();
-    void save();
-    void load();
 
 
     ConstructionInfo Construction_Info;

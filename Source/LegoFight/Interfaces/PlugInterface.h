@@ -73,7 +73,10 @@ public:
         FRotator getPluginRotation();
         bool checkPluginPointAvailable(FVector &Point);
         void autoPlugin(AActor *TargetBrick);
-        void releaseAllItemsOnIt();
-        void notifyOwnerPluginisDestroyed(int PluginIndex);
-
+        void detachItemsOnIt();
+        void attachItem(ABrick* Object, const FVector& Location, const FRotator& Rotation, const FVector& OffsetLocation, const FRotator& OffsetRotation);
+        void setOwner(ABrick* Object);
+        void addWeapon(ABrick* Object);
+        void addSeat(ABrick* Object);
+        void addPluggedItemList(ABrick* Object, const FVector& OffsetLocation, const FRotator& OffsetRotation, int PluginIndex);
 };
