@@ -180,7 +180,7 @@ void IBuilderInterface::lookForBuildingSpace(AActor *Target, FHitResult& OutHit)
 
     IPlugInterface* target_plugable = Cast<IPlugInterface>(Target);
 
-    if (target_plugable && Grabbable_Brick)
+    if (target_plugable)
     {
 
         if (Target_Plugable_Item != target_plugable) {
@@ -189,8 +189,10 @@ void IBuilderInterface::lookForBuildingSpace(AActor *Target, FHitResult& OutHit)
         }
 
         Target_Plugable_Item = target_plugable;
-        Brick_Plugable = target_plugable->highLightPlugin(Ghost_Component, Ghost_Possible_Material, Ghost_Imposible_Material,
-            Grabbable_Brick, OutHit, OffSet_Rotation, OffSet_Location, Ghost_Overlapped_Brick);
+
+        if(Grabbable_Brick)
+            Brick_Plugable = target_plugable->highLightPlugin(Ghost_Component, Ghost_Possible_Material, Ghost_Imposible_Material,
+                Grabbable_Brick, OutHit, OffSet_Rotation, OffSet_Location, Ghost_Overlapped_Brick);
 
     }
     else
@@ -207,7 +209,6 @@ void IBuilderInterface::lookForBuildingSpace(AActor *Target, FHitResult& OutHit)
 void IBuilderInterface::checkGhostItemOverlap(AActor* OtherActor)
 {
     ABrick* overlapped_brick = Cast<ABrick>(OtherActor);
-    GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("OnGhostOverLap"));
 
     if (overlapped_brick != nullptr)
     {

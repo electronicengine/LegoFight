@@ -130,6 +130,9 @@ void IInteractInterface::saveAndLoad()
     if (Game_Instance) {
         Game_Instance->savePanel(vehicle, Aim_Impact_Point);
     }
+    else {
+
+    }
 
 }
 

@@ -114,6 +114,32 @@ bool UInventoryWidget::Initialize()
         WeaponBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
     }
 
+    TArray<UObject*> buildings_assets;
+    EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/buildings/"), buildings_assets, EngineUtils::ATL_Regular);
+    for (auto asset : buildings_assets)
+    {
+        btn_texture = Cast<UTexture2D>(asset);
+        name_appendix = FString::FromInt(i++);
+
+        btn = NewObject<UButton>(UButton::StaticClass());
+        btn->AppendName(name_appendix);
+
+        // Set the button's background image using the slate brush
+        btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
+
+        btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+
+        box->AddChild(btn);
+        BuildingBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
+    }
+
 
     TArray<UObject*> color_assets;
     EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/colors/"), color_assets, EngineUtils::ATL_Regular);

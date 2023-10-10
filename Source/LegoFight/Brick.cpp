@@ -8,6 +8,7 @@
 #include "LegoFightGameInstance.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Containers/UnrealString.h"
+#include "Engine/StaticMeshSocket.h"
 
 #include "Materials/MaterialInstanceDynamic.h"
 
@@ -166,12 +167,12 @@ void ABrick::setMaterialColor(FLinearColor Color)
 
 void ABrick::setBrickTypeOptions(ItemOptions&Options)
 {
-    float pivot_loc_x;
-    float pivot_loc_y;
-    float pivot_loc_z;
-    int pivot_width;
-    int pivot_height;
-    int offset;
+    //float pivot_loc_x;
+    //float pivot_loc_y;
+    //float pivot_loc_z;
+    //int pivot_width;
+    //int pivot_height;
+    //int offset;
 
 
     Brick->SetStaticMesh(Options.Mesh);
@@ -186,40 +187,29 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
     UKismetSystemLibrary::GetComponentBounds(Brick, Origin, BoxExtent, SphereRadius);
 
-    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, BoxExtent.ToString());
 
-    if (Options.Name.Find(WEAPON_APPENDIX) >= 0) {
+    TArray<FName> names = Brick->GetAllSocketNames();
 
-        Height_Offset = 20;
+    for (FName name : names) {
 
-    }else if (Options.Name.Find(SIDED_APPENDIX) >= 0) {
+        FVector pivot = Brick->GetSocketLocation(name);
 
-        setupPluginPoints(FVector(25, -25, 30.7f), 3, 3);
-        setupSidePlugPoints(FVector(50.1f, 44, -6.0f), 3, 9);
-        Height_Offset = 20;
-    }
-    else if (Options.Name == "CarFender4x2") {
-        Height_Offset = 20;
-        setupPluginPoints(FVector(0, 0, 29.0f), 3, 3);
+        FString tag = Brick->GetSocketByName(name)->Tag;
+        FString width = tag.Mid(0, tag.Find(":"));
 
-    }
-    else {
 
-        pivot_loc_x = 0;
-        pivot_loc_y = 0;
-        pivot_loc_z = 30.7f;
-        pivot_width = (BoxExtent.Y / 12.5) + 1;
-        pivot_height = (BoxExtent.X / 12.5) + 1;
-        offset = 2 * (int)(18 - BoxExtent.Z);
+        int plug_width = FCString::Atoi(*width.Mid(0, width.Find("x")));
+        int plug_height = FCString::Atoi(*width.Right(width.Find("x")));
 
-        setupPluginPoints(FVector(pivot_loc_x, pivot_loc_y, pivot_loc_z), pivot_width, pivot_height);
-        Height_Offset = offset;
-        
-
+        if (name.ToString().Find("side") < 0) {
+            setupPluginPoints(pivot, plug_width, plug_height);
+            Height_Offset = FCString::Atoi(*tag.Right(tag.Find(":") - 1));
+        }
+        else {
+            setupSidePlugPoints(pivot, plug_width, plug_height);
+        }
 
     }
-
-
 
 
     Destructible_Container = ADestrictable::StaticClass();
@@ -230,7 +220,6 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
     Healt_ = Options.Health;
 
     Current_Plugin_Index = 0;
-
 
     Brick->CreateDynamicMaterialInstance(0);
     Brick->SetVectorParameterValueOnMaterials(FName("BaseColor"), FVector(Options.Color));
