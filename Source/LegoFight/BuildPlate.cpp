@@ -15,7 +15,7 @@ ABuildPlate::ABuildPlate()
     Static_Mesh->SetSimulatePhysics(true);
     Static_Mesh->SetCollisionProfileName(FName("BlockAll"));
 
-	setupPluginPoints(FVector(0, 0, 30.7f), 19, 19);
+	setupPluginPoints(FVector(0, 0, 30.7f), 20, 20);
 }
 
 USceneComponent* ABuildPlate::CreatePluginPoint(FString Name)

@@ -112,7 +112,7 @@ bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMateria
     FRotator plugin_rotation = getPluginRotation();
 
     Ghost_Brick->SetStaticMesh(Interactable_Brick->getBrickMesh());
-    Ghost_Brick->SetWorldScale3D(FVector(0.85f, 0.85f, 0.85f));
+    //Ghost_Brick->SetWorldScale3D(FVector(0.85f, 0.85f, 0.85f));
 
 
     if(plugin != FVector(0,0,0))
