@@ -4,6 +4,10 @@
 #include "InteractInterface.h"
 #include "../Vehicles/LegoCarChasis.h"
 #include "../LegoFightGameInstance.h"
+#include "../Widgets/CharacterWidget.h"
+#include "../Characters/LegoCharacter.h"
+#include "../Vehicles/LegoCarChasis.h"
+#include "../Guns/Weapon.h"
 
 // Add default functionality here for any IInteractInterface functions that are not pure virtual.
 
@@ -15,42 +19,52 @@ IInteractInterface::IInteractInterface()
 
 void IInteractInterface::equip()
 {
-
-    if (Cast<ALegoCarChasis>(Object_NearBy))
-    {
-        enteredToCar();
-
+    if (Cast<ALegoCarChasis>(this)) {
+        exitCar();
     }
-    else if (Cast<ABrick>(Object_NearBy))
-    {
+    else {
 
-        if (Grabbable_Brick == Cast<ABrick>(Object_NearBy))
-            dropObject(Grabbable_Brick);
-        else
+        if (Cast<ALegoCarChasis>(Object_NearBy))
         {
-            if (Grabbable_Brick == nullptr)
-            {
-                Grabbable_Brick = Cast<ABrick>(Object_NearBy);
-                grapObject(Grabbable_Brick);
+            enteredToCar();
+            Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
+            Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setAimButtonVisibilty(ESlateVisibility::Hidden);
 
-            }
+
+
+        }
+        else if (Cast<ABrick>(Object_NearBy))
+        {
+
+            if (Grabbable_Brick == Cast<ABrick>(Object_NearBy))
+                dropObject(Grabbable_Brick);
             else
             {
+                if (Grabbable_Brick == nullptr)
+                {
+                    Grabbable_Brick = Cast<ABrick>(Object_NearBy);
+                    grapObject(Grabbable_Brick);
 
-                dropObject(Grabbable_Brick);
-                Grabbable_Brick = Cast<ABrick>(Object_NearBy);
+                }
+                else
+                {
 
-                grapObject(Grabbable_Brick);
+                    dropObject(Grabbable_Brick);
+                    Grabbable_Brick = Cast<ABrick>(Object_NearBy);
 
+                    grapObject(Grabbable_Brick);
+
+                }
             }
+
+
         }
+        else
+        {
+            if (Grabbable_Brick != nullptr)
+                dropObject(Grabbable_Brick);
 
-
-    }
-    else
-    {
-        if (Grabbable_Brick != nullptr)
-            dropObject(Grabbable_Brick);
+        }   
 
     }
 
@@ -71,7 +85,8 @@ void IInteractInterface::enteredToCar()
 
         if (Interactable_Car != nullptr)
         {
-
+            Cast<ALegoCharacter>(this)->AddActorLocalOffset(FVector(0,0,100));
+            Cast<ALegoCharacter>(this)->SetActorHiddenInGame(true);
 
             Interactable_Car->enterCar(Cast<ALegoCharacter>(this));
             Is_In_Car = true;
@@ -86,9 +101,7 @@ void IInteractInterface::enteredToCar()
 
 void IInteractInterface::buyBrick()
 {
-    if(Game_Instance)
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, TEXT("buy"));
-
+    
     if (Grabbable_Brick == nullptr && Game_Instance) {
         Grabbable_Brick = Cast<ABrick>(Game_Instance->spawnItem(FVector(0, 0, 0), FRotator(0, 0, 0)));
 
@@ -139,8 +152,9 @@ void IInteractInterface::saveAndLoad()
 void IInteractInterface::interactNearby(AActor* OtherActor)
 {
     ALegoCarChasis* car = Cast<ALegoCarChasis>(OtherActor);
-    if (car != nullptr)
+    if (car != nullptr) {
         Object_NearBy = car;
+    }
     else
     {
         ABrick* brick = Cast<ABrick>(OtherActor);
@@ -155,4 +169,76 @@ void IInteractInterface::interactNearby(AActor* OtherActor)
 
         }
     }
+}
+
+
+bool IInteractInterface::carHasPassenger()
+{
+    if (Passenger_ == nullptr)
+        return false;
+    else
+        return true;
+}
+
+
+
+void IInteractInterface::enterCar(ALegoCharacter* LegoChar)
+{
+    //if(LegoChar != nullptr && Car_Seat != nullptr)
+    //{
+
+    Passenger_ = LegoChar;
+
+    AController* lego_man_controller = Passenger_->GetController();
+
+    //Passenger_->SetActorRotation(Car_Seat->GetActorRotation());
+
+    Passenger_->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+    Passenger_->GetMesh()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+
+
+    lego_man_controller->Possess(Cast<ALegoCarChasis>(this));
+
+    if (Weapons.size() > 0) {
+
+        Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setFireButtonVisibilty(ESlateVisibility::Visible);
+
+    }
+
+
+    /*       Passenger_->AttachToActor(Car_Seat, FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
+                                                                            EAttachmentRule::KeepWorld,
+                                                                            EAttachmentRule::KeepWorld, true), TEXT("seat"));*/
+                                                                            //}
+
+                                                                        //    GetMesh()->SetSimulatePhysics(true);
+
+}
+
+
+
+void IInteractInterface::exitCar()
+{
+
+    AController* car_controller = Cast<ALegoCarChasis>(this)->GetController();
+
+    car_controller->Possess(Passenger_);
+
+    const FDetachmentTransformRules& attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+        EDetachmentRule::KeepWorld,
+        EDetachmentRule::KeepWorld, true);
+    Passenger_->DetachFromActor(attachment_rules);
+    Passenger_->SetActorLocation(Cast<ALegoCarChasis>(this)->GetActorLocation());
+    Passenger_->AddActorWorldOffset(FVector(100, 0, 10));
+    Passenger_->SetActorHiddenInGame(false);
+
+    Cast<IInteractInterface>(Passenger_)->exitedFromCar();
+
+    Passenger_ = nullptr;
+
+    Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setAimButtonVisibilty(ESlateVisibility::Visible);
+    Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setFireButtonVisibilty(ESlateVisibility::Hidden);
+
+    //    GetMesh()->SetSimulatePhysics(false);
+
 }

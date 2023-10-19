@@ -129,7 +129,7 @@ void IBuilderInterface::plugObject()
 
 
 
-void IBuilderInterface::turnObject()
+void IBuilderInterface::giveOffsetRotation()
 {
     if (OffSet_Location == FVector(0, 0, 0)) {
         if (OffSet_Rotation.Yaw == 360)

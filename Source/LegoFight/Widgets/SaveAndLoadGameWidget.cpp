@@ -16,6 +16,10 @@
 #include "Styling/SlateBrush.h"
 #include "SlateBasics.h"
 #include "Widgets/Images/SImage.h"
+//#include "Android/AndroidApplication.h"
+//#include "Android/AndroidJNI.h"
+//#include "Android/AndroidPermissionFunctionLibrary.h"
+
 #include "Runtime/Engine/Classes/Engine/Texture2D.h"
 
 #include "../Brick.h"
@@ -70,4 +74,33 @@ void USaveAndLoadGameWidget::onClickedButton_Load()
 	game_instance->loadGame(txt.ToString());
 
 	removeWidget();
+}
+
+
+void USaveAndLoadGameWidget::CheckStoragePermission()
+{
+    // Check if READ_EXTERNAL_STORAGE permission is granted
+    //JNIEnv* Env = FAndroidApplication::GetJavaEnv();
+
+    //if (Env)
+    //{
+    //    jclass ClassID = FAndroidApplication::FindJavaClass("com/epicgames/ue4/GameActivity");
+    //    jmethodID MethodID = FJavaWrapper::FindMethod(Env, ClassID, "checkStoragePermission", "()Z", false);
+
+    //    if (MethodID)
+    //    {
+    //        bool bHasPermission = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, MethodID);
+
+    //        if (bHasPermission)
+    //        {
+    //            // Storage permission is granted
+    //            UE_LOG(LogTemp, Warning, TEXT("Storage permission granted"));
+    //        }
+    //        else
+    //        {
+    //            // Storage permission is not granted
+    //            UE_LOG(LogTemp, Warning, TEXT("Storage permission not granted"));
+    //        }
+    //    }
+    //}
 }

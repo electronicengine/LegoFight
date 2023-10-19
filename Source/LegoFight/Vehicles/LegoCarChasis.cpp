@@ -12,6 +12,8 @@
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/UObjectGlobals.h"
 #include "VehicleAnimInstance.h"
+#include "../Widgets/CharacterWidget.h"
+#include "../LegoFightGameInstance.h"
 #include "../Interfaces/InteractInterface.h"
 
 
@@ -145,68 +147,11 @@ void ALegoCarChasis::BeginPlay()
 //    GetMesh()->SetSimulatePhysics(false);
 
     GetVehicleMovement()->SetHandbrakeInput(true);
-
+    Game_Instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
 }
 
 
 
-bool ALegoCarChasis::carHasPassenger()
-{
-    if(Passenger_ == nullptr)
-        return false;
-    else
-        return true;
-}
-
-
-
-void ALegoCarChasis::enterCar(ALegoCharacter *LegoChar)
-{
-    //if(LegoChar != nullptr && Car_Seat != nullptr)
-    //{
-
-        Passenger_ = LegoChar;
-
-        AController* lego_man_controller = Passenger_->GetController();
-
-        //Passenger_->SetActorRotation(Car_Seat->GetActorRotation());
-
-        Passenger_->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-        Passenger_->GetMesh()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-
-
-        lego_man_controller->Possess(this);
-
- /*       Passenger_->AttachToActor(Car_Seat, FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
-                                                                         EAttachmentRule::KeepWorld,
-                                                                         EAttachmentRule::KeepWorld, true), TEXT("seat"));*/
-    //}
-
-//    GetMesh()->SetSimulatePhysics(true);
-
-}
-
-
-
-void ALegoCarChasis::exitCar()
-{
-
-    AController* car_controller = this->GetController();
-
-    car_controller->Possess(Passenger_);
-
-    const FDetachmentTransformRules &attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
-                                                       EDetachmentRule::KeepWorld,
-                                                       EDetachmentRule::KeepWorld, true);
-    Passenger_->DetachFromActor(attachment_rules);
-
-    Cast<IInteractInterface>(Passenger_)->exitedFromCar();
-
-    Passenger_ = nullptr;
-
-//    GetMesh()->SetSimulatePhysics(false);
-
-}
 
 void ALegoCarChasis::jump()
 {
@@ -291,11 +236,6 @@ void ALegoCarChasis::fire()
 }
 
 
-
-void ALegoCarChasis::equip()
-{
-    exitCar();
-}
 
 
 

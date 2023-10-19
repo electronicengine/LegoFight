@@ -17,6 +17,8 @@
 #include "../Brick.h"
 #include "../Interfaces/BuiltInInterface.h"
 #include "../Interfaces/PlugInterface.h"
+#include "../Interfaces/InteractInterface.h"
+
 #include "LegoCarChasis.generated.h"
 
 
@@ -26,7 +28,7 @@
  * 
  */
 UCLASS()
-class LEGOFIGHT_API ALegoCarChasis : public AWheeledVehicle, public IBuiltInInterface, public IPlugInterface
+class LEGOFIGHT_API ALegoCarChasis : public AWheeledVehicle, public IBuiltInInterface, public IPlugInterface, public IInteractInterface
 {
 	GENERATED_BODY()
 	
@@ -43,13 +45,10 @@ class LEGOFIGHT_API ALegoCarChasis : public AWheeledVehicle, public IBuiltInInte
 protected:
     virtual USceneComponent *CreatePluginPoint(FString Name) override;
 
-    UPROPERTY(EditAnywhere)
-        ALegoCharacter* Passenger_;
 
     ACarSeat* Car_Seat;
 
     int Current_Weapon_Index;
-    std::map<int, AWeapon*> Weapons;
 
     bool Weapon_Camera_Used;
     int Current_Camera_Index;
@@ -63,9 +62,6 @@ public:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
-    bool carHasPassenger();
-
-    void enterCar(ALegoCharacter *LegoChar);
 
     void moveForward(float Value);
     void moveRight(float Value);
@@ -74,8 +70,7 @@ public:
     void interact();
 
     void fire();
-    void equip();
-    void exitCar();
+  
     void jump();
 
     int removeWeaponToInventory(int Index);

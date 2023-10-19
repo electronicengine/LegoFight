@@ -16,7 +16,6 @@
 
 
 class ULegoFightGameInstance;
-enum BrickColor;
 static std::map<FString, FLinearColor> Colors = {
 
     {"Black", FLinearColor(0.005f, 0.005f, 0.005f)},

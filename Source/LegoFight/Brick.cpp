@@ -177,7 +177,7 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
     Brick->SetStaticMesh(Options.Mesh);
     Brick_Mesh = Options.Mesh;
-    Brick->SetMaterial(0, Options.Material);
+    Brick->SetMaterialByName(FName("main"), Options.Material);
     Material = Options.Material;
 
 

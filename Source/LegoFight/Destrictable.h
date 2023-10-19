@@ -10,7 +10,6 @@
 #include <string>
 #include "Destrictable.generated.h"
 
-enum ItemType;
 UCLASS()
 class LEGOFIGHT_API ADestrictable : public AActor
 {

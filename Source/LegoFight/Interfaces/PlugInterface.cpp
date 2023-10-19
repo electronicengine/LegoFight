@@ -132,12 +132,17 @@ bool IPlugInterface::highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMateria
 
         if(Ghost_Brick->IsOverlappingActor(OverlappedBrick))
         {
+           
             Ghost_Brick->SetMaterial(0, ImPossible_Material);
+            Ghost_Brick->SetMaterial(1, ImPossible_Material);
+
             return true;
         }
         else
         {
             Ghost_Brick->SetMaterial(0, Possible_Material);
+            Ghost_Brick->SetMaterial(1, Possible_Material);
+
             return true;
         }
     }

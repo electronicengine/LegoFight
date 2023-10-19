@@ -53,9 +53,7 @@ class LEGOFIGHT_API ULegoFightGameInstance : public UGameInstance
     UPROPERTY(EditAnywhere, Category = "UI")
     TSubclassOf<class UUserWidget> Save_Panel_Container;
 
-    UUserWidget* Save_Panel;
-    UUserWidget* Invantory_Panel;
-    UUserWidget* Char_Panel;
+
 
     UPROPERTY(EditAnywhere, Category = "UI")
     TSubclassOf<class UUserWidget> Character_Panel_Container;
@@ -84,6 +82,10 @@ public:
     ALegoCarChasis* Save_Vehicle;
     FVector Impact_Point;
     std::map<FString, TArray<UStaticMesh*>> Destructables;
+
+    UUserWidget* Save_Panel;
+    UUserWidget* Invantory_Panel;
+    UUserWidget* Char_Panel;
 
     UUserWidget* savePanel(ALegoCarChasis* Vehicle, FVector ImpactPoint);
 

@@ -111,11 +111,11 @@ UUserWidget* ULegoFightGameInstance::savePanel(ALegoCarChasis* Vehicle, FVector 
 
     if (Save_Panel == nullptr)
     {
-        if (Char_Panel != nullptr)
-        {
-            Char_Panel->RemoveFromParent();
-            Char_Panel = nullptr;
-        }
+        //if (Char_Panel != nullptr)
+        //{
+        //    Char_Panel->RemoveFromParent();
+        //    Char_Panel = nullptr;
+        //}
 
         Save_Panel = CreateWidget<UUserWidget>(this, Save_Panel_Container);
 
@@ -157,11 +157,11 @@ UUserWidget *ULegoFightGameInstance::loadInvantoryPanel()
 
     if(Invantory_Panel == nullptr)
     {
-        if(Char_Panel != nullptr)
+   /*     if(Char_Panel != nullptr)
         {
             Char_Panel->RemoveFromParent();
             Char_Panel = nullptr;
-        }
+        }*/
 
         Invantory_Panel = CreateWidget<UUserWidget>(this, Invantory_Panel_Container);
 

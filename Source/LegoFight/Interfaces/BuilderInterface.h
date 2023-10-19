@@ -39,11 +39,9 @@ protected:
 
 	IPlugInterface* Target_Plugable_Item;
 	bool Brick_Just_Plug;
-	bool Keeping_Bricks;
 	int Pivot_Width;
 	ABrick* Ghost_Overlapped_Brick;
 	AActor* Object_NearBy;
-	ABrick* Grabbable_Brick;
 
 	FRotator OffSet_Rotation;
 	FVector OffSet_Location;
@@ -56,9 +54,12 @@ public:
 	void grapObject(ABrick* Object);
 	void dropObject(ABrick* Object);
 	void plugObject();
-	void turnObject();
+	void giveOffsetRotation();
 	void giveOffsetLocation();
 	void lookForBuildingSpace(AActor* Target, FHitResult& OutHit);
 	void checkGhostItemOverlap(AActor* OtherActor);
+
+	ABrick* Grabbable_Brick;
+	bool Keeping_Bricks;
 
 };

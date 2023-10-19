@@ -10,7 +10,7 @@
 #include "DrawDebugHelpers.h"
 #include "../LegoFightSaveGame.h"
 #include "Json.h"
-
+#include "../Widgets/CharacterWidget.h"
 #include "Engine/World.h"
 
 
@@ -39,7 +39,8 @@ ALegoCharacter::ALegoCharacter()
     Interaction_Component->SetupAttachment(RootComponent);
 
     Interaction_Component->SetCollisionProfileName(TEXT("OverlapAll"));
-    Interaction_Component->OnComponentBeginOverlap.AddDynamic(this, &ALegoCharacter::OnDelegateOverlap);
+    Interaction_Component->OnComponentBeginOverlap.AddDynamic(this, &ALegoCharacter::OnInteractBegin);
+    Interaction_Component->OnComponentEndOverlap.AddDynamic(this, &ALegoCharacter::OnInteractEnd);
 
     Ghost_Component = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ghost"));
 
@@ -149,6 +150,8 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
     PlayerInputComponent->BindAxis("Turn", this, &ALegoCharacter::turn);
     PlayerInputComponent->BindAxis("LookUp", this, &ALegoCharacter::lookUp);
+    PlayerInputComponent->BindAxis("Zoom", this, &ALegoCharacter::zoom);
+
 
     PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ALegoCharacter::fire);
     PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ALegoCharacter::aimStart);
@@ -157,7 +160,7 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
     PlayerInputComponent->BindAction("Inventory", IE_Pressed, this, &IInteractInterface::openInventoryWidget);
     PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &IInteractInterface::equip);
     PlayerInputComponent->BindAction("OffSetItem", IE_Pressed, this, &IBuilderInterface::giveOffsetLocation);
-    PlayerInputComponent->BindAction("TurnObject", IE_Pressed, this, &IBuilderInterface::turnObject);
+    PlayerInputComponent->BindAction("TurnObject", IE_Pressed, this, &IBuilderInterface::giveOffsetRotation);
 
     PlayerInputComponent->BindAction("Plug", IE_Pressed, this, &IBuilderInterface::plugObject);
     PlayerInputComponent->BindAction("Buy", IE_Pressed, this, &IInteractInterface::buyBrick);
@@ -168,12 +171,19 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 
 
-void ALegoCharacter::OnDelegateOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void ALegoCharacter::OnInteractBegin(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 
-
-    if (Aiming_ == false)
+    if (Aiming_ == false && Cast<IInteractInterface>(OtherActor) && !Cast<ALegoCharacter>(OtherActor)){
         interactNearby(OtherActor);
+        Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
+    }
+
+}
+
+void ALegoCharacter::OnInteractEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+    Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Hidden);
 
 }
 
@@ -221,6 +231,15 @@ void ALegoCharacter::turn(float Value)
 void ALegoCharacter::lookUp(float Value)
 {
     AddControllerPitchInput(Value);
+
+}
+
+void ALegoCharacter::zoom(float Value)
+{
+    if (Aiming_) {
+        Aim_Camera->AddLocalOffset(FVector(0, 0, Value * 10));
+    }
+
 
 }
 

@@ -7,6 +7,9 @@
 #include "BuilderInterface.h"
 #include "InteractInterface.generated.h"
 
+
+class ALegoCharacter;
+class AWeapon;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInteractInterface : public UBuilderInterface
@@ -28,9 +31,16 @@ protected:
 
     bool Is_In_Car;
 
+
 public:
+
     IInteractInterface();
     void equip();
+    void exitCar();
+
+    bool carHasPassenger();
+
+    void enterCar(ALegoCharacter* LegoChar);
 
 
     void buyBrick();
@@ -40,4 +50,8 @@ public:
     void openInventoryWidget();
     void saveAndLoad();
     void interactNearby(AActor* OtherActor);
+
+    ALegoCharacter* Passenger_;
+    std::map<int, AWeapon*> Weapons;
+
 };

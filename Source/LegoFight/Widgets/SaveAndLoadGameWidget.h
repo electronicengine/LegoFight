@@ -49,4 +49,7 @@ public:
 
     UFUNCTION()
     void onClickedButton_Load();
+
+    void CheckStoragePermission();
+
 };

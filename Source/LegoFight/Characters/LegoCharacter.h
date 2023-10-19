@@ -70,16 +70,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    bool Is_In_Use_Weapon;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    bool Keeping_Bricks;
-
     bool Aiming_;
 
     UFUNCTION()
-    void OnDelegateOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+    void OnInteractBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+
+    UFUNCTION()
+    void OnInteractEnd(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
     UFUNCTION()
     void OnGhostOverLap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -89,7 +86,7 @@ public:
     void moveRight(float Value);
     void turn(float Value);
     void lookUp(float Value);
-
+    void zoom(float Value);
     void fire();
     void aimStart();
     void aimEnd();

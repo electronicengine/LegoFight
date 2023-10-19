@@ -187,6 +187,12 @@ void UInventoryWidget::removeWidget()
 
     Game_Instance->loadCharacterPanel();
     APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    Current_Category_Buttons = &GeneralBrick_Buttons;
+    setVisibilityCategoryButtons(GeneralBrick_Buttons, true);
+    setVisibilityCategoryButtons(VehicleBrick_Buttons, false);
+    setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
+    setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
+    setVisibilityCategoryButtons(Color_Buttons, false);
 
     controller->SetInputMode(FInputModeGameOnly());
 
@@ -194,8 +200,6 @@ void UInventoryWidget::removeWidget()
 
 void UInventoryWidget::checkCategory()
 {
-
-
 
     for (int i = 0; i < Category_Buttons.size(); i++) {
 
