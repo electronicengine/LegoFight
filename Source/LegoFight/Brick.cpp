@@ -34,7 +34,7 @@ ABrick::ABrick()
 
 
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 400; i++) {
 
         FString scene_name = "sidescene";
         scene_name.AppendInt(i);
@@ -200,14 +200,18 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
         int plug_width = FCString::Atoi(*width.Mid(0, width.Find("x")));
         int plug_height = FCString::Atoi(*width.Right(width.Find("x")));
+        FString plug_offset = tag.Mid(tag.Find(":") + 1, tag.Find(".") - tag.Find(":") - 1);
+        FString healt = tag.Mid(tag.Find(".") + 1, tag.Len() - 1);
 
         if (name.ToString().Find("side") < 0) {
             setupPluginPoints(pivot, plug_width, plug_height);
-            Height_Offset = FCString::Atoi(*tag.Right(tag.Find(":") - 1));
+            Height_Offset = FCString::Atoi(*plug_offset);
         }
         else {
             setupSidePlugPoints(pivot, plug_width, plug_height);
         }
+
+        Healt_ = FCString::Atoi( * healt);
 
     }
 
@@ -217,7 +221,6 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
     //Type_ = Options.Type;
     //Sub_Type = Options.SubType;
-    Healt_ = Options.Health;
 
     Current_Plugin_Index = 0;
 

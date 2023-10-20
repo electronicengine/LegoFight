@@ -97,17 +97,14 @@ void ULegoFightGameInstance::initializeDestructables()
 
 
 
-UUserWidget* ULegoFightGameInstance::savePanel(ALegoCarChasis* Vehicle, FVector ImpactPoint)
+UUserWidget* ULegoFightGameInstance::savePanel(IBuiltInInterface* Item, FVector ImpactPoint)
 {
     APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     ULegoFightSaveGame* save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
-
-    Save_Vehicle = Vehicle;
+    if (Item) {
+        Saved_Item = Item;
+    }
     Impact_Point = ImpactPoint;
-
-    if(Save_Vehicle)
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Save_Vehicle ok"));
-
 
     if (Save_Panel == nullptr)
     {
@@ -253,14 +250,9 @@ ALegoCarChasis *ULegoFightGameInstance::spawnVehicle(const FString& Name, const 
     if (Name.Find(AI_APPENDIX) >= 0) {
 
         vehicle = GetWorld()->SpawnActor<AEnemyLegoVehicle>(AEnemyLegoVehicle::StaticClass(), SpawnLocation + FVector(0, 0, 100.0f), SpawnRotation);
-
-        GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, "spawnVehicleAI");
-
     }
     else {
         vehicle = GetWorld()->SpawnActor<ALegoCarChasis>(ALegoCarChasis::StaticClass(), SpawnLocation + FVector(0, 0, 100.0f), SpawnRotation);
-        GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, "spawnVehicle");
-
     }
 
     return vehicle;
@@ -323,9 +315,10 @@ bool ULegoFightGameInstance::saveGame(FString Name)
 {
     ULegoFightSaveGame* save_game = Cast<ULegoFightSaveGame>(UGameplayStatics::CreateSaveGameObject(ULegoFightSaveGame::StaticClass()));
 
-    if(Save_Vehicle)
+    if(Saved_Item)
     {
-        ConstructionInfo info = Save_Vehicle->compileConstructInfo(Save_Vehicle);
+
+        ConstructionInfo info = Saved_Item->compileConstructInfo(Saved_Item);
 
         TSharedPtr<FJsonObject> json = save_game->convertConstructionInfoToJson(info);
 
@@ -337,7 +330,7 @@ bool ULegoFightGameInstance::saveGame(FString Name)
 
     }
     else {
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Save_Vehicle non"));
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("save failed"));
 
         return false;
     }

@@ -7,6 +7,9 @@
 #include "../Widgets/CharacterWidget.h"
 #include "../Characters/LegoCharacter.h"
 #include "../Vehicles/LegoCarChasis.h"
+#include "Engine/StaticMesh.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "../Guns/Weapon.h"
 
 // Add default functionality here for any IInteractInterface functions that are not pure virtual.
@@ -103,18 +106,20 @@ void IInteractInterface::buyBrick()
 {
     
     if (Grabbable_Brick == nullptr && Game_Instance) {
-        Grabbable_Brick = Cast<ABrick>(Game_Instance->spawnItem(FVector(0, 0, 0), FRotator(0, 0, 0),"", Aim_Impact_Point));
+        AActor *spawned_object = Game_Instance->spawnItem(FVector(0, 0, 0), FRotator(0, 0, 0),"", Aim_Impact_Point);
 
+        Grabbable_Brick = Cast<ABrick>(spawned_object);
         if (Grabbable_Brick != nullptr)
         {
-
             grapObject(Grabbable_Brick);
             Brick_Just_Plug = false;
         }
+
     }
 
 
 }
+
 
 void IInteractInterface::exitedFromCar()
 {
@@ -139,9 +144,8 @@ void IInteractInterface::openInventoryWidget()
 void IInteractInterface::saveAndLoad()
 {
 
-    ALegoCarChasis* vehicle = Cast<ALegoCarChasis>(Target_Plugable_Item);
     if (Game_Instance) {
-        Game_Instance->savePanel(vehicle, Aim_Impact_Point);
+            Game_Instance->savePanel(Cast<IBuiltInInterface>(Target_Plugable_Item), Aim_Impact_Point);
     }
     else {
 

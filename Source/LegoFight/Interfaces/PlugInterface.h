@@ -65,7 +65,8 @@ public:
         float calculateDistance(const FVector &Vector1, const FVector &Vector2);
         int getClosestPluginIndex(const std::vector<float> &Array);
         FVector getPlugin(const FVector &ImpactPoint);
-        void plugTheBrick(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation, const FVector& OffsetLocation);
+        void plugTheItem(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation, const FVector& OffsetLocation);
+        void putTheItem(const FVector& Location, const FRotator& Rotation);
 
 
         bool highLightPlugin(UStaticMeshComponent *Ghost_Brick, UMaterial *Possible_Material, UMaterial *ImPossible_Material,

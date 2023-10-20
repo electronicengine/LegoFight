@@ -79,7 +79,7 @@ public:
     void initializeItemOptions();
     void initializeDestructables();
 
-    ALegoCarChasis* Save_Vehicle;
+    IBuiltInInterface* Saved_Item;
     FVector Impact_Point;
     std::map<FString, TArray<UStaticMesh*>> Destructables;
 
@@ -87,7 +87,7 @@ public:
     UUserWidget* Invantory_Panel;
     UUserWidget* Char_Panel;
 
-    UUserWidget* savePanel(ALegoCarChasis* Vehicle, FVector ImpactPoint);
+    UUserWidget* savePanel(IBuiltInInterface* Item, FVector ImpactPoint);
 
     UUserWidget *loadInvantoryPanel();
     UUserWidget *loadCharacterPanel();

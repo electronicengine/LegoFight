@@ -174,7 +174,7 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ALegoCharacter::OnInteractBegin(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 
-    if (Aiming_ == false && Cast<IInteractInterface>(OtherActor) && !Cast<ALegoCharacter>(OtherActor)){
+    if (Aiming_ == false && Cast<IPlugInterface>(OtherActor) && !Cast<ALegoCharacter>(OtherActor)){
         interactNearby(OtherActor);
         Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
     }

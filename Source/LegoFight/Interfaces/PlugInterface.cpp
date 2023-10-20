@@ -203,7 +203,7 @@ int IPlugInterface::getClosestPluginIndex(const std::vector<float> &Array)
 }
 
 
-void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation, const FVector &OffsetLocation)
+void IPlugInterface::plugTheItem(ABrick *Object, int PluginIndex, const FRotator &OffsetRotation, const FVector &OffsetLocation)
 {
 
     FVector plug_location;
@@ -230,6 +230,22 @@ void IPlugInterface::plugTheBrick(ABrick *Object, int PluginIndex, const FRotato
     }
 }
 
+void IPlugInterface::putTheItem(const FVector& Location, const FRotator& Rotation)
+{
+    const FDetachmentTransformRules& attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+        EDetachmentRule::KeepWorld,
+        EDetachmentRule::KeepWorld, false);
+    Cast<ABrick>(this)->DetachFromActor(attachment_rules);
+
+    Cast<ABrick>(this)->SetActorLocationAndRotation(Location, Rotation,
+        false, 0, ETeleportType::TeleportPhysics);
+
+    Cast<ABrick>(this)->enablePhysics(true);
+    Cast<ABrick>(this)->setCollisionProfile("BlockAll");
+    Cast<ABrick>(this)->SetActorEnableCollision(true);
+
+}
+
 
 
 void IPlugInterface::autoPlugin(AActor *BelowBrick)
@@ -243,7 +259,7 @@ void IPlugInterface::autoPlugin(AActor *BelowBrick)
 
     //    SetActorLocationAndRotation(plugin, plugin_rotation);
 
-        below_brick->plugTheBrick(Cast<ABrick>(this), -1, plugin_rotation, FVector(0, 0, 0));
+        below_brick->plugTheItem(Cast<ABrick>(this), -1, plugin_rotation, FVector(0, 0, 0));
     }
     else if(Cast<ALegoCarChasis>(BelowBrick))
     {
@@ -254,7 +270,7 @@ void IPlugInterface::autoPlugin(AActor *BelowBrick)
 
     //    SetActorLocationAndRotation(plugin, plugin_rotation);
 
-        below_vehicle->plugTheBrick(Cast<ABrick>(this), -1, plugin_rotation, FVector(0,0,0));
+        below_vehicle->plugTheItem(Cast<ABrick>(this), -1, plugin_rotation, FVector(0,0,0));
     }
 }
 

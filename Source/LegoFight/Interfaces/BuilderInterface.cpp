@@ -62,7 +62,6 @@ void IBuilderInterface::grapObject(ABrick* Object)
         float SphereRadius;
 
         UKismetSystemLibrary::GetComponentBounds(Ghost_Component, Origin, BoxExtent, SphereRadius);
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, BoxExtent.ToString());
 
         if (BoxExtent.Y >= BoxExtent.X)
             Pivot_Width = (BoxExtent.Y / 12.5);
@@ -110,7 +109,10 @@ void IBuilderInterface::plugObject()
             if (Target_Plugable_Item != nullptr)
             {
 
-                Target_Plugable_Item->plugTheBrick(Grabbable_Brick, -1, OffSet_Rotation, OffSet_Location);
+                Target_Plugable_Item->plugTheItem(Grabbable_Brick, -1, OffSet_Rotation, OffSet_Location);
+            }
+            else {
+                Grabbable_Brick->putTheItem(Ghost_Component->GetComponentLocation(), Ghost_Component->GetComponentRotation());
             }
 
 
@@ -197,10 +199,24 @@ void IBuilderInterface::lookForBuildingSpace(AActor *Target, FHitResult& OutHit)
     }
     else
     {
-        if (Ghost_Component != nullptr)
-        {
-            Ghost_Component->SetVisibility(false);
+        if (Grabbable_Brick && Ghost_Component && OutHit.IsValidBlockingHit()) {
+            Ghost_Component->SetMaterial(0, Ghost_Possible_Material);
+            Ghost_Component->SetMaterial(1, Ghost_Possible_Material);
+            if(Grabbable_Brick->getBrickMesh())
+                Ghost_Component->SetStaticMesh(Grabbable_Brick->getBrickMesh());
+
+            Ghost_Component->SetVisibility(true);
+
+            Ghost_Component->SetWorldLocationAndRotation(OutHit.ImpactPoint,
+                OutHit.Actor->GetActorRotation());
+            Ghost_Component->AddLocalOffset(FVector(0, 0, 30.7));
         }
+
+
+        //if (Ghost_Component != nullptr)
+        //{
+        //    Ghost_Component->SetVisibility(false);
+        //}
         Target_Plugable_Item = nullptr;
     }
 

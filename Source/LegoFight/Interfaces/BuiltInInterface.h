@@ -42,7 +42,7 @@ class LEGOFIGHT_API IBuiltInInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	
-    ConstructionInfo compileConstructInfo(AActor *Object);
+    ConstructionInfo compileConstructInfo(IBuiltInInterface* Object);
     static void buildFromConstructionInfo(const ConstructionInfo &Info, const FVector &BuildLocation,
                                           ULegoFightGameInstance *GameInstance, ABrick *MainBrick = nullptr);
 	

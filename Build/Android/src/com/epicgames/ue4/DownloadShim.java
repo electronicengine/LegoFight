@@ -1,10 +1,10 @@
 package com.epicgames.ue4;
 
-import com.yusufbulbul.legofight.OBBDownloaderService;
-import com.yusufbulbul.legofight.DownloaderActivity;
+import com.yusufbulbul.mastermaker.OBBDownloaderService;
+import com.yusufbulbul.mastermaker.DownloaderActivity;
 import android.app.Activity;
 import com.google.android.vending.expansion.downloader.Helpers;
-import com.yusufbulbul.legofight.OBBData;
+import com.yusufbulbul.mastermaker.OBBData;
 
 
 public class DownloadShim
