@@ -18,7 +18,7 @@
 ABrick::ABrick()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-    PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = true;
     Destructible_Container = ADestrictable::StaticClass();
 
     Brick = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Brick"));
@@ -225,7 +225,6 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
     Brick->SetVectorParameterValueOnMaterials(FName("BaseColor"), FVector(Options.Color));
     Brick_Color = FVector(Options.Color);
     Brick_Name = Options.Name;
-    Brick->OnComponentHit.AddDynamic(this, &ABrick::OnHit);
 
 }
 
@@ -237,60 +236,6 @@ void ABrick::setLegoCarOwner(ALegoCarChasis *Car)
     if(Car != nullptr)
         Owner_Car = Car;
 }
-
-
-
-
-void ABrick::OnHit(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
-{
-
-    if(First_Hit != false)
-    {
-
-        ABrick *below_brick = Cast<ABrick>(OtherActor);
-
-        if(below_brick != nullptr)
-        {
-//            GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("cast"));
-
-//            autoPlugin(below_brick);
-
-
-        }
-        else
-        {
-            ALegoCarChasis *car = Cast<ALegoCarChasis>(OtherActor);
-
-//            if(car != nullptr)
-//                autoPlugin(car);
-
-        }
-
-        First_Hit = false;
-    }
-    else
-    {
-        AWeapon *weapon = Cast<AWeapon>(this);
-
-        if(weapon != nullptr)
-        {
-            ABrick *below_brick = Cast<ABrick>(OtherActor);
-
-            if(below_brick != nullptr)
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("hit meale weapon "));
-
-                below_brick->addDamage(10);
-            }
-
-        }
-    }
-
-
-
-}
-
-
 
 
 

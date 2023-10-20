@@ -12,6 +12,7 @@ UCLASS()
 class LEGOFIGHT_API ABullet : public AActor
 {
 	GENERATED_BODY()
+		UPrimitiveComponent* Primitive;
 
 		bool First_Hit;
 public:	

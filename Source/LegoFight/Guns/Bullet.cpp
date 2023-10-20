@@ -35,9 +35,7 @@ ABullet::ABullet()
     //Bullet_Mesh->SetMaterial(0, material);
 
     Bullet_Mesh->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
-    Bullet_Mesh->SetCollisionProfileName(TEXT("PhysicsActor"));
-
-    Bullet_Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+    Bullet_Mesh->SetUseCCD(true);
 
     InitialLifeSpan = 2;
 

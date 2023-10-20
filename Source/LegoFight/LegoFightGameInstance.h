@@ -17,7 +17,7 @@
 #define FIRE_WEAPON_APPENDIX    "fire"
 #define MELEE_WEAPON_APPENDIX   "melee"
 #define VEHICLE_APPENDIX        "vehicle"
-#define ENEMY_APPENDIX          "enemy"
+#define AI_APPENDIX             "ai"
 #define SIDED_APPENDIX          "sided"
 #define LOW_APPENDIX            "Low"
 #define HIGH_APPENDIX           "High"
@@ -94,7 +94,7 @@ public:
     ABrick* spawnBrick(const FString& Name, const FVector &SpawnLocation, const FRotator &SpawnRotation);
     ALegoCarChasis *spawnVehicle(const FString& Name, const FVector &SpawnLocation, const FRotator &SpawnRotation);
     AWeapon* spawnWeapon(const FString& Name, const FVector& SpawnLocation, const FRotator& SpawnRotation);
-    AActor* spawnItem(const FVector& SpawnLocation, const FRotator& SpawnRotation, const FString& Name = "");
+    AActor* spawnItem(const FVector& SpawnLocation, const FRotator& SpawnRotation, const FString& Name = "", const FVector& ImpactPoint = FVector(0,0,0));
 
     void selectCurrentProductItem(const FString& ItemName);
     void selectCurrentProductColor(FLinearColor Color);

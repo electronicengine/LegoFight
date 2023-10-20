@@ -333,8 +333,7 @@ void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const F
     Object->AddActorLocalOffset(FVector(0, 0, (Object->Height_Offset) * -1));
 
     if (Cast<AWeapon>(Object)) {
-        Object->enablePhysics(false);
-        Object->setCollisionProfile("OverlapAll");
+        Cast<AWeapon>(Object)->makePluginSettings();
     }
     else {
         Object->enablePhysics(true);

@@ -12,9 +12,12 @@ AWeapon::AWeapon()
 
     Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     Camera->SetupAttachment(Brick);
+    static ConstructorHelpers::FObjectFinder<UParticleSystem> particle(TEXT("/Game/effects/effect"));
+    Particle_Effect = particle.Object;
+
 
     Healt_ = 900000;
-    
+    Type_ = WeaponType::fire;
 
 
 }
@@ -27,7 +30,8 @@ void AWeapon::Tick(float DeltaTime)
         return;
 
     if (Owner_Car) {
-        if (Owner_Car->carHasPassenger()) {
+        if (Owner_Car->carHasPassenger() && Type_ == WeaponType::fire)
+        {
 
             // Get the player controller
             APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
@@ -46,7 +50,7 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::aimToRotation(FRotator& Rot)
 {
-    SetActorRotation(Rot);
+        SetActorRotation(Rot);
 }
 
 void AWeapon::removeOwner()
@@ -79,6 +83,48 @@ bool AWeapon::checkWeaponDetached()
     return false;
 }
 
+void AWeapon::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+    int now = time(NULL);
+
+    if (now - Last_Time > 1) {
+        int crash_speed = Brick->GetPhysicsLinearVelocity().Size();
+
+        if (Cast<ABrick>(OtherActor)) {
+
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
+            Cast<ABrick>(OtherActor)->addDamage(crash_speed * 4);
+        }
+        else if (Cast<ALegoCarChasis>(OtherActor)) {
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
+            Cast<ALegoCarChasis>(OtherActor)->addDamage(crash_speed * 4);
+        }
+        Last_Time = now;
+    }
+
+}
+
+void AWeapon::makePluginSettings()
+{
+    Type_ = (Brick_Name.Find("fire") >= 0) ? WeaponType::fire : WeaponType::melee;
+
+    if (Type_ == WeaponType::fire) {
+
+        enablePhysics(false);
+        setCollisionProfile("OverlapAll");
+    }
+    else {
+        enablePhysics(true);
+        setCollisionProfile("BlockAll");
+        Brick->SetMassOverrideInKg(NAME_None, 10, true);
+        Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+        Brick->SetNotifyRigidBodyCollision(true);
+
+        Brick->OnComponentHit.AddDynamic(this, &AWeapon::OnHit);
+
+    }
+}
+
 
 void AWeapon::useWeapon()
 {
@@ -97,7 +143,7 @@ void AWeapon::useWeapon()
 void AWeapon::fire()
 {
 
-    if (Owner_Car) {
+    if (Owner_Car && Type_== WeaponType::fire) {
         ABullet* bullet_ptr;
 
         Barrel_Location = Brick->GetSocketLocation("barrel");

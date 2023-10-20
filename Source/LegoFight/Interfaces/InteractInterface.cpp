@@ -103,7 +103,7 @@ void IInteractInterface::buyBrick()
 {
     
     if (Grabbable_Brick == nullptr && Game_Instance) {
-        Grabbable_Brick = Cast<ABrick>(Game_Instance->spawnItem(FVector(0, 0, 0), FRotator(0, 0, 0)));
+        Grabbable_Brick = Cast<ABrick>(Game_Instance->spawnItem(FVector(0, 0, 0), FRotator(0, 0, 0),"", Aim_Impact_Point));
 
         if (Grabbable_Brick != nullptr)
         {

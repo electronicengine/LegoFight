@@ -21,6 +21,7 @@ bool UCharacterWidget::Initialize()
 	Button_ZoomOut->OnClicked.AddDynamic(this, &UCharacterWidget::Button_ZoomOutClicked);
 	Button_LocationOffset->OnClicked.AddDynamic(this, &UCharacterWidget::Button_LocationOffsetClicked);
 	Button_RotationOffset->OnClicked.AddDynamic(this, &UCharacterWidget::Button_RotationOffsetClicked);
+	Button_Jump->OnClicked.AddDynamic(this, &UCharacterWidget::Button_JumpClicked);
 
 
 	Button_GetBrick->SetVisibility(ESlateVisibility::Hidden);
@@ -34,6 +35,7 @@ bool UCharacterWidget::Initialize()
 	Button_ZoomOut->SetVisibility(ESlateVisibility::Hidden);
 	Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
 	Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
+	Button_Jump->SetVisibility(ESlateVisibility::Visible);
 
 	return true;
 }
@@ -93,6 +95,7 @@ void UCharacterWidget::Button_InteractClicked()
 		character->equip();
 	}
 	else {
+
 		ALegoCarChasis* vehicle = Cast<ALegoCarChasis>(GetOwningPlayerPawn());
 		if (vehicle) {
 			vehicle->exitCar();
@@ -104,12 +107,17 @@ void UCharacterWidget::Button_InteractClicked()
 void UCharacterWidget::Button_FireClicked()
 {
 	ALegoCharacter* character = Cast<ALegoCharacter>(GetOwningPlayerPawn());
-	if (character)
+	if (character) {
 		character->fire();
 
-	ALegoCarChasis* vehicle = Cast<ALegoCarChasis>(GetOwningPlayerPawn());
-	if (vehicle)
-		vehicle->fire();
+	}
+	else {
+		ALegoCarChasis* vehicle = Cast<ALegoCarChasis>(GetOwningPlayerPawn());
+		if (vehicle)
+			vehicle->fire();
+	}
+
+
 
 }
 
@@ -158,6 +166,8 @@ void UCharacterWidget::Button_AimClicked()
 			Button_ZoomOut->SetVisibility(ESlateVisibility::Visible);
 			Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
 			Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
+			Button_Jump->SetVisibility(ESlateVisibility::Hidden);
+
 		}
 		else {
 			Button_GetBrick->SetVisibility(ESlateVisibility::Hidden);
@@ -171,6 +181,8 @@ void UCharacterWidget::Button_AimClicked()
 			Button_ZoomOut->SetVisibility(ESlateVisibility::Hidden);
 			Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
 			Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
+			Button_Jump->SetVisibility(ESlateVisibility::Visible);
+
 		}
 	}
 
@@ -206,6 +218,19 @@ void UCharacterWidget::Button_RotationOffsetClicked()
 	if (character) {
 		character->giveOffsetRotation();
 	}
+}
+
+void UCharacterWidget::Button_JumpClicked()
+{
+	ALegoCharacter* character = Cast<ALegoCharacter>(GetOwningPlayerPawn());
+	if (character) {
+		character->Jump();
+	}
+
+	ALegoCarChasis* vehicle = Cast<ALegoCarChasis>(GetOwningPlayerPawn());
+	if (vehicle)
+		vehicle->jump();
+	
 }
 
 void UCharacterWidget::setInteractButtonVisibilty(ESlateVisibility Val)

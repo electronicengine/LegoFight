@@ -155,8 +155,6 @@ public:
     std::vector<float> Distance_Array;
     void setLegoCarOwner(ALegoCarChasis *Car);
 
-    UFUNCTION()
-    void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
     UStaticMesh* test_mesh;
     bool First_Hit;
 

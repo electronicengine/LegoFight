@@ -14,6 +14,11 @@
 
 
 
+enum WeaponType {
+    fire,
+    melee
+};
+
 class ALegoCharacter;
 class ACharacter;
 /**
@@ -25,12 +30,17 @@ class LEGOFIGHT_API AWeapon : public ABrick
 	GENERATED_BODY()
 	
 
-     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-     UCameraComponent* Camera;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+        UCameraComponent* Camera;
+    UParticleSystem* Particle_Effect;
+
     FVector Barrel_Location;
     FRotator Barrel_Rotation;
     USceneComponent* barrel;
-     ACharacter *User_;
+    ACharacter *User_;
+    WeaponType Type_;
+    int Last_Time;
+
 public:
 
     AWeapon();
@@ -42,8 +52,11 @@ public:
     void aimToRotation(FRotator &Rotation);
     void removeOwner();
     bool checkWeaponDetached();
+    void makePluginSettings();
 
     virtual void Tick(float DeltaTime) override;
+    UFUNCTION()
+        void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	
 };

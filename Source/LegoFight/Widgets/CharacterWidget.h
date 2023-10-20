@@ -48,7 +48,8 @@ public:
         UButton* Button_LocationOffset;
     UPROPERTY(meta = (BindWidget))
         UButton* Button_RotationOffset;
-
+    UPROPERTY(meta = (BindWidget))
+        UButton* Button_Jump;
 
     virtual bool Initialize();
 
@@ -74,7 +75,8 @@ public:
         void Button_LocationOffsetClicked();
     UFUNCTION()
         void Button_RotationOffsetClicked();
-
+    UFUNCTION()
+        void Button_JumpClicked();
 
 
     void setInteractButtonVisibilty(ESlateVisibility Val);

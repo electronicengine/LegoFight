@@ -226,12 +226,12 @@ void ALegoCarChasis::fire()
 
     static int weapon_index;
 
-    if(Weapons.size() != 0)
-    {
 
-        if(Weapons[Current_Weapon_Index])
-            Weapons[Current_Weapon_Index]->fire();
+    for (std::pair<int, AWeapon*> weapon : Weapons) {
+        weapon.second->fire();
+
     }
+   
 
 }
 
@@ -254,7 +254,7 @@ int ALegoCarChasis::addWeaponToInventory(AWeapon *Weapon)
 {
     Current_Weapon_Index++;
 
-    Weapons.insert(std::make_pair(Current_Weapon_Index, Weapon));
+    Weapons.emplace(std::make_pair(Current_Weapon_Index, Weapon));
 
     return Current_Weapon_Index;
 

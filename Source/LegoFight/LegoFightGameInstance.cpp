@@ -250,14 +250,16 @@ ALegoCarChasis *ULegoFightGameInstance::spawnVehicle(const FString& Name, const 
 {
     ALegoCarChasis *vehicle;
 
-    if (Name.Find(ENEMY_APPENDIX) >= 0) {
+    if (Name.Find(AI_APPENDIX) >= 0) {
 
         vehicle = GetWorld()->SpawnActor<AEnemyLegoVehicle>(AEnemyLegoVehicle::StaticClass(), SpawnLocation + FVector(0, 0, 100.0f), SpawnRotation);
 
+        GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, "spawnVehicleAI");
 
     }
     else {
         vehicle = GetWorld()->SpawnActor<ALegoCarChasis>(ALegoCarChasis::StaticClass(), SpawnLocation + FVector(0, 0, 100.0f), SpawnRotation);
+        GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, "spawnVehicle");
 
     }
 
@@ -274,7 +276,7 @@ AWeapon* ULegoFightGameInstance::spawnWeapon(const FString& Name, const FVector&
     return weapon;
 }
 
-AActor* ULegoFightGameInstance::spawnItem(const FVector& SpawnLocation, const FRotator& SpawnRotation, const FString& Name)
+AActor* ULegoFightGameInstance::spawnItem(const FVector& SpawnLocation, const FRotator& SpawnRotation, const FString& Name, const FVector& ImpactPoint)
 {
     FString item_name;
     AWeapon* weapon;
@@ -293,7 +295,7 @@ AActor* ULegoFightGameInstance::spawnItem(const FVector& SpawnLocation, const FR
         return weapon;
     }
     else if (item_name.Find(VEHICLE_APPENDIX) > 0) {
-        vehicle = spawnVehicle(item_name, SpawnLocation, SpawnRotation);
+        vehicle = spawnVehicle(item_name, ImpactPoint, SpawnRotation);
         return vehicle;
     }
     else {

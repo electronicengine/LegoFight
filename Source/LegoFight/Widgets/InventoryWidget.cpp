@@ -48,15 +48,15 @@ bool UInventoryWidget::Initialize()
 
         // Set the button's background image using the slate brush
         btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(200, 200));
 
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(200, 200));
         btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
 
         btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(200, 200));
 
         box->AddChild(btn);
         GeneralBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
@@ -74,15 +74,15 @@ bool UInventoryWidget::Initialize()
 
         // Set the button's background image using the slate brush
         btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(200, 200));
 
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(200, 200));
         btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
 
         btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(200, 200));
 
         box->AddChild(btn);
         VehicleBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
@@ -100,15 +100,15 @@ bool UInventoryWidget::Initialize()
 
         // Set the button's background image using the slate brush
         btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(200, 200));
 
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(200, 200));
         btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
 
         btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(200, 200));
 
         box->AddChild(btn);
         WeaponBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
@@ -126,15 +126,15 @@ bool UInventoryWidget::Initialize()
 
         // Set the button's background image using the slate brush
         btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(200, 200));
 
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(200, 200));
         btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
 
         btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(200, 200));
 
         box->AddChild(btn);
         BuildingBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
@@ -153,15 +153,15 @@ bool UInventoryWidget::Initialize()
 
         // Set the button's background image using the slate brush
         btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Normal.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(200, 200));
 
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
         btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(200, 200));
         btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
 
         btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
-        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(130, 130));
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(200, 200));
 
         box->AddChild(btn);
         Color_Buttons.push_back(std::make_pair(asset->GetName(), btn));
@@ -193,6 +193,9 @@ void UInventoryWidget::removeWidget()
     setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
     setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
     setVisibilityCategoryButtons(Color_Buttons, false);
+
+    controller->bShowMouseCursor = false;
+
 
     controller->SetInputMode(FInputModeGameOnly());
 
