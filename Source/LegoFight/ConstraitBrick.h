@@ -14,12 +14,14 @@ class LEGOFIGHT_API AConstraitBrick : public ABrick
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UPhysicsConstraintComponent* Constrait;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UStaticMeshComponent* Additional_Brick;
 
 public:
 	AConstraitBrick();
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UPhysicsConstraintComponent* Constrait;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UStaticMeshComponent* Additional_Brick;
 };
