@@ -36,7 +36,8 @@ enum BrickMenuCategory {
     General,
     Weapon,
     Vehicle,
-    Building
+    Building,
+    Machine
 };
 /**
  * 
@@ -54,6 +55,8 @@ class LEGOFIGHT_API UInventoryWidget : public UUserWidget
     std::vector<std::pair<FString, UButton*>> WeaponBrick_Buttons;
     std::vector<std::pair<FString, UButton*>> VehicleBrick_Buttons;
     std::vector<std::pair<FString, UButton*>> BuildingBrick_Buttons;
+    std::vector<std::pair<FString, UButton*>> MachineBrick_Buttons;
+
     std::vector<std::pair<FString, UButton*>> Color_Buttons;
 
 
@@ -74,6 +77,8 @@ class LEGOFIGHT_API UInventoryWidget : public UUserWidget
     UButton* Button_Vehicle_Category;
     UPROPERTY(meta = (BindWidget))
     UButton* Button_Building_Category;
+    UPROPERTY(meta = (BindWidget))
+    UButton* Button_Machine_Category;
 
     UPROPERTY(meta = (BindWidget))
         UScrollBox* box;

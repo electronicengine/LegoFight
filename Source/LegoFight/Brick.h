@@ -117,6 +117,7 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
         UStaticMesh* Brick_Mesh;
 
+    UStaticMesh* Ghost_Mesh;
 
     UPROPERTY(EditAnywhere)
         UMaterial* Material;
@@ -145,7 +146,7 @@ public:
     UStaticMesh *getBrickMesh();
     void addDamage(int Value);
     void breakBrick();
-    void setMaterialColor(FLinearColor Color);
+    virtual void setMaterialColor(FLinearColor Color);
     void setBrickTypeOptions(ItemOptions& Options);
 
     FString Brick_Name;

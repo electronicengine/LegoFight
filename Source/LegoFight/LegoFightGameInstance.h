@@ -8,6 +8,7 @@
 #include "Brick.h"
 #include "Guns/Weapon.h"
 #include "Vehicles/EnemyLegoVehicle.h"
+#include "ConstraitBrick.h"
 #include <map>
 
 #include "LegoFightGameInstance.generated.h"
@@ -17,6 +18,7 @@
 #define FIRE_WEAPON_APPENDIX    "fire"
 #define MELEE_WEAPON_APPENDIX   "melee"
 #define VEHICLE_APPENDIX        "vehicle"
+#define MACHINE_APPENDIX        "machine"
 #define AI_APPENDIX             "ai"
 #define SIDED_APPENDIX          "sided"
 #define LOW_APPENDIX            "Low"
@@ -60,13 +62,13 @@ class LEGOFIGHT_API ULegoFightGameInstance : public UGameInstance
 
     FString Selected_Item;
     FLinearColor Selected_Color;
-
+    UBlueprintGeneratedClass* GeneratedClass;
 
 
     std::map<FString, UStaticMesh*> General_Brick_Meshes;
     std::map<FString, UStaticMesh*> Weapon_Meshes;
     std::map<FString, UStaticMesh*> Vehicle_Meshes;
-
+    std::map<FString, AConstraitBrick*> MachineClasses;
 
     std::map<FString, ItemOptions> Item_Options;
 
@@ -94,6 +96,8 @@ public:
     ABrick* spawnBrick(const FString& Name, const FVector &SpawnLocation, const FRotator &SpawnRotation);
     ALegoCarChasis *spawnVehicle(const FString& Name, const FVector &SpawnLocation, const FRotator &SpawnRotation);
     AWeapon* spawnWeapon(const FString& Name, const FVector& SpawnLocation, const FRotator& SpawnRotation);
+    AConstraitBrick* spawnMachine(const FString& Name, const FVector& SpawnLocation, const FRotator& SpawnRotation);
+
     AActor* spawnItem(const FVector& SpawnLocation, const FRotator& SpawnRotation, const FString& Name = "", const FVector& ImpactPoint = FVector(0,0,0));
 
     void selectCurrentProductItem(const FString& ItemName);

@@ -30,13 +30,9 @@ ABrick::ABrick()
 
     plugged = false;
 
-
-
-
-
     for (int i = 0; i < 400; i++) {
 
-        FString scene_name = "sidescene";
+        FString scene_name = "const";
         scene_name.AppendInt(i);
 
         USceneComponent* scene;
@@ -77,10 +73,9 @@ USceneComponent* ABrick::CreatePluginPoint(FString Name)
 
         return nullptr;
     }
-       
+
     scene = plugs.front();
     plugs.pop();
-   
 
     return scene;
 }
@@ -114,7 +109,7 @@ void ABrick::setCollisionProfile(FString Profile)
 
 UStaticMesh *ABrick::getBrickMesh()
 {
-    return Brick_Mesh;
+    return Ghost_Mesh;
 }
 
 
@@ -176,11 +171,18 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
 
     Brick->SetStaticMesh(Options.Mesh);
+    Ghost_Mesh = Options.Mesh;
     Brick_Mesh = Options.Mesh;
     Brick->SetMaterialByName(FName("main"), Options.Material);
     Material = Options.Material;
 
+    if (Options.Name.Find("Plate") >= 0) {
+        Brick->SetMassOverrideInKg(NAME_None, 1000000, true);
+        Brick->SetMassScale(NAME_None, 100000);
+        Brick->bIgnoreRadialForce = true;
+        Brick->bIgnoreRadialImpulse = true;
 
+    }
     FVector Origin;
     FVector BoxExtent;
     float SphereRadius;

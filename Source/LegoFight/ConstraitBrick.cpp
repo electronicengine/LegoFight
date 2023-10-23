@@ -2,12 +2,87 @@
 
 
 #include "ConstraitBrick.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Containers/UnrealString.h"
+#include "Engine/StaticMeshSocket.h"
+
 
 AConstraitBrick::AConstraitBrick() {
 
-	Constrait = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("Constrait"));
-	Additional_Brick = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Additional Mesh"));
 
-	Constrait->SetConstrainedComponents(Brick, NAME_None, Additional_Brick, NAME_None);
 
+    Add = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Add"));
+    Add->SetMobility(EComponentMobility::Movable);  // Set as movable
+
+    Add->SetupAttachment(RootComponent);
+
+
+    Add->SetSimulatePhysics(true);
+    Brick->SetSimulatePhysics(true);
+    Brick->SetMobility(EComponentMobility::Movable);  // Set as movable
+
+
+    USceneComponent* scene;
+
+    while (plugs.size() > 0) {
+        scene = plugs.front();
+        scene->DestroyComponent();
+        plugs.pop();
+    }
+
+    for (int i = 0; i < 10; i++) {
+
+        FString scene_name = "constrait";
+        scene_name.AppendInt(i);
+
+        scene = CreateDefaultSubobject<USceneComponent>(FName(scene_name));
+        scene->SetupAttachment(Add);
+        plugs.push(scene);
+
+    }
+
+    Healt_ = 1000;
+    Height_Offset = 20;
+    Machine_Running = false;
+
+}
+
+bool AConstraitBrick::turnOnOffMachine()
+{
+
+    if (Machine_Running) {
+        Machine_Running = false;
+    }
+    else {
+        Machine_Running = true;
+
+    }
+
+    return Machine_Running;
+}
+
+void AConstraitBrick::setGhostComponent(UStaticMesh* Mesh)
+{
+    Ghost_Mesh = Mesh;
+}
+
+void AConstraitBrick::BeginPlay()
+{
+    Super::BeginPlay();
+    FVector pivot = FVector(0,0,30.7f);
+
+
+    setupPluginPoints(pivot, 2, 1);
+
+}
+
+void AConstraitBrick::setMaterialColor(FLinearColor Color)
+{
+
+    Brick->CreateDynamicMaterialInstance(0);
+    Brick->SetVectorParameterValueOnMaterials(FName("BaseColor"), FVector(Color));
+    Brick_Color = FVector(Color);
+
+    Add->CreateDynamicMaterialInstance(0);
+    Add->SetVectorParameterValueOnMaterials(FName("BaseColor"), FVector(Color));
 }

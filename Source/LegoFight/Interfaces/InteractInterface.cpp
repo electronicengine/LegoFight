@@ -22,54 +22,62 @@ IInteractInterface::IInteractInterface()
 
 void IInteractInterface::equip()
 {
-    if (Cast<ALegoCarChasis>(this)) {
-        exitCar();
+    if (Aiming_) {
+        if (Cast<AConstraitBrick>(Target_Plugable_Item)) {
+            Cast<AConstraitBrick>(Target_Plugable_Item)->turnOnOffMachine();
+        }
     }
     else {
-
-        if (Cast<ALegoCarChasis>(Object_NearBy))
-        {
-            enteredToCar();
-            Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
-            Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setAimButtonVisibilty(ESlateVisibility::Hidden);
-
-
-
+        if (Cast<ALegoCarChasis>(this)) {
+            exitCar();
         }
-        else if (Cast<ABrick>(Object_NearBy))
-        {
+        else {
 
-            if (Grabbable_Brick == Cast<ABrick>(Object_NearBy))
-                dropObject(Grabbable_Brick);
-            else
+            if (Cast<ALegoCarChasis>(Object_NearBy))
             {
-                if (Grabbable_Brick == nullptr)
-                {
-                    Grabbable_Brick = Cast<ABrick>(Object_NearBy);
-                    grapObject(Grabbable_Brick);
+                enteredToCar();
+                Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
+                Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setAimButtonVisibilty(ESlateVisibility::Hidden);
 
-                }
+
+
+            }
+            else if (Cast<ABrick>(Object_NearBy))
+            {
+
+                if (Grabbable_Brick == Cast<ABrick>(Object_NearBy))
+                    dropObject(Grabbable_Brick);
                 else
                 {
+                    if (Grabbable_Brick == nullptr)
+                    {
+                        Grabbable_Brick = Cast<ABrick>(Object_NearBy);
+                        grapObject(Grabbable_Brick);
 
-                    dropObject(Grabbable_Brick);
-                    Grabbable_Brick = Cast<ABrick>(Object_NearBy);
+                    }
+                    else
+                    {
 
-                    grapObject(Grabbable_Brick);
+                        dropObject(Grabbable_Brick);
+                        Grabbable_Brick = Cast<ABrick>(Object_NearBy);
 
+                        grapObject(Grabbable_Brick);
+
+                    }
                 }
+
+
+            }
+            else
+            {
+                if (Grabbable_Brick != nullptr)
+                    dropObject(Grabbable_Brick);
+
             }
 
-
         }
-        else
-        {
-            if (Grabbable_Brick != nullptr)
-                dropObject(Grabbable_Brick);
-
-        }   
-
     }
+    
 
 }
 

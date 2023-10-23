@@ -53,5 +53,6 @@ public:
 
     ALegoCharacter* Passenger_;
     std::map<int, AWeapon*> Weapons;
+    bool Aiming_;
 
 };

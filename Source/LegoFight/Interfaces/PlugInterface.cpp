@@ -3,6 +3,7 @@
 
 #include "PlugInterface.h"
 #include "../Brick.h"
+#include "../ConstraitBrick.h"
 #include "../Vehicles/LegoCarChasis.h"
 #include <vector>
 #include "Engine/Engine.h"
@@ -315,10 +316,25 @@ void IPlugInterface::detachItemsOnIt()
     if (brick) {
 
 
+        for (auto item : Plugged_Items_OnIt) {
+            if (Cast<AConstraitBrick>(item.second)) {
+                Cast<AConstraitBrick>(item.second)->Add->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+                    EDetachmentRule::KeepWorld,
+                    EDetachmentRule::KeepWorld, true));
+
+                Cast<AConstraitBrick>(item.second)->enablePhysics(true);
+                Cast<AConstraitBrick>(item.second)->setCollisionProfile("BlockAll");
+
+            }
+        }
+
+      
         const FDetachmentTransformRules& detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
             EDetachmentRule::KeepWorld,
             EDetachmentRule::KeepWorld, true);
         Cast<AActor>(brick)->DetachFromActor(detachment_rules);
+        
+
 
         brick->enablePhysics(true);
         brick->setCollisionProfile("BlockAll");
@@ -335,13 +351,13 @@ void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const F
 
     const FDetachmentTransformRules& attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
         EDetachmentRule::KeepWorld,
-        EDetachmentRule::KeepWorld, false);
+        EDetachmentRule::KeepWorld, true);
     Object->DetachFromActor(attachment_rules);
+    Object->enablePhysics(false);
 
-    Object->SetActorEnableCollision(true);
 
     Object->SetActorLocationAndRotation(Location, Rotation,
-        false, 0, ETeleportType::None);
+        true, NULL, ETeleportType::TeleportPhysics);
 
     Object->AddActorLocalRotation(OffsetRotation);
     Object->AddActorLocalOffset(OffsetLocation);
@@ -351,15 +367,29 @@ void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const F
     if (Cast<AWeapon>(Object)) {
         Cast<AWeapon>(Object)->makePluginSettings();
     }
-    else {
+    else if (Cast<AConstraitBrick>(Object)) {
+    }
+    else
+    {
         Object->enablePhysics(true);
         Object->setCollisionProfile("BlockAll");
+        Object->SetActorEnableCollision(true);
+    }
+
+    if (Cast<AConstraitBrick>(this)) {
+        Object->AttachToComponent(Cast<AConstraitBrick>(this)->Add, FAttachmentTransformRules(EAttachmentRule::KeepWorld,
+            EAttachmentRule::KeepWorld,
+            EAttachmentRule::KeepWorld, true));
+    }
+    else {
+        Object->AttachToActor(Cast<AActor>(this), FAttachmentTransformRules(EAttachmentRule::KeepWorld,
+            EAttachmentRule::KeepWorld,
+            EAttachmentRule::KeepWorld, true));
     }
 
 
-    Object->AttachToActor(Cast<AActor>(this), FAttachmentTransformRules(EAttachmentRule::KeepWorld,
-        EAttachmentRule::KeepWorld,
-        EAttachmentRule::KeepWorld, true));
+
+
 }
 
 void IPlugInterface::setOwner(ABrick* Object)

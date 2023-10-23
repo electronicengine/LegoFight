@@ -38,10 +38,12 @@ ULegoFightGameInstance::ULegoFightGameInstance()
         General_Brick_Meshes[asset->GetName()] = Cast<UStaticMesh>(asset);
     }
 
+
     // default material
     static ConstructorHelpers::FObjectFinder<UMaterial>
         material_asset(TEXT("Material'/Game/bricks/materials/brick_material.brick_material'"));
     Default_Brick_Material = material_asset.Object;
+
 
     initializeItemOptions();
     initializeDestructables();
@@ -268,11 +270,24 @@ AWeapon* ULegoFightGameInstance::spawnWeapon(const FString& Name, const FVector&
     return weapon;
 }
 
+AConstraitBrick* ULegoFightGameInstance::spawnMachine(const FString& Name, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+{
+    FString path = FString("Blueprint'/Game/bricks/MachineBP/") + Name + FString(".") + Name + FString("'");
+    UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, *path));
+    UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+
+    AConstraitBrick* machine = GetWorld()->SpawnActor<AConstraitBrick>(GeneratedBP->GeneratedClass, SpawnLocation, SpawnRotation);
+    machine->setGhostComponent(General_Brick_Meshes[Name]);
+    machine->setMaterialColor(Selected_Color);
+    return machine;
+}
+
 AActor* ULegoFightGameInstance::spawnItem(const FVector& SpawnLocation, const FRotator& SpawnRotation, const FString& Name, const FVector& ImpactPoint)
 {
     FString item_name;
     AWeapon* weapon;
     ALegoCarChasis* vehicle;
+    AConstraitBrick* machine;
     ABrick* brick;
 
     if (Name.GetAllocatedSize() != 0)
@@ -289,6 +304,10 @@ AActor* ULegoFightGameInstance::spawnItem(const FVector& SpawnLocation, const FR
     else if (item_name.Find(VEHICLE_APPENDIX) > 0) {
         vehicle = spawnVehicle(item_name, ImpactPoint, SpawnRotation);
         return vehicle;
+    }
+    else if (item_name.Find(MACHINE_APPENDIX) > 0) {
+        machine = spawnMachine(item_name, ImpactPoint, SpawnRotation);
+        return machine;
     }
     else {
         brick = spawnBrick(item_name, SpawnLocation, SpawnRotation);

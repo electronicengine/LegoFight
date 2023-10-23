@@ -31,6 +31,7 @@ bool UInventoryWidget::Initialize()
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Vehicle, Button_Vehicle_Category));
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Weapon, Button_Weapon_Category));
     Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Building, Button_Building_Category));
+    Category_Buttons.push_back(std::make_pair(BrickMenuCategory::Machine, Button_Machine_Category));
 
     UButton* btn;
     UTexture2D* btn_texture;
@@ -140,6 +141,32 @@ bool UInventoryWidget::Initialize()
         BuildingBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
     }
 
+    TArray<UObject*> machines_assets;
+    EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/machines/"), machines_assets, EngineUtils::ATL_Regular);
+    for (auto asset : machines_assets)
+    {
+        btn_texture = Cast<UTexture2D>(asset);
+        name_appendix = FString::FromInt(i++);
+
+        btn = NewObject<UButton>(UButton::StaticClass());
+        btn->AppendName(name_appendix);
+
+        // Set the button's background image using the slate brush
+        btn->WidgetStyle.Normal.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Normal.SetImageSize(FVector2D(200, 200));
+
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Hovered.SetImageSize(FVector2D(200, 200));
+        btn->WidgetStyle.Hovered.TintColor = FLinearColor(0.270498, 0.270498, 0.270498);
+
+        btn->WidgetStyle.Pressed.SetResourceObject(btn_texture);
+        btn->WidgetStyle.Pressed.SetImageSize(FVector2D(200, 200));
+
+        box->AddChild(btn);
+        MachineBrick_Buttons.push_back(std::make_pair(asset->GetName(), btn));
+    }
+
 
     TArray<UObject*> color_assets;
     EngineUtils::FindOrLoadAssetsByPath(FString("/Game/widgets/thumbnails/colors/"), color_assets, EngineUtils::ATL_Regular);
@@ -175,7 +202,10 @@ bool UInventoryWidget::Initialize()
     setVisibilityCategoryButtons(VehicleBrick_Buttons, false);
     setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
     setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
+    setVisibilityCategoryButtons(MachineBrick_Buttons, false);
+
     setVisibilityCategoryButtons(Color_Buttons, false);
+
 
     return true;
 }
@@ -192,6 +222,8 @@ void UInventoryWidget::removeWidget()
     setVisibilityCategoryButtons(VehicleBrick_Buttons, false);
     setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
     setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
+    setVisibilityCategoryButtons(MachineBrick_Buttons, false);
+
     setVisibilityCategoryButtons(Color_Buttons, false);
 
     controller->bShowMouseCursor = false;
@@ -219,6 +251,7 @@ void UInventoryWidget::checkCategory()
                     setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
                     setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
                     setVisibilityCategoryButtons(Color_Buttons, false);
+                    setVisibilityCategoryButtons(MachineBrick_Buttons, false);
 
                     break;
 
@@ -230,6 +263,7 @@ void UInventoryWidget::checkCategory()
                     setVisibilityCategoryButtons(WeaponBrick_Buttons, true);
                     setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
                     setVisibilityCategoryButtons(Color_Buttons, false);
+                    setVisibilityCategoryButtons(MachineBrick_Buttons, false);
 
                     break;
 
@@ -241,6 +275,7 @@ void UInventoryWidget::checkCategory()
                     setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
                     setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
                     setVisibilityCategoryButtons(Color_Buttons, false);
+                    setVisibilityCategoryButtons(MachineBrick_Buttons, false);
 
                     break;
 
@@ -252,6 +287,19 @@ void UInventoryWidget::checkCategory()
                     setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
                     setVisibilityCategoryButtons(BuildingBrick_Buttons, true);
                     setVisibilityCategoryButtons(Color_Buttons, false);
+                    setVisibilityCategoryButtons(MachineBrick_Buttons, false);
+
+                    break;
+
+                case BrickMenuCategory::Machine:
+                    Current_Category_Buttons = &MachineBrick_Buttons;
+
+                    setVisibilityCategoryButtons(GeneralBrick_Buttons, false);
+                    setVisibilityCategoryButtons(VehicleBrick_Buttons, false);
+                    setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
+                    setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
+                    setVisibilityCategoryButtons(Color_Buttons, false);
+                    setVisibilityCategoryButtons(MachineBrick_Buttons, true);
 
                     break;
 
@@ -312,6 +360,8 @@ void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
                         setVisibilityCategoryButtons(VehicleBrick_Buttons, false);
                         setVisibilityCategoryButtons(WeaponBrick_Buttons, false);
                         setVisibilityCategoryButtons(BuildingBrick_Buttons, false);
+                        setVisibilityCategoryButtons(MachineBrick_Buttons, false);
+
                         setVisibilityCategoryButtons(Color_Buttons, true);
 
                         Current_Category_Buttons = &Color_Buttons;

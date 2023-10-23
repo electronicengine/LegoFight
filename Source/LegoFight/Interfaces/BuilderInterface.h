@@ -30,7 +30,6 @@ protected:
 
 	UMaterial* Ghost_Possible_Material;
 	UMaterial* Ghost_Imposible_Material;
-	UStaticMeshComponent* Ghost_Component;
 	bool Building;
 	int Tick_Count;
 	bool Brick_Plugable;
@@ -61,5 +60,6 @@ public:
 
 	ABrick* Grabbable_Brick;
 	bool Keeping_Bricks;
+	UStaticMeshComponent* Ghost_Component;
 
 };

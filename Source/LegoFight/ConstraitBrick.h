@@ -19,9 +19,15 @@ class LEGOFIGHT_API AConstraitBrick : public ABrick
 public:
 	AConstraitBrick();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		UPhysicsConstraintComponent* Constrait;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMeshComponent* Add;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		UStaticMeshComponent* Additional_Brick;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool Machine_Running;
+
+	bool turnOnOffMachine();
+	void setGhostComponent(UStaticMesh* Mesh);
+	virtual void BeginPlay() override;
+	virtual void setMaterialColor(FLinearColor Color);
+
 };
