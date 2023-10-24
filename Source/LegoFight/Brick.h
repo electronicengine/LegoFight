@@ -103,7 +103,6 @@ class LEGOFIGHT_API ABrick : public AActor, public IBuiltInInterface, public IPl
 public:
     // Sets default values for this actor's properties
     ABrick();
-
     std::queue<USceneComponent*> plugs;
 
     UPROPERTY(EditAnywhere)
@@ -128,7 +127,6 @@ public:
 
 
 protected:
-
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -9,7 +9,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Containers/UnrealString.h"
 #include "Engine/StaticMeshSocket.h"
-
 #include "Materials/MaterialInstanceDynamic.h"
 
 

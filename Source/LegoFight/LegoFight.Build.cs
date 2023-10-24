@@ -8,7 +8,7 @@ public class LegoFight : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "PhysXVehicles","Json", "JsonUtilities", "Slate", "SlateCore", "NavigationSystem"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "PhysXVehicles","Json", "JsonUtilities", "Slate", "SlateCore", "NavigationSystem", "CableComponent"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "BuilderInterface.h"
+#include "../ConstraitBrick.h"
+
 #include "InteractInterface.generated.h"
 
 
@@ -31,7 +33,6 @@ protected:
 
     bool Is_In_Car;
 
-
 public:
 
     IInteractInterface();
@@ -51,8 +52,10 @@ public:
     void saveAndLoad();
     void interactNearby(AActor* OtherActor);
 
+    AConstraitBrick* Cable_Start_Item;
     ALegoCharacter* Passenger_;
     std::map<int, AWeapon*> Weapons;
     bool Aiming_;
+
 
 };

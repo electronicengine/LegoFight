@@ -17,6 +17,7 @@
 
 IInteractInterface::IInteractInterface()
 {
+
 }
 
 
@@ -24,7 +25,19 @@ void IInteractInterface::equip()
 {
     if (Aiming_) {
         if (Cast<AConstraitBrick>(Target_Plugable_Item)) {
-            Cast<AConstraitBrick>(Target_Plugable_Item)->turnOnOffMachine();
+            if (Cast<AConstraitBrick>(Target_Plugable_Item)->Cable_Hook) {
+                if (!Cast<AConstraitBrick>(Target_Plugable_Item)->Cable_Start_Hooked && !Cable_Start_Item) {
+                    Cable_Start_Item = Cast<AConstraitBrick>(Target_Plugable_Item);
+                    Cable_Start_Item->Cable_Start_Hooked = true;
+                }
+                else if(Cable_Start_Item != Cast<AConstraitBrick>(Target_Plugable_Item)) {
+                    Cast<AConstraitBrick>(Target_Plugable_Item)->hookCableToItem(Cable_Start_Item);
+                    Cable_Start_Item = nullptr;
+                }
+            }
+            else {
+                Cast<AConstraitBrick>(Target_Plugable_Item)->turnOnOffMachine();
+            }
         }
     }
     else {

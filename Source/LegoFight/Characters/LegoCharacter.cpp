@@ -44,7 +44,6 @@ ALegoCharacter::ALegoCharacter()
 
     Ghost_Component = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ghost"));
 
-
 }
 
 
