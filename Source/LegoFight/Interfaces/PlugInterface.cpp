@@ -351,6 +351,7 @@ void IPlugInterface::detachItemsOnIt()
 
 void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const FRotator& Rotation, const FVector& OffsetLocation, const FRotator &OffsetRotation)
 {
+
     if (Object->Grabbed) {
         const FDetachmentTransformRules& attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
             EDetachmentRule::KeepWorld,
@@ -360,7 +361,7 @@ void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const F
     }
 
     Object->SetActorLocationAndRotation(Location, Rotation,
-        false, NULL, ETeleportType::TeleportPhysics);
+        false, NULL, ETeleportType::ResetPhysics);
 
     Object->AddActorLocalRotation(OffsetRotation);
     Object->AddActorLocalOffset(OffsetLocation);
@@ -371,7 +372,8 @@ void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const F
         Cast<AWeapon>(Object)->makePluginSettings();
     }
     else if (Cast<AConstraitBrick>(Object)) {
-        Cast<AConstraitBrick>(Object)->AttachedComponent = Cast<ABrick>(this)->Brick;
+        if(Cast<ABrick>(this))
+            Cast<AConstraitBrick>(Object)->AttachedComponent = Cast<ABrick>(this)->Brick;
     }
     else
     {
@@ -386,14 +388,13 @@ void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const F
             EAttachmentRule::KeepWorld, true));
     }
     else {
-        Object->AttachToComponent(Cast<ABrick>(this)->Brick, FAttachmentTransformRules(EAttachmentRule::KeepWorld,
+
+        Object->AttachToActor(Cast<AActor>(this), FAttachmentTransformRules(EAttachmentRule::KeepWorld,
             EAttachmentRule::KeepWorld,
             EAttachmentRule::KeepWorld, true));
+        
+
     }
-
-
-
-
 }
 
 void IPlugInterface::setOwner(ABrick* Object)

@@ -16,6 +16,11 @@ AConstraitBrick::AConstraitBrick() {
 
     Add->SetupAttachment(RootComponent);
 
+    Constrait = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("Constrait"));
+    Constrait->SetupAttachment(RootComponent);
+
+    AttachPoint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("Attach"));
+    AttachPoint->SetupAttachment(RootComponent);
 
     Add->SetSimulatePhysics(true);
     Brick->SetSimulatePhysics(true);

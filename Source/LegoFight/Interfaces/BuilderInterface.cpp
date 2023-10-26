@@ -4,6 +4,7 @@
 #include "BuilderInterface.h"
 #include "../Brick.h"
 #include "Kismet/GameplayStatics.h"
+#include "../ConstraitBrick.h"
 #include "Engine/World.h"
 
 IBuilderInterface::IBuilderInterface()
@@ -54,7 +55,7 @@ void IBuilderInterface::grapObject(ABrick* Object)
         Object->AttachToComponent(Cast<ACharacter>(this)->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
             EAttachmentRule::SnapToTarget,
             EAttachmentRule::KeepWorld, false), TEXT("grab_socket"));
-        Object->Brick->SetRelativeRotation(FRotator(0,180, 90), false, nullptr, ETeleportType::ResetPhysics);
+        Object->Brick->SetRelativeRotation(FRotator(0, 180, 90), false, nullptr, ETeleportType::ResetPhysics);
         Object->Brick->AddLocalOffset(FVector(0, -2, 0));
 
         Ghost_Component->SetStaticMesh(Object->getBrickMesh());
@@ -73,6 +74,7 @@ void IBuilderInterface::grapObject(ABrick* Object)
 
         Object->Grabbed = true;
     }
+    
 }
 
 

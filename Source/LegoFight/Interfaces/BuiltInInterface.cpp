@@ -130,7 +130,9 @@ void IBuiltInInterface::buildFromConstructionInfo(const ConstructionInfo &Info, 
             else if(vehicle)
                 location = vehicle->GetActorLocation() + FVector(50, 0, 0);
 
-            brick = Cast<ABrick>(GameInstance->spawnMachine(Info.Plugged_Items[i].Item_Name, location, FRotator(0, 0, 0)));        
+            brick = Cast<ABrick>(GameInstance->spawnMachine(Info.Plugged_Items[i].Item_Name, location, FRotator(0, 0, 0)));    
+            brick->enablePhysics(false);
+            brick->setCollisionProfile("OverlapAll");
         }
         else{
             brick = GameInstance->spawnBrick(Info.Plugged_Items[i].Item_Name, FVector(0, 0, 0), FRotator(0, 0, 0));

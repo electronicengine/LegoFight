@@ -308,7 +308,7 @@ AActor* ULegoFightGameInstance::spawnItem(const FVector& SpawnLocation, const FR
         return vehicle;
     }
     else if (item_name.Find(MACHINE_APPENDIX) > 0) {
-        machine = spawnMachine(item_name, SpawnLocation, FRotator(0,0,0));
+        machine = spawnMachine(item_name, SpawnLocation + FVector(100, 0, 0), FRotator(0,0,0));
         return machine;
     }
     else {

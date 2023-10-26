@@ -27,6 +27,12 @@ public:
 		UStaticMeshComponent* AttachedComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UPhysicsConstraintComponent* Constrait;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UPhysicsConstraintComponent* AttachPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Machine_Running;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -39,6 +45,8 @@ public:
 		void setHeightOffset(int Offset);
 
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Constrait")
+		void setupConstraits();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Hook")
 		void hookCableToItem(UStaticMeshComponent *Hook);
