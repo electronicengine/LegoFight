@@ -278,7 +278,9 @@ AConstraitBrick* ULegoFightGameInstance::spawnMachine(const FString& Name, const
 
     AConstraitBrick* machine = GetWorld()->SpawnActor<AConstraitBrick>(GeneratedBP->GeneratedClass, SpawnLocation, SpawnRotation);
     machine->setGhostComponent(General_Brick_Meshes[Name]);
+    machine->Brick_Name = Name;
     machine->setMaterialColor(Selected_Color);
+    
     return machine;
 }
 
@@ -306,7 +308,7 @@ AActor* ULegoFightGameInstance::spawnItem(const FVector& SpawnLocation, const FR
         return vehicle;
     }
     else if (item_name.Find(MACHINE_APPENDIX) > 0) {
-        machine = spawnMachine(item_name, ImpactPoint, SpawnRotation);
+        machine = spawnMachine(item_name, SpawnLocation, FRotator(0,0,0));
         return machine;
     }
     else {

@@ -188,33 +188,8 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
     UKismetSystemLibrary::GetComponentBounds(Brick, Origin, BoxExtent, SphereRadius);
 
+    setPivot(Brick);
 
-    TArray<FName> names = Brick->GetAllSocketNames();
-
-    for (FName name : names) {
-
-        FVector pivot = Brick->GetSocketLocation(name);
-
-        FString tag = Brick->GetSocketByName(name)->Tag;
-        FString width = tag.Mid(0, tag.Find(":"));
-
-
-        int plug_width = FCString::Atoi(*width.Mid(0, width.Find("x")));
-        int plug_height = FCString::Atoi(*width.Right(width.Find("x")));
-        FString plug_offset = tag.Mid(tag.Find(":") + 1, tag.Find(".") - tag.Find(":") - 1);
-        FString healt = tag.Mid(tag.Find(".") + 1, tag.Len() - 1);
-
-        if (name.ToString().Find("side") < 0) {
-            setupPluginPoints(pivot, plug_width, plug_height);
-            Height_Offset = FCString::Atoi(*plug_offset);
-        }
-        else {
-            setupSidePlugPoints(pivot, plug_width, plug_height);
-        }
-
-        Healt_ = FCString::Atoi( * healt);
-
-    }
 
 
     Destructible_Container = ADestrictable::StaticClass();
@@ -232,6 +207,37 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
 
 }
 
+void ABrick::setPivot(UStaticMeshComponent *Component)
+{
+    TArray<FName> names = Component->GetAllSocketNames();
+
+    for (FName name : names) {
+
+        const UStaticMeshSocket* soc = Component->GetSocketByName(name);
+        FVector pivot = soc->RelativeLocation;
+
+        FString tag = Component->GetSocketByName(name)->Tag;
+        FString width = tag.Mid(0, tag.Find(":"));
+
+
+        int plug_width = FCString::Atoi(*width.Mid(0, width.Find("x")));
+        int plug_height = FCString::Atoi(*width.Right(width.Find("x")));
+        FString plug_offset = tag.Mid(tag.Find(":") + 1, tag.Find(".") - tag.Find(":") - 1);
+        FString healt = tag.Mid(tag.Find(".") + 1, tag.Len() - 1);
+
+        if (name.ToString().Find("side") < 0) {
+            setupPluginPoints(pivot, plug_width, plug_height);
+            Height_Offset = FCString::Atoi(*plug_offset);
+        }
+        else {
+            setupSidePlugPoints(pivot, plug_width, plug_height);
+        }
+
+        Healt_ = FCString::Atoi(*healt);
+
+    }
+}
+
 
 
 
@@ -239,6 +245,30 @@ void ABrick::setLegoCarOwner(ALegoCarChasis *Car)
 {
     if(Car != nullptr)
         Owner_Car = Car;
+}
+
+void ABrick::applyForceToOwner(FVector Force, FVector Location)
+{
+    if (Owner_Item) {
+        if (Cast<AConstraitBrick>(Owner_Item)) {
+            if (Cast<AConstraitBrick>(Owner_Item)->ApplyForce_ToAdd) {
+                Cast<AConstraitBrick>(Owner_Item)->Add->AddForceAtLocation(Force / 10, Location);
+                Owner_Item->applyForceToOwner(Force / 100, Location);
+            }
+            else {
+                Owner_Item->applyForceToOwner(Force, Location);
+
+            }
+
+        }
+        else {
+            Owner_Item->applyForceToOwner(Force, Location);
+
+        }
+    }
+    else {
+        Brick->AddForceAtLocation(Force, Location);
+    }
 }
 
 

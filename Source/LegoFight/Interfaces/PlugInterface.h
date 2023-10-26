@@ -42,7 +42,6 @@ public:
         TArray<USceneComponent *> Plugin_Points;
 
         std::map<int, ABrick *> Plugged_Items_OnIt;
-
         bool plugged;
         int Current_Plugin_Index;
         float Height_Offset;

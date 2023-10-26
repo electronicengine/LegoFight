@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Brick.h"
+#include "Interfaces/BuilderInterface.h"
 #include "ConstraitBrick.generated.h"
 
 /**
@@ -15,12 +16,15 @@ class LEGOFIGHT_API AConstraitBrick : public ABrick
 	GENERATED_BODY()
 
 
-
+	
 public:
 	AConstraitBrick();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UStaticMeshComponent* Add;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMeshComponent* AttachedComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Machine_Running;
@@ -29,20 +33,24 @@ public:
 		bool Cable_Hook;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool Cable_Start_Hooked;
+		bool ApplyForce_ToAdd;
 
 	UFUNCTION(BlueprintCallable)
 		void setHeightOffset(int Offset);
 
+
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Hook")
-		void hookCableToItem(AConstraitBrick *Hook);
+		void hookCableToItem(UStaticMeshComponent *Hook);
 
 	UFUNCTION(BlueprintCallable)
 		UStaticMeshComponent* getBrickComponent() { return Brick; };
+
 
 	bool turnOnOffMachine();
 	void setGhostComponent(UStaticMesh* Mesh);
 	virtual void BeginPlay() override;
 	virtual void setMaterialColor(FLinearColor Color);
+	
 
 };

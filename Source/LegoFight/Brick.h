@@ -146,7 +146,7 @@ public:
     void breakBrick();
     virtual void setMaterialColor(FLinearColor Color);
     void setBrickTypeOptions(ItemOptions& Options);
-
+    void setPivot(UStaticMeshComponent* Component);
     FString Brick_Name;
     FVector Brick_Color;
 
@@ -156,5 +156,8 @@ public:
 
     UStaticMesh* test_mesh;
     bool First_Hit;
+    bool Grabbed;
 
+    UFUNCTION(BlueprintCallable)
+        void applyForceToOwner(FVector Force, FVector Location);
 };

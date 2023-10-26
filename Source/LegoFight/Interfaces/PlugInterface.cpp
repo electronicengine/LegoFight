@@ -219,7 +219,6 @@ void IPlugInterface::plugTheItem(ABrick *Object, int PluginIndex, const FRotator
         plug_location = Plugin_Points[PluginIndex]->GetComponentLocation();
         plug_rotation = Plugin_Points[PluginIndex]->GetComponentRotation();
         
-
         attachItem(Object, plug_location, plug_rotation, OffsetLocation, OffsetRotation);
         setOwner(Object);
 
@@ -233,10 +232,14 @@ void IPlugInterface::plugTheItem(ABrick *Object, int PluginIndex, const FRotator
 
 void IPlugInterface::putTheItem(const FVector& Location, const FRotator& Rotation)
 {
+    Cast<ABrick>(this)->enablePhysics(false);
+    Cast<ABrick>(this)->setCollisionProfile("OverlapAll");
     const FDetachmentTransformRules& attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
         EDetachmentRule::KeepWorld,
         EDetachmentRule::KeepWorld, false);
     Cast<ABrick>(this)->DetachFromActor(attachment_rules);
+    Cast<ABrick>(this)->enablePhysics(false);
+    Cast<ABrick>(this)->setCollisionProfile("OverlapAll");
 
     Cast<ABrick>(this)->SetActorLocationAndRotation(Location, Rotation,
         false, 0, ETeleportType::TeleportPhysics);
@@ -348,16 +351,16 @@ void IPlugInterface::detachItemsOnIt()
 
 void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const FRotator& Rotation, const FVector& OffsetLocation, const FRotator &OffsetRotation)
 {
-
-    const FDetachmentTransformRules& attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
-        EDetachmentRule::KeepWorld,
-        EDetachmentRule::KeepWorld, true);
-    Object->DetachFromActor(attachment_rules);
-    Object->enablePhysics(false);
-
+    if (Object->Grabbed) {
+        const FDetachmentTransformRules& attachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+            EDetachmentRule::KeepWorld,
+            EDetachmentRule::KeepWorld, false);
+        Object->DetachFromActor(attachment_rules);
+        Object->enablePhysics(false);
+    }
 
     Object->SetActorLocationAndRotation(Location, Rotation,
-        true, NULL, ETeleportType::TeleportPhysics);
+        false, NULL, ETeleportType::TeleportPhysics);
 
     Object->AddActorLocalRotation(OffsetRotation);
     Object->AddActorLocalOffset(OffsetLocation);
@@ -368,6 +371,7 @@ void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const F
         Cast<AWeapon>(Object)->makePluginSettings();
     }
     else if (Cast<AConstraitBrick>(Object)) {
+        Cast<AConstraitBrick>(Object)->AttachedComponent = Cast<ABrick>(this)->Brick;
     }
     else
     {
@@ -382,7 +386,7 @@ void IPlugInterface::attachItem(ABrick *Object, const FVector& Location, const F
             EAttachmentRule::KeepWorld, true));
     }
     else {
-        Object->AttachToActor(Cast<AActor>(this), FAttachmentTransformRules(EAttachmentRule::KeepWorld,
+        Object->AttachToComponent(Cast<ABrick>(this)->Brick, FAttachmentTransformRules(EAttachmentRule::KeepWorld,
             EAttachmentRule::KeepWorld,
             EAttachmentRule::KeepWorld, true));
     }

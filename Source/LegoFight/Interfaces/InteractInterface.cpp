@@ -25,20 +25,26 @@ void IInteractInterface::equip()
 {
     if (Aiming_) {
         if (Cast<AConstraitBrick>(Target_Plugable_Item)) {
-            if (Cast<AConstraitBrick>(Target_Plugable_Item)->Cable_Hook) {
-                if (!Cast<AConstraitBrick>(Target_Plugable_Item)->Cable_Start_Hooked && !Cable_Start_Item) {
-                    Cable_Start_Item = Cast<AConstraitBrick>(Target_Plugable_Item);
-                    Cable_Start_Item->Cable_Start_Hooked = true;
-                }
-                else if(Cable_Start_Item != Cast<AConstraitBrick>(Target_Plugable_Item)) {
-                    Cast<AConstraitBrick>(Target_Plugable_Item)->hookCableToItem(Cable_Start_Item);
-                    Cable_Start_Item = nullptr;
-                }
+            if (!Cable_Start_Item) {
+                Cable_Start_Item = Cast<AConstraitBrick>(Target_Plugable_Item);
             }
-            else {
+            else if(Cable_Start_Item->Cable_Hook) {
+                Cable_Start_Item->hookCableToItem(Cast<ABrick>(Target_Plugable_Item)->Brick);
+                Cable_Start_Item = nullptr;
+            }else {
                 Cast<AConstraitBrick>(Target_Plugable_Item)->turnOnOffMachine();
             }
         }
+        else {
+            if (Cable_Start_Item) {
+                if (Cast<ABrick>(Target_Plugable_Item)) {
+                    Cable_Start_Item->hookCableToItem(Cast<ABrick>(Target_Plugable_Item)->Brick);
+                    Cable_Start_Item = nullptr;
+                }
+
+            }
+        }
+
     }
     else {
         if (Cast<ALegoCarChasis>(this)) {
@@ -127,13 +133,15 @@ void IInteractInterface::buyBrick()
 {
     
     if (Grabbable_Brick == nullptr && Game_Instance) {
-        AActor *spawned_object = Game_Instance->spawnItem(FVector(0, 0, 0), FRotator(0, 0, 0),"", Aim_Impact_Point);
+        ALegoCharacter* charc = Cast<ALegoCharacter>(this);
+        AActor *spawned_object = Game_Instance->spawnItem(charc->GetActorLocation(), FRotator(0, 0, 0), "", Aim_Impact_Point);
 
         Grabbable_Brick = Cast<ABrick>(spawned_object);
         if (Grabbable_Brick != nullptr)
         {
             grapObject(Grabbable_Brick);
             Brick_Just_Plug = false;
+
         }
 
     }

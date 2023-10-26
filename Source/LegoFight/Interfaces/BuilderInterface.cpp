@@ -50,10 +50,13 @@ void IBuilderInterface::grapObject(ABrick* Object)
         Object->enablePhysics(false);
         Object->setCollisionProfile("OverlapAll");
 
-        Object->SetActorRotation(FRotator(0, 0, 0));
+        Object->SetActorRotation(FRotator(90, 90, 0), ETeleportType::ResetPhysics);
         Object->AttachToComponent(Cast<ACharacter>(this)->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
             EAttachmentRule::SnapToTarget,
-            EAttachmentRule::KeepWorld, true), TEXT("grab_socket"));
+            EAttachmentRule::KeepWorld, false), TEXT("grab_socket"));
+        Object->Brick->SetRelativeRotation(FRotator(0,180, 90), false, nullptr, ETeleportType::ResetPhysics);
+        Object->Brick->AddLocalOffset(FVector(0, -2, 0));
+
         Ghost_Component->SetStaticMesh(Object->getBrickMesh());
         Keeping_Bricks = true;
 
@@ -68,7 +71,7 @@ void IBuilderInterface::grapObject(ABrick* Object)
         else
             Pivot_Width = (BoxExtent.X / 12.5);
 
-
+        Object->Grabbed = true;
     }
 }
 
@@ -94,6 +97,7 @@ void IBuilderInterface::dropObject(ABrick* Object)
     }
 
     Keeping_Bricks = false;
+    Object->Grabbed = false;
 
 }
 
@@ -116,6 +120,7 @@ void IBuilderInterface::plugObject()
             }
 
 
+            Grabbable_Brick->Grabbed = false;
             Grabbable_Brick = nullptr;
             Object_NearBy = nullptr;
             Brick_Just_Plug = true;
