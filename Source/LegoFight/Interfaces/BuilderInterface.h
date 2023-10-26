@@ -35,6 +35,7 @@ protected:
 	bool Brick_Plugable;
 	int Offset_Step;
 	FVector Aim_Impact_Point;
+	class ULegoFightGameInstance* Game_Instance;
 
 	IPlugInterface* Target_Plugable_Item;
 	bool Brick_Just_Plug;

@@ -45,6 +45,9 @@ ULegoFightGameInstance::ULegoFightGameInstance()
     Default_Brick_Material = material_asset.Object;
 
 
+    LoadBlueprintFromPath(FName("/Game/bricks/MachineBP/"), Machine_Classes);
+
+
     initializeItemOptions();
     initializeDestructables();
 
@@ -66,6 +69,11 @@ void ULegoFightGameInstance::initializeItemOptions()
 
    
 }
+
+
+
+
+
 
 void ULegoFightGameInstance::initializeDestructables()
 {
@@ -272,14 +280,17 @@ AWeapon* ULegoFightGameInstance::spawnWeapon(const FString& Name, const FVector&
 
 AConstraitBrick* ULegoFightGameInstance::spawnMachine(const FString& Name, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {
-    FString path = FString("Blueprint'/Game/bricks/MachineBP/") + Name + FString(".") + Name + FString("'");
-    UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, *path));
-    UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+    AConstraitBrick* machine;
+    //FString path = FString("Blueprint'/Game/bricks/MachineBP/") + Name + FString(".") + Name + FString("'");
+    //UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, *path));
+    //AConstraitBrick* GeneratedBP = Cast<AConstraitBrick>(Spawned);
 
-    AConstraitBrick* machine = GetWorld()->SpawnActor<AConstraitBrick>(GeneratedBP->GeneratedClass, SpawnLocation, SpawnRotation);
+    machine = GetWorld()->SpawnActor<AConstraitBrick>(Machine_Classes[Name + FString("_C")], SpawnLocation, SpawnRotation);
     machine->setGhostComponent(General_Brick_Meshes[Name]);
     machine->Brick_Name = Name;
     machine->setMaterialColor(Selected_Color);
+    
+
     
     return machine;
 }

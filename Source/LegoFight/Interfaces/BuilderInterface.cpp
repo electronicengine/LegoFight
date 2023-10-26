@@ -6,6 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "../ConstraitBrick.h"
 #include "Engine/World.h"
+#include "../Widgets/CharacterWidget.h"
+#include "../LegoFightGameInstance.h"
 
 IBuilderInterface::IBuilderInterface()
 {
@@ -202,6 +204,7 @@ void IBuilderInterface::lookForBuildingSpace(AActor *Target, FHitResult& OutHit)
         if(Grabbable_Brick)
             Brick_Plugable = target_plugable->highLightPlugin(Ghost_Component, Ghost_Possible_Material, Ghost_Imposible_Material,
                 Grabbable_Brick, OutHit, OffSet_Rotation, OffSet_Location, Ghost_Overlapped_Brick);
+        Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
 
     }
     else
@@ -225,6 +228,8 @@ void IBuilderInterface::lookForBuildingSpace(AActor *Target, FHitResult& OutHit)
         //    Ghost_Component->SetVisibility(false);
         //}
         Target_Plugable_Item = nullptr;
+        Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Hidden);
+
     }
 
 }

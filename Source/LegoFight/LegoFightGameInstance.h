@@ -28,6 +28,26 @@
 
 
 
+static FORCEINLINE void LoadBlueprintFromPath(const FName& Path, std::map<FString, UBlueprintGeneratedClass*> &Array)
+{
+    TArray<UObject*> tempArray;
+    if (EngineUtils::FindOrLoadAssetsByPath(*Path.ToString(), tempArray, EngineUtils::ATL_Class))
+    {
+        for (int i = 0; i < tempArray.Num(); ++i)
+        {
+            UObject* temp = tempArray[i];
+
+            if (temp == NULL || (!Cast<UBlueprintGeneratedClass>(temp)))
+            {
+                continue;
+            }
+            Array[temp->GetName()] = Cast<UBlueprintGeneratedClass>(temp);
+
+        }
+    }
+}
+
+
 struct ItemOptions {
 
     FString Name;
@@ -68,7 +88,7 @@ class LEGOFIGHT_API ULegoFightGameInstance : public UGameInstance
     std::map<FString, UStaticMesh*> General_Brick_Meshes;
     std::map<FString, UStaticMesh*> Weapon_Meshes;
     std::map<FString, UStaticMesh*> Vehicle_Meshes;
-    std::map<FString, AConstraitBrick*> MachineClasses;
+    std::map<FString, UBlueprintGeneratedClass*> Machine_Classes;
 
     std::map<FString, ItemOptions> Item_Options;
 
@@ -106,5 +126,6 @@ public:
     bool loadGame(FString Name);
 
     UTexture2D* texture;
+    UBlueprintGeneratedClass* Spawned;
 
 };

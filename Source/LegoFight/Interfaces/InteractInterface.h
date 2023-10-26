@@ -29,7 +29,6 @@ class LEGOFIGHT_API IInteractInterface : public IBuilderInterface
 protected:
 
     ALegoCarChasis* Interactable_Car;
-    class ULegoFightGameInstance* Game_Instance;
 
     bool Is_In_Car;
 
