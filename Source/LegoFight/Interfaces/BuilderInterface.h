@@ -45,9 +45,10 @@ protected:
 
 	FRotator OffSet_Rotation;
 	FVector OffSet_Location;
+	UStaticMeshComponent* Ghost;
 
-	UCameraComponent* Aim_Camera;
 public:
+
 	IBuilderInterface();
 	void buildStart();
 	void buildEnd();
@@ -61,6 +62,5 @@ public:
 
 	ABrick* Grabbable_Brick;
 	bool Keeping_Bricks;
-	UStaticMeshComponent* Ghost_Component;
 
 };

@@ -37,7 +37,7 @@ void IBuilderInterface::buildEnd()
 {
 
     Building = false;
-    Ghost_Component->SetVisibility(false);
+    Ghost->SetVisibility(false);
     Target_Plugable_Item = nullptr;
     Brick_Just_Plug = false;
     Tick_Count = 0;
@@ -50,6 +50,8 @@ void IBuilderInterface::grapObject(ABrick* Object)
 
     if (Object && Cast<ACharacter>(this))
     {
+        Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
+
         Object->enablePhysics(false);
         Object->setCollisionProfile("OverlapAll");
 
@@ -60,14 +62,14 @@ void IBuilderInterface::grapObject(ABrick* Object)
         Object->Brick->SetRelativeRotation(FRotator(0, 180, 90), false, nullptr, ETeleportType::ResetPhysics);
         Object->Brick->AddLocalOffset(FVector(0, -2, 0));
 
-        Ghost_Component->SetStaticMesh(Object->getBrickMesh());
+        Ghost->SetStaticMesh(Object->getBrickMesh());
         Keeping_Bricks = true;
 
         FVector Origin;
         FVector BoxExtent;
         float SphereRadius;
 
-        UKismetSystemLibrary::GetComponentBounds(Ghost_Component, Origin, BoxExtent, SphereRadius);
+        UKismetSystemLibrary::GetComponentBounds(Ghost, Origin, BoxExtent, SphereRadius);
 
         if (BoxExtent.Y >= BoxExtent.X)
             Pivot_Width = (BoxExtent.Y / 12.5);
@@ -97,6 +99,7 @@ void IBuilderInterface::dropObject(ABrick* Object)
 
         Grabbable_Brick = nullptr;
         Object_NearBy = nullptr;
+        Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Hidden);
 
     }
 
@@ -111,7 +114,7 @@ void IBuilderInterface::plugObject()
 {
     if (Grabbable_Brick != nullptr && Building && Brick_Plugable)
     {
-        if (Ghost_Component->IsVisible())
+        if (Ghost->IsVisible())
         {
 
             if (Target_Plugable_Item != nullptr)
@@ -120,7 +123,7 @@ void IBuilderInterface::plugObject()
                 Target_Plugable_Item->plugTheItem(Grabbable_Brick, -1, OffSet_Rotation, OffSet_Location);
             }
             else {
-                Grabbable_Brick->putTheItem(Ghost_Component->GetComponentLocation(), Ghost_Component->GetComponentRotation());
+                Grabbable_Brick->putTheItem(Ghost->GetComponentLocation(), Ghost->GetComponentRotation());
             }
 
 
@@ -132,7 +135,7 @@ void IBuilderInterface::plugObject()
 
         }
 
-        Ghost_Component->SetVisibility(false);
+        Ghost->SetVisibility(false);
 
 
     }
@@ -156,7 +159,7 @@ void IBuilderInterface::giveOffsetLocation()
 
     int offset = 0;
 
-    if (Ghost_Component) {
+    if (Ghost) {
         Offset_Step += 1;
 
         if (Pivot_Width != 0)
@@ -170,7 +173,7 @@ void IBuilderInterface::giveOffsetLocation()
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::FromInt(offset));
 
 
-        if (Ghost_Component->IsVisible()) {
+        if (Ghost->IsVisible()) {
             OffSet_Location -= FVector(0, 25, 0);
 
         }
@@ -202,24 +205,23 @@ void IBuilderInterface::lookForBuildingSpace(AActor *Target, FHitResult& OutHit)
         Target_Plugable_Item = target_plugable;
 
         if(Grabbable_Brick)
-            Brick_Plugable = target_plugable->highLightPlugin(Ghost_Component, Ghost_Possible_Material, Ghost_Imposible_Material,
+            Brick_Plugable = target_plugable->highLightPlugin(Ghost, Ghost_Possible_Material, Ghost_Imposible_Material,
                 Grabbable_Brick, OutHit, OffSet_Rotation, OffSet_Location, Ghost_Overlapped_Brick);
         Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
 
     }
     else
     {
-        if (Grabbable_Brick && Ghost_Component && OutHit.IsValidBlockingHit()) {
-            Ghost_Component->SetMaterial(0, Ghost_Possible_Material);
-            Ghost_Component->SetMaterial(1, Ghost_Possible_Material);
+        if (Grabbable_Brick && Ghost && OutHit.IsValidBlockingHit()) {
+            Ghost->SetMaterial(0, Ghost_Possible_Material);
+            Ghost->SetMaterial(1, Ghost_Possible_Material);
             if(Grabbable_Brick->getBrickMesh())
-                Ghost_Component->SetStaticMesh(Grabbable_Brick->getBrickMesh());
+                Ghost->SetStaticMesh(Grabbable_Brick->getBrickMesh());
 
-            Ghost_Component->SetVisibility(true);
-
-            Ghost_Component->SetWorldLocationAndRotation(OutHit.ImpactPoint,
+            Ghost->SetVisibility(true);
+            Ghost->SetWorldLocationAndRotation(OutHit.ImpactPoint,
                 OutHit.Actor->GetActorRotation());
-            Ghost_Component->AddLocalOffset(FVector(0, 0, 30.7));
+            Ghost->AddLocalOffset(FVector(0, 0, 30.7));
         }
 
 

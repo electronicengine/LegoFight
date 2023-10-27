@@ -17,13 +17,13 @@
 
 IInteractInterface::IInteractInterface()
 {
-
+    Builder_Mode_Enable = false;
 }
 
 
 void IInteractInterface::equip()
 {
-    if (Aiming_) {
+    if (Builder_Mode_Enable) {
         if (Cast<AConstraitBrick>(Target_Plugable_Item)) {
             if (!Cable_Start_Item) {
                 Cable_Start_Item = Cast<AConstraitBrick>(Target_Plugable_Item);
@@ -42,6 +42,15 @@ void IInteractInterface::equip()
                     Cable_Start_Item = nullptr;
                 }
 
+            }
+            else {
+                if (Grabbable_Brick == nullptr)
+                {
+                    if (Cast<ABrick>(Target_Plugable_Item)) {
+                        Grabbable_Brick = Cast<ABrick>(Target_Plugable_Item);
+                        grapObject(Grabbable_Brick);
+                    }
+                }
             }
         }
 
@@ -63,7 +72,6 @@ void IInteractInterface::equip()
             }
             else if (Cast<ABrick>(Object_NearBy))
             {
-
                 if (Grabbable_Brick == Cast<ABrick>(Object_NearBy))
                     dropObject(Grabbable_Brick);
                 else
@@ -76,7 +84,6 @@ void IInteractInterface::equip()
                     }
                     else
                     {
-
                         dropObject(Grabbable_Brick);
                         Grabbable_Brick = Cast<ABrick>(Object_NearBy);
 

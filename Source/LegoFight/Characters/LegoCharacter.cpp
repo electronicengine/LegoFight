@@ -12,6 +12,7 @@
 #include "Json.h"
 #include "../Widgets/CharacterWidget.h"
 #include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 
 
 ALegoCharacter::ALegoCharacter()
@@ -27,10 +28,20 @@ ALegoCharacter::ALegoCharacter()
 
     Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     Camera->SetupAttachment(SpringArm);
+    Camera->SetRelativeLocation(FVector(-165.196976, 0, 192.280701));
+    Camera->SetRelativeRotation(FRotator(0, -10.0, 0));
+
+    Builder_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Aim_Camera"));
+    Builder_Camera->AttachTo(GetMesh());
+    Builder_Camera->SetRelativeLocation(FVector(-66.029541, -134.599854, 759.365051));
+    Builder_Camera->SetRelativeRotation(FRotator(0.000003, -20.000061, 90.000221));
+    Builder_Camera->bUsePawnControlRotation = true;
 
 
-    Aim_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Aim_Camera"));
-    Aim_Camera->AttachTo(GetMesh());    
+    Sling_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Sling_Camera"));
+    Sling_Camera->AttachTo(GetMesh());
+    Sling_Camera->SetRelativeLocation(FVector(-66.029541, -134.599854, 759.365051));
+    Sling_Camera->SetRelativeRotation(FRotator(0.000003, -20.000061, 90.000221));
 
     Barrel_ = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel"));
     Barrel_->SetupAttachment(GetMesh());
@@ -39,10 +50,15 @@ ALegoCharacter::ALegoCharacter()
     Interaction_Component->SetupAttachment(RootComponent);
 
     Interaction_Component->SetCollisionProfileName(TEXT("OverlapAll"));
-    Interaction_Component->OnComponentBeginOverlap.AddDynamic(this, &ALegoCharacter::OnInteractBegin);
-    Interaction_Component->OnComponentEndOverlap.AddDynamic(this, &ALegoCharacter::OnInteractEnd);
 
-    Ghost_Component = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ghost"));
+
+    Ghost_Item = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ghost"));
+    //Ghost_Item->SetupAttachment(RootComponent);
+    Ghost_Item->SetSimulatePhysics(false);
+    Ghost_Item->SetCollisionProfileName("OverlapAll");
+
+    Ghost = Ghost_Item;
+    Camera_Mode = CameraMode::normal;
 
 }
 
@@ -98,6 +114,8 @@ void ALegoCharacter::setupMesh()
     //static ConstructorHelpers::FClassFinder<ADestrictable>
     //         bullet(TEXT("Class'/Script/LegoFight.Bullet_C'"));
     Bullet_Container = ABullet::StaticClass();
+
+    //GetMesh()->SetRelativeScale3D(FVector(0.5225, 0.5225, 0.5225));
 }
 
 
@@ -110,21 +128,79 @@ void ALegoCharacter::BeginPlay()
     Game_Instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
     Game_Instance->loadCharacterPanel();
 //    Skeletal_Mesh->AddRadialImpulse(GetActorLocation(), 100, 1000, RIF_Constant, true);
-    Ghost_Component->OnComponentBeginOverlap.AddDynamic(this, &ALegoCharacter::OnGhostOverLap);
+    Ghost_Item->OnComponentBeginOverlap.AddDynamic(this, &ALegoCharacter::OnGhostOverLap);
+    Viewport_Client = GetWorld()->GetGameViewport();
 
-
+    Interaction_Component->OnComponentBeginOverlap.AddDynamic(this, &ALegoCharacter::OnInteractBegin);
+    Interaction_Component->OnComponentEndOverlap.AddDynamic(this, &ALegoCharacter::OnInteractEnd);
 }
 
-// Called every frame
+// Function to calculate and visualize projectile path
+void ALegoCharacter::calculateProjectilePath(AActor* Projectile, const FVector& ForwardVector)
+{
+    // Set up parameters for PredictProjectilePath
+    FHitResult HitResult;
+    TArray<FVector> PathPositions;
+    FVector LastTraceDestination;
+
+    // Initial projectile parameters
+    FVector StartLocation = Projectile->GetActorLocation();
+    FVector LaunchVelocity = ForwardVector * 3; // Adjust as needed
+    float ProjectileRadius = 5;  // Adjust based on your projectile's collision size
+
+    TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+    // Add object types that you want to trace against (e.g., WorldStatic, WorldDynamic, etc.)
+
+    TArray<AActor*> ActorsToIgnore;
+    // Add actors that you want to ignore during the trace (if any)
+
+    // Call PredictProjectilePath
+    bool bHit = UGameplayStatics::PredictProjectilePath(
+        this,
+        HitResult,
+        PathPositions,
+        LastTraceDestination,
+        StartLocation,
+        LaunchVelocity,
+        true,  // bTracePath
+        ProjectileRadius,
+        ObjectTypes,
+        true,  // bTraceComplex
+        ActorsToIgnore,
+        EDrawDebugTrace::ForOneFrame,  // DrawDebugType
+        1.0f,  // DrawDebugTime
+        10.0f,  // SimFrequency
+        1.0f,  // MaxSimTime
+        -980.0f  // OverrideGravityZ (adjust as needed, -980.0f is default gravity)
+    );
+
+    //// Process the results
+    //if (bHit)
+    //{
+    //    // Loop through the path points and do something with them (e.g., visualize the path)
+    //    for (FVector PointLocation : PathPositions)
+    //    {
+    //        // Visualize or do something with the path points...
+    //    }
+    //}
+    //else
+    //{
+    //    // Handle the case when no hit is predicted
+    //}
+}
+
+
+
+
 void ALegoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    if (Aiming_ == true)
+    if (Builder_Mode_Enable == true)
     {
         FHitResult OutHit;
-        FVector Start = Aim_Camera->GetComponentLocation();
-        FVector forward_vector = Aim_Camera->GetComponentRotation().Vector();
+        FVector Start = Builder_Camera->GetComponentLocation();
+        FVector forward_vector = Builder_Camera->GetComponentRotation().Vector();
         FVector End = Start + (forward_vector * 3000.0f);
         FCollisionQueryParams CollisionParams;
 
@@ -133,8 +209,53 @@ void ALegoCharacter::Tick(float DeltaTime)
 
         lookForBuildingSpace(OutHit.Actor.Get(), OutHit);
     }
+    else if (Sling_Mode_Enable && Stretching_Sling) {
+        FVector forward;
+
+        UGameViewportClient* ViewportClient = GetWorld()->GetGameViewport();
+
+        FVector2D MousePosition;
+        ViewportClient->GetMousePosition(MousePosition);
+            
+
+        FVector cam_rot_vec = Sling_Camera->GetComponentRotation().Vector();
+
+        float x = (Stretch_Begin.X - MousePosition.X) * (-cam_rot_vec.Y);
+        float y = (Stretch_Begin.X - MousePosition.X) * (cam_rot_vec.X);
+        float z = (MousePosition.Y - Stretch_Begin.Y);
+        Throw_Force = FVector(x, y, z);
+        if (Grabbable_Brick) {          
+            calculateProjectilePath(Grabbable_Brick, Throw_Force);
+
+        }
+    }
 
 }
+
+
+void ALegoCharacter::OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location)
+{
+    Stretch_Begin = Location;
+    Stretching_Sling = true;
+
+}
+
+
+void ALegoCharacter::OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Location)
+{
+    Stretch_End = Location;
+    Stretching_Sling = false;
+
+    throwTheItem(Throw_Force, Grabbable_Brick);
+    Projectile_Item = nullptr;
+}
+
+void ALegoCharacter::TouchMoved(ETouchIndex::Type FingerIndex, FVector Location)
+{
+    Stretch_End = Location;
+    Stretching_Sling = true;
+}
+
 
 void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -153,7 +274,9 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 
     PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ALegoCharacter::fire);
-    PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ALegoCharacter::aimStart);
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ISlingInterface::strechTheSling);
+
+    PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ALegoCharacter::changeCameraMode);
     //PlayerInputComponent->BindAction("Aim", IE_Released, this, &ALegoCharacter::aimEnd);
 
     PlayerInputComponent->BindAction("Inventory", IE_Pressed, this, &IInteractInterface::openInventoryWidget);
@@ -166,6 +289,11 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
     PlayerInputComponent->BindAction("Save", IE_Pressed, this, &IInteractInterface::saveAndLoad);
     PlayerInputComponent->BindAction("Load", IE_Pressed, this, &ALegoCharacter::saveAndLoad);
 
+    PlayerInputComponent->BindTouch(IE_Pressed, this, &ALegoCharacter::OnTouchPressed);
+    PlayerInputComponent->BindTouch(IE_Released, this, &ALegoCharacter::OnTouchReleased);   
+    PlayerInputComponent->BindTouch(IE_Repeat, this, &ALegoCharacter::TouchMoved);
+
+
 }
 
 
@@ -173,7 +301,7 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ALegoCharacter::OnInteractBegin(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 
-    if (Aiming_ == false && Cast<IPlugInterface>(OtherActor) && !Cast<ALegoCharacter>(OtherActor)){
+    if (Builder_Mode_Enable == false && Cast<IPlugInterface>(OtherActor) && !Cast<ALegoCharacter>(OtherActor)){
         interactNearby(OtherActor);
         Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Visible);
     }
@@ -182,7 +310,8 @@ void ALegoCharacter::OnInteractBegin(UPrimitiveComponent *OverlappedComp, AActor
 
 void ALegoCharacter::OnInteractEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Hidden);
+    if(!Grabbable_Brick)
+        Cast<UCharacterWidget>(Game_Instance->Char_Panel)->setInteractButtonVisibilty(ESlateVisibility::Hidden);
 
 }
 
@@ -190,6 +319,7 @@ void ALegoCharacter::OnGhostOverLap(UPrimitiveComponent* OverlappedComp, AActor*
 {
     checkGhostItemOverlap(OtherActor);
 }
+
 
 
 void ALegoCharacter::moveForward(float Value)
@@ -221,7 +351,14 @@ void ALegoCharacter::moveRight(float Value)
 
 void ALegoCharacter::turn(float Value)
 {
-    AddControllerYawInput(Value );
+    if (Sling_Mode_Enable) {
+
+        Sling_Camera->AddLocalOffset(FVector(0, Value * 10, 0));
+    }
+    else {
+        AddControllerYawInput(Value);
+    }
+    
 
 }
 
@@ -229,14 +366,23 @@ void ALegoCharacter::turn(float Value)
 
 void ALegoCharacter::lookUp(float Value)
 {
-    AddControllerPitchInput(Value);
+    if (Sling_Mode_Enable) {
+
+        Sling_Camera->AddLocalOffset(FVector(0, 0, Value * -10));
+    }
+    else {
+        AddControllerPitchInput(Value);
+    }
 
 }
 
 void ALegoCharacter::zoom(float Value)
 {
-    if (Aiming_) {
-        Aim_Camera->AddLocalOffset(FVector(0, 0, Value * 10));
+    if (Builder_Mode_Enable) {
+        Builder_Camera->AddLocalOffset(FVector(0, 0, Value * 10));
+    }
+    else if (Sling_Mode_Enable) {
+        Sling_Camera->AddLocalOffset(FVector(Value * 10, 0, 0));
     }
 
 
@@ -246,33 +392,85 @@ void ALegoCharacter::zoom(float Value)
 
 void ALegoCharacter::fire()
 {
+    Projectile_Item = Grabbable_Brick;
+    if (Builder_Mode_Enable) {
 
+        ABullet* bullet_ptr;
+        FVector spawn_location = Builder_Camera->GetComponentLocation();
+        FRotator spawn_rotation = Builder_Camera->GetForwardVector().Rotation();
 
-    ABullet *bullet_ptr;
-    FVector spawn_location = Aim_Camera->GetComponentLocation();
-    FRotator spawn_rotation = Aim_Camera->GetForwardVector().Rotation();
+        bullet_ptr = GetWorld()->SpawnActor<ABullet>(Bullet_Container, spawn_location, spawn_rotation);
 
-    bullet_ptr = GetWorld()->SpawnActor<ABullet>(Bullet_Container,  spawn_location, spawn_rotation);
+        if (bullet_ptr != nullptr)
+            bullet_ptr->addFireImpulse(Builder_Camera->GetForwardVector().Rotation().Vector(), 30000);
+    }
+  
 
-    if(bullet_ptr != nullptr)
-        bullet_ptr->addFireImpulse(Aim_Camera->GetForwardVector().Rotation().Vector(), 30000);
 }
 
 
 
-void ALegoCharacter::aimStart()
+void ALegoCharacter::changeCameraMode()
 {
-    if (Aiming_) {
-        aimEnd();
+    Camera_Mode = (CameraMode)((int)Camera_Mode + 1);
+    APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+    switch (Camera_Mode)
+    {
+    case CameraMode::normal:
+        Camera->SetActive(true);
+        Builder_Camera->SetActive(false);
+        Sling_Camera->SetActive(false);
+        controller->bShowMouseCursor = false;
+
+        Builder_Mode_Enable = false;
+        Sling_Mode_Enable = false;
+
         buildEnd();
-    }
-    else {
+        break;
+
+    case CameraMode::builder:
         Camera->SetActive(false);
-        Aim_Camera->SetActive(true);
-        Aiming_ = true;
+        Builder_Camera->SetActive(true);
+        Sling_Camera->SetActive(false);
+        controller->bShowMouseCursor = false;
+
+        Builder_Mode_Enable = true;
+        Sling_Mode_Enable = false;
+
         buildStart();
 
+        break;
+
+    case CameraMode::sling:
+
+        Camera->SetActive(false);
+        Builder_Camera->SetActive(false);
+        Sling_Camera->SetActive(true);
+        controller->bShowMouseCursor = true;
+        Builder_Mode_Enable = false;
+        Sling_Mode_Enable = true;
+
+        buildEnd();
+
+        break;
+
+    default:
+        Camera_Mode = CameraMode::normal;
+
+        Camera->SetActive(true);
+        Builder_Camera->SetActive(false);
+        Sling_Camera->SetActive(false);
+
+        Builder_Mode_Enable = false;
+        Sling_Mode_Enable = false;
+        controller->bShowMouseCursor = false;
+
+        buildEnd();
+       
+        break;
     }
+
 
 }
 
@@ -281,9 +479,9 @@ void ALegoCharacter::aimStart()
 void ALegoCharacter::aimEnd()
 {
     Camera->SetActive(true);
-    Aim_Camera->SetActive(false);
+    Builder_Camera->SetActive(false);
 
-    Aiming_ = false;
+    Builder_Mode_Enable = false;
 
 }
 

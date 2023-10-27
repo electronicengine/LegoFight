@@ -54,7 +54,7 @@ public:
     AConstraitBrick* Cable_Start_Item;
     ALegoCharacter* Passenger_;
     std::map<int, AWeapon*> Weapons;
-    bool Aiming_;
+    bool Builder_Mode_Enable;
 
 
 };

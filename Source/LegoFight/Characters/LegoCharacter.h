@@ -13,15 +13,22 @@
 #include "Materials/Material.h"
 #include "../Interfaces/BuilderInterface.h"
 #include "../Interfaces/InteractInterface.h"
+#include "../Interfaces/SlingInterface.h"
 
 #include "LegoCharacter.generated.h"
 
+
+enum CameraMode {
+    normal,
+    builder,
+    sling
+};
 
 class ALegoCarChasis;
 class AWeapon;
 
 UCLASS()
-class LEGOFIGHT_API ALegoCharacter : public ACharacter, public IInteractInterface
+class LEGOFIGHT_API ALegoCharacter : public ACharacter, public IInteractInterface, public ISlingInterface
 {
 	GENERATED_BODY()
 
@@ -31,12 +38,16 @@ class LEGOFIGHT_API ALegoCharacter : public ACharacter, public IInteractInterfac
 
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-    UCameraComponent* Aim_Camera;
+    UCameraComponent* Builder_Camera;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    UCameraComponent* Sling_Camera;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UCapsuleComponent* Interaction_Component;
 
-
+    UPROPERTY(VisibleAnywhere)
+    UStaticMeshComponent* Ghost_Item;
 
 
     /** Projectile class to spawn */
@@ -47,6 +58,8 @@ class LEGOFIGHT_API ALegoCharacter : public ACharacter, public IInteractInterfac
     USceneComponent *Barrel_;
 
     AWeapon *Interactable_Weapon;
+
+    CameraMode Camera_Mode;
 
 
     void setupMesh();
@@ -80,6 +93,16 @@ public:
     UFUNCTION()
     void OnGhostOverLap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+    UFUNCTION()
+    void OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location);
+
+    UFUNCTION()
+    void OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Location);
+
+    UFUNCTION()
+    void TouchMoved(ETouchIndex::Type FingerIndex, FVector Location);
+
+    
 
     void moveForward(float Value);
     void moveRight(float Value);
@@ -87,9 +110,9 @@ public:
     void lookUp(float Value);
     void zoom(float Value);
     void fire();
-    void aimStart();
+    void changeCameraMode();
     void aimEnd();
-
+    void calculateProjectilePath(AActor* Projectile, const FVector& ForwardVector);
 
 
     ConstructionInfo Construction_Info;
