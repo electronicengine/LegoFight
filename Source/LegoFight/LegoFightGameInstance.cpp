@@ -395,3 +395,27 @@ bool ULegoFightGameInstance::loadGame(FString Name)
 
     return false;
 }
+
+void ULegoFightGameInstance::setScreenMessage(const FString& Message)
+{
+    if (!ToastMessage_Panel) {
+        ToastMessage_Panel = CreateWidget<UUserWidget>(this, ToastMessage_Panel_Container);
+
+    }
+
+    ToastMessage_Panel->AddToViewport();
+
+    Cast<UToastMessageWidget>(ToastMessage_Panel)->setTextAndDisplay(Message, 10);
+
+}
+
+void ULegoFightGameInstance::hideScreenMessage()
+{
+    if (!ToastMessage_Panel) {
+        ToastMessage_Panel = CreateWidget<UUserWidget>(this, ToastMessage_Panel_Container);
+    }
+
+    ToastMessage_Panel->RemoveFromParent();
+
+    Cast<UToastMessageWidget>(ToastMessage_Panel)->hideText();
+}

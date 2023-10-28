@@ -315,34 +315,49 @@ bool IPlugInterface::checkPluginPointAvailable(FVector& Point)
 
 void IPlugInterface::detachItemsOnIt()
 {
-    ABrick *brick = Cast<ABrick>(this);
-    if (brick) {
+    AActor *item = Cast<AActor>(this);
+    if (item) {
 
+        if (Cast<ABrick>(item) || Cast<ALegoCarChasis>(item)) {
+            for (auto child_item : Plugged_Items_OnIt) {
+                if (child_item.second) {
+                    if (Cast<AConstraitBrick>(child_item.second)) {
+                        Cast<AConstraitBrick>(child_item.second)->Add->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+                            EDetachmentRule::KeepWorld,
+                            EDetachmentRule::KeepWorld, true));
 
-        for (auto item : Plugged_Items_OnIt) {
-            if (Cast<AConstraitBrick>(item.second)) {
-                Cast<AConstraitBrick>(item.second)->Add->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,
-                    EDetachmentRule::KeepWorld,
-                    EDetachmentRule::KeepWorld, true));
+                        Cast<AConstraitBrick>(child_item.second)->enablePhysics(true);
+                        Cast<AConstraitBrick>(child_item.second)->setCollisionProfile("BlockAll");
 
-                Cast<AConstraitBrick>(item.second)->enablePhysics(true);
-                Cast<AConstraitBrick>(item.second)->setCollisionProfile("BlockAll");
+                    }
 
+                    if (Cast<ALegoCarChasis>(item)) {
+                        child_item.second->Owner_Car = nullptr;
+                        child_item.second->Owner_Item = nullptr;
+
+                    }
+                    else {
+                        child_item.second->Owner_Item = nullptr;
+                    }
+                }
             }
         }
 
-      
-        const FDetachmentTransformRules& detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
-            EDetachmentRule::KeepWorld,
-            EDetachmentRule::KeepWorld, true);
-        Cast<AActor>(brick)->DetachFromActor(detachment_rules);
-        
 
 
-        brick->enablePhysics(true);
-        brick->setCollisionProfile("BlockAll");
+        if (Cast<ABrick>(item)) {
+            const FDetachmentTransformRules& detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+                EDetachmentRule::KeepWorld,
+                EDetachmentRule::KeepWorld, true);
+            Cast<AActor>(item)->DetachFromActor(detachment_rules);
 
-        brick->Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+
+            Cast<ABrick>(item)->enablePhysics(true);
+            Cast<ABrick>(item)->setCollisionProfile("BlockAll");
+
+            Cast<ABrick>(item)->Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+        }
+
 
     }
 
@@ -447,6 +462,12 @@ void IPlugInterface::addPluggedItemList(ABrick* Object, const FVector& OffsetLoc
     Plugged_Items_OnIt.insert(std::make_pair(Total_Plug_Item, Object));
     Total_Plug_Item++;
 
+}
+
+void IPlugInterface::notifyTheOwnerPlugIsDestroyed(int Id)
+{
+    if(Owner_Item)
+        Owner_Item->Plugged_Items_OnIt[Id] = nullptr;
 }
 
 

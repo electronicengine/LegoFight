@@ -10,6 +10,7 @@
 #include "Vehicles/EnemyLegoVehicle.h"
 #include "ConstraitBrick.h"
 #include <map>
+#include "Widgets/ToastMessageWidget.h"
 
 #include "LegoFightGameInstance.generated.h"
 
@@ -76,10 +77,11 @@ class LEGOFIGHT_API ULegoFightGameInstance : public UGameInstance
     UPROPERTY(EditAnywhere, Category = "UI")
     TSubclassOf<class UUserWidget> Save_Panel_Container;
 
-
-
     UPROPERTY(EditAnywhere, Category = "UI")
     TSubclassOf<class UUserWidget> Character_Panel_Container;
+
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<class UUserWidget> ToastMessage_Panel_Container;
 
     FString Selected_Item;
     FLinearColor Selected_Color;
@@ -109,6 +111,7 @@ public:
     UUserWidget* Save_Panel;
     UUserWidget* Invantory_Panel;
     UUserWidget* Char_Panel;
+    UUserWidget* ToastMessage_Panel;
 
     UUserWidget* savePanel(IBuiltInInterface* Item, FVector ImpactPoint);
 
@@ -125,6 +128,8 @@ public:
     void selectCurrentProductColor(FLinearColor Color);
     bool saveGame(FString Name);
     bool loadGame(FString Name);
+    void setScreenMessage(const FString& Message);
+    void hideScreenMessage();
 
     UTexture2D* texture;
     UBlueprintGeneratedClass* Spawned;

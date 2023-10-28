@@ -51,27 +51,27 @@ ABullet::ABullet()
 
     Bullet_Mesh->SetMaterial(0, material_asset.Object);
 
-    Strenght_ = 3;
 }
 
 
 
 void ABullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-
+    FVector velocity = Bullet_Mesh->GetPhysicsLinearVelocity();
+    int speed = Bullet_Mesh->GetPhysicsLinearVelocity().Size();
     ABrick* brick = Cast<ABrick>(OtherActor);
     ALegoCarChasis * vehicle = Cast<ALegoCarChasis>(OtherActor);
-    if (!First_Hit) {
+   
         if (brick)
         {
-            brick->addDamage(Strenght_);
+            brick->addDamage(Strenght_ * speed, Hit.ImpactPoint, velocity);
         }
         else if (vehicle) {
-            vehicle->addDamage(Strenght_);
+            vehicle->addDamage(Strenght_ * speed);
         }
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
         First_Hit = true;
-    }
+
 
 }
 
@@ -81,7 +81,8 @@ void ABullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
+    Bullet_Mesh->SetMassOverrideInKg(NAME_None, 5);
+    Strenght_ = 0.001;
 }
 
 
@@ -99,7 +100,7 @@ void ABullet::addFireImpulse(FVector Direction ,float Strenght)
 {
     FVector n = Direction * Strenght;
 
-    Bullet_Mesh->AddImpulse(n);
+    Bullet_Mesh->AddImpulse(n * 15);
 }
 
 void ABullet::spawnparticle()
@@ -110,5 +111,11 @@ void ABullet::spawnparticle()
 
 
 
+}
+
+void ABullet::setMassAndStrenght(float Strenght, float Mass)
+{
+    Bullet_Mesh->SetMassOverrideInKg(NAME_None, Mass);
+    Strenght_ = Strenght;
 }
 

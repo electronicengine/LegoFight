@@ -123,7 +123,7 @@ public:
 
     UPROPERTY(EditAnywhere)
         USceneComponent* Default_Root;
-    int Healt_;
+    float Healt_;
 
 
 protected:
@@ -142,8 +142,8 @@ public:
     void setCollisionProfile(FString Profile);
 
     UStaticMesh *getBrickMesh();
-    void addDamage(int Value);
-    void breakBrick();
+    void addDamage(float Value, const FVector &ImpactPoint, const FVector& Velocity);
+    void breakBrick(const FVector& ImpactPoint, const FVector& Velocity);
     virtual void setMaterialColor(FLinearColor Color);
     void setBrickTypeOptions(ItemOptions& Options);
     void setPivot(UStaticMeshComponent* Component);

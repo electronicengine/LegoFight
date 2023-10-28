@@ -52,7 +52,7 @@ protected:
 
     bool Weapon_Camera_Used;
     int Current_Camera_Index;
-    int Healt;
+    float Healt;
 
 public:
 
@@ -76,7 +76,7 @@ public:
     int removeWeaponToInventory(int Index);
     int addWeaponToInventory(AWeapon *Weapon);
     void addSeatToCar(ACarSeat *Seat);
-    void addDamage(int Value);
+    void addDamage(float Value);
     void breakBrick();
 
 

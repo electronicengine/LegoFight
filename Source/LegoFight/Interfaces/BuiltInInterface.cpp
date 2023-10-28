@@ -26,7 +26,7 @@ ConstructionInfo IBuiltInInterface::compileConstructInfo(IBuiltInInterface *Obje
     {
 
         if (Cast<AEnemyLegoVehicle>(vehicle)) {
-            build_info.Item_Name = "enemy_vehicle";
+            build_info.Item_Name = "vehicle_ai";
         }
         else {
             build_info.Item_Name = "vehicle";

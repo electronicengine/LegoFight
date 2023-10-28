@@ -6,6 +6,8 @@
 #include "../Vehicles/LegoCarChasis.h"
 #include "Kismet/GameplayStatics.h"
 #include "../LegoFightGameInstance.h"
+#include "Components/PrimitiveComponent.h"
+#include "Engine/EngineTypes.h"
 
 AWeapon::AWeapon()
 {
@@ -87,12 +89,12 @@ bool AWeapon::checkWeaponDetached()
 void AWeapon::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
  
-    int crash_speed = Brick->GetPhysicsLinearVelocity().Size();
-
+    FVector crash_velocity = Brick->GetPhysicsLinearVelocity();
+    int crash_speed = crash_velocity.Size();
     if (Cast<ABrick>(OtherActor)) {
 
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
-        Cast<ABrick>(OtherActor)->addDamage(crash_speed * 4);
+        Cast<ABrick>(OtherActor)->addDamage(crash_speed * 4, Hit.ImpactPoint, crash_velocity);
     }
     else if (Cast<ALegoCarChasis>(OtherActor)) {
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
@@ -115,15 +117,14 @@ void AWeapon::makePluginSettings()
     switch (Type_)
     {
     case WeaponType::fire:
-        if (Owner_Item || Owner_Car) {
+
             enablePhysics(false);
             setCollisionProfile("OverlapAll");
-        }
+
         break;
     case WeaponType::melee:
         enablePhysics(true);
         setCollisionProfile("BlockAll");
-        Brick->SetMassOverrideInKg(NAME_None, 10, true);
         Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
         Brick->SetNotifyRigidBodyCollision(true);
 
@@ -132,12 +133,11 @@ void AWeapon::makePluginSettings()
     case WeaponType::explosive:
         enablePhysics(true);
         setCollisionProfile("BlockAll");
-        Brick->SetMassOverrideInKg(NAME_None, 10, true);
+        Brick->SetMassOverrideInKg(NAME_None, 200, true);
         Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
         Brick->SetNotifyRigidBodyCollision(true);
         SetLifeSpan(20);
-        Mass_ = 17;
-        Brick->SetMassOverrideInKg(NAME_None, 17);
+        Mass_ = 200;
         Brick->OnComponentHit.AddDynamic(this, &AWeapon::OnHit);
         break;
     default:
@@ -174,7 +174,7 @@ void AWeapon::fire()
         FVector direction = Barrel_Rotation.Vector();
 
         if (bullet_ptr != nullptr)
-            bullet_ptr->addFireImpulse(direction, 50000);
+            bullet_ptr->addFireImpulse(direction, 500 * bullet_ptr->Bullet_Mesh->GetMass());
     }
 
 }

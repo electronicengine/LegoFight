@@ -127,7 +127,6 @@ void ALegoCharacter::BeginPlay()
 
     Game_Instance = Cast<ULegoFightGameInstance>(GetWorld()->GetGameInstance());
     Game_Instance->loadCharacterPanel();
-//    Skeletal_Mesh->AddRadialImpulse(GetActorLocation(), 100, 1000, RIF_Constant, true);
     Ghost_Item->OnComponentBeginOverlap.AddDynamic(this, &ALegoCharacter::OnGhostOverLap);
     Viewport_Client = GetWorld()->GetGameViewport();
 
@@ -135,10 +134,9 @@ void ALegoCharacter::BeginPlay()
     Interaction_Component->OnComponentEndOverlap.AddDynamic(this, &ALegoCharacter::OnInteractEnd);
 }
 
-// Function to calculate and visualize projectile path
+
 void ALegoCharacter::calculateProjectilePath(AActor* Projectile, const FVector& ForwardVector)
 {
-    // Set up parameters for PredictProjectilePath
     FHitResult HitResult;
     TArray<FVector> PathPositions;
     FVector LastTraceDestination;
@@ -146,20 +144,15 @@ void ALegoCharacter::calculateProjectilePath(AActor* Projectile, const FVector& 
 
         
     if (Cast<ABrick>(Projectile))
-        k =  100 / Cast<ABrick>(Projectile)->Mass_;
+        k =  500 / Cast<ABrick>(Projectile)->Mass_;
 
-    // Initial projectile parameters
     FVector StartLocation = Projectile->GetActorLocation();
-    FVector LaunchVelocity = ForwardVector * k; // Adjust as needed
-    float ProjectileRadius = 5;  // Adjust based on your projectile's collision size
+    FVector LaunchVelocity = ForwardVector * k; 
+    float ProjectileRadius = 5;  
 
     TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-    // Add object types that you want to trace against (e.g., WorldStatic, WorldDynamic, etc.)
-
     TArray<AActor*> ActorsToIgnore;
-    // Add actors that you want to ignore during the trace (if any)
 
-    // Call PredictProjectilePath
     bool bHit = UGameplayStatics::PredictProjectilePath(
         this,
         HitResult,
@@ -179,19 +172,7 @@ void ALegoCharacter::calculateProjectilePath(AActor* Projectile, const FVector& 
         -980.0f  // OverrideGravityZ (adjust as needed, -980.0f is default gravity)
     );
 
-    //// Process the results
-    //if (bHit)
-    //{
-    //    // Loop through the path points and do something with them (e.g., visualize the path)
-    //    for (FVector PointLocation : PathPositions)
-    //    {
-    //        // Visualize or do something with the path points...
-    //    }
-    //}
-    //else
-    //{
-    //    // Handle the case when no hit is predicted
-    //}
+
 }
 
 
@@ -331,9 +312,17 @@ void ALegoCharacter::moveForward(float Value)
 {
     if((Controller) && Value != 0.0f)
     {
-        const FVector direction = FRotationMatrix(FRotator(0, Controller->GetControlRotation().Yaw, 0)).GetUnitAxis(EAxis::X);
+        if (Sling_Mode_Enable) {
 
-        AddMovementInput(direction, Value);
+            Sling_Camera->AddLocalOffset(FVector(0, 0, Value * 10));
+        }
+        else if (Builder_Mode_Enable) {
+            Builder_Camera->AddLocalOffset(FVector(Value * 10, 0, 0));
+        }
+        else {
+            const FVector direction = FRotationMatrix(FRotator(0, Controller->GetControlRotation().Yaw, 0)).GetUnitAxis(EAxis::X);
+            AddMovementInput(direction, Value);
+        }
     }
 }
 
@@ -343,12 +332,18 @@ void ALegoCharacter::moveRight(float Value)
 {
     if((Controller) && Value != 0.0f)
     {
+        if (Sling_Mode_Enable) {
 
-        const FVector direction = FRotationMatrix(FRotator(0, Controller->GetControlRotation().Yaw, 0)).GetUnitAxis(EAxis::Y);
+            Sling_Camera->AddLocalOffset(FVector(0, Value * 10, 0));
+        }
+        else if (Builder_Mode_Enable) {
 
-
-
-        AddMovementInput(direction, Value);
+            Builder_Camera->AddLocalOffset(FVector(0, Value * 10, 0));
+        }
+        else {
+            const FVector direction = FRotationMatrix(FRotator(0, Controller->GetControlRotation().Yaw, 0)).GetUnitAxis(EAxis::Y);
+            AddMovementInput(direction, Value);
+        }
     }
 }
 
@@ -356,29 +351,14 @@ void ALegoCharacter::moveRight(float Value)
 
 void ALegoCharacter::turn(float Value)
 {
-    if (Sling_Mode_Enable) {
-
-        Sling_Camera->AddLocalOffset(FVector(0, Value * 10, 0));
-    }
-    else {
-        AddControllerYawInput(Value);
-    }
-    
-
+    AddControllerYawInput(Value);
 }
 
 
 
 void ALegoCharacter::lookUp(float Value)
 {
-    if (Sling_Mode_Enable) {
-
-        Sling_Camera->AddLocalOffset(FVector(0, 0, Value * -10));
-    }
-    else {
-        AddControllerPitchInput(Value);
-    }
-
+    AddControllerPitchInput(Value);
 }
 
 void ALegoCharacter::zoom(float Value)
@@ -408,6 +388,7 @@ void ALegoCharacter::fire()
 
         if (bullet_ptr != nullptr) {
             bullet_ptr->Strenght_ = 40;
+            bullet_ptr->setMassAndStrenght(3, 100);
             bullet_ptr->addFireImpulse(Builder_Camera->GetForwardVector().Rotation().Vector(), 30000);
 
         }

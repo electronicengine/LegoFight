@@ -11,7 +11,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "../Guns/Weapon.h"
-
+#include "../Widgets/ToastMessageWidget.h"
 // Add default functionality here for any IInteractInterface functions that are not pure virtual.
 
 
@@ -25,12 +25,14 @@ void IInteractInterface::equip()
 {
     if (Builder_Mode_Enable) {
         if (Cast<AConstraitBrick>(Target_Plugable_Item)) {
-            if (!Cable_Start_Item) {
+            if (!Cable_Start_Item && Cast<AConstraitBrick>(Target_Plugable_Item)->Cable_Hook) {
                 Cable_Start_Item = Cast<AConstraitBrick>(Target_Plugable_Item);
+                Game_Instance->setScreenMessage("Connect It A Item");
             }
-            else if(Cable_Start_Item->Cable_Hook) {
+            else if(Cable_Start_Item) {
                 Cable_Start_Item->hookCableToItem(Cast<ABrick>(Target_Plugable_Item)->Brick);
                 Cable_Start_Item = nullptr;
+
             }else {
                 Cast<AConstraitBrick>(Target_Plugable_Item)->turnOnOffMachine();
             }

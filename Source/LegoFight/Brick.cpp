@@ -113,43 +113,50 @@ UStaticMesh *ABrick::getBrickMesh()
 
 
 
-void ABrick::addDamage(int Value)
+void ABrick::addDamage(float Value, const FVector& ImpactPoint, const FVector& Velocity)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("breakBrick"));
     Healt_ -= Value;
 
     if(Healt_ <= 0)
-        breakBrick();
+        breakBrick(ImpactPoint, Velocity);
 
 
 }
 
 
 
-void ABrick::breakBrick()
+void ABrick::breakBrick(const FVector& ImpactPoint, const FVector& Velocity)
 {
 
-    ADestrictable *dest_ptr;
+
     FVector spawn_location = Brick->GetComponentLocation();
     FRotator spawn_rotation = Brick->GetComponentRotation();
+    notifyTheOwnerPlugIsDestroyed(Item_Index);
 
-    //GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, Brick_Name);
+    detachItemsOnIt();
+
+    if (RootComponent)
+    {
+        RootComponent->DetachFromParent(true);
+    }
+    SetActorTickEnabled(false);
+
+    Destroy();
+
+    ADestrictable* dest_ptr;
 
     dest_ptr = GetWorld()->SpawnActor<ADestrictable>(ADestrictable::StaticClass(), spawn_location, spawn_rotation);
     dest_ptr->setMesh(Brick_Name);
     dest_ptr->setColor(Brick_Color);
 
-//    const FDetachmentTransformRules &detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
-//                                                           EDetachmentRule::KeepWorld,
-//                                                           EDetachmentRule::KeepWorld, true);
-    
-    
-    
-    detachItemsOnIt();
+    dest_ptr->setImpactPointAndVelocity(ImpactPoint, Velocity);
 
+    const FDetachmentTransformRules &detachment_rules = FDetachmentTransformRules(EDetachmentRule::KeepWorld,
+                                                           EDetachmentRule::KeepWorld,
+                                                           EDetachmentRule::KeepWorld, true);
+    
     
 
-    Destroy();
 }
 
 void ABrick::setMaterialColor(FLinearColor Color)

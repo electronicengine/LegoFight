@@ -79,4 +79,5 @@ public:
         void addWeapon(ABrick* Object);
         void addSeat(ABrick* Object);
         void addPluggedItemList(ABrick* Object, const FVector& OffsetLocation, const FRotator& OffsetRotation, int PluginIndex);
+        void notifyTheOwnerPlugIsDestroyed(int Id);
 };

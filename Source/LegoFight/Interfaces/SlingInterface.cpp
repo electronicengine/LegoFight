@@ -22,7 +22,7 @@ void ISlingInterface::throwTheItem(const FVector& ForceVector, AActor* Item)
     if (Cast<ABrick>(Item)) {
 
         float Mass = Cast<ABrick>(Item)->Mass_; // Get the mass of the projectile
-        FVector InitialVelocityVector = ForceVector  * (100 / Mass); // Calculate the initial velocity vector
+        FVector InitialVelocityVector = ForceVector  * (500 / Mass); // Calculate the initial velocity vector
 
         FVector CurrentVelocity = FVector(0,0,0); // Get the current velocity
 

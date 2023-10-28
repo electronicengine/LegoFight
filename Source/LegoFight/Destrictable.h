@@ -34,5 +34,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void setColor(FVector ColorVec);
 	void setMesh(FString Name);
+	void setImpactPointAndVelocity(const FVector &ImpactPoint, const FVector& Velocity);
 
 };

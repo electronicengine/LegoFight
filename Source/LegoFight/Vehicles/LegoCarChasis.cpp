@@ -56,7 +56,7 @@ ALegoCarChasis::ALegoCarChasis()
     Plugin_Number_Width = 3;
     Plugin_Number_Height = 9;
     Plugin_Number = Plugin_Number_Width * Plugin_Number_Height;
-    Healt = 40;
+    Healt = 120;
 }
 
 
@@ -270,7 +270,7 @@ void ALegoCarChasis::addSeatToCar(ACarSeat *Seat)
         Car_Seat = Seat;
 }
 
-void ALegoCarChasis::addDamage(int Value)
+void ALegoCarChasis::addDamage(float Value)
 {
         Healt -= Value;
 
@@ -297,6 +297,11 @@ void ALegoCarChasis::breakBrick()
 
 
 
+    if (RootComponent)
+    {
+        RootComponent->DetachFromParent(true);
+    }
+    SetActorTickEnabled(false);
     detachItemsOnIt();
 
     Destroy();

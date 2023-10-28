@@ -55,6 +55,19 @@ void ADestrictable::setColor(FVector ColorVec)
 
 }
 
+
+void ADestrictable::setImpactPointAndVelocity(const FVector& ImpactPoint, const FVector& Velocity)
+{
+
+    for (UStaticMeshComponent* comp : Pieces)
+    {
+        comp->AddImpulse(Velocity);
+
+        //comp->AddRadialImpulse(ImpactPoint, 100, Velocity.Size(), ERadialImpulseFalloff::RIF_Linear, false);
+    }
+}
+
+
 void ADestrictable::setMesh(FString Name)
 {
     ULegoFightGameInstance *instance = Cast<ULegoFightGameInstance>(GetGameInstance());

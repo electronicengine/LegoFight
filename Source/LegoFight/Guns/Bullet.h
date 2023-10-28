@@ -25,7 +25,7 @@ public:
 	TSubclassOf<class UParticleSystem> Particle;
 	UParticleSystem* Particle_Effect;
 
-	int Strenght_;
+	float Strenght_;
 
 protected:
 	// Called when the game starts or when spawned
@@ -36,6 +36,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
     void addFireImpulse(FVector Direction, float Strenght);
 	void spawnparticle();
+	void setMassAndStrenght(float Strenght, float Mass);
 private:
 
     // FUNCTIONS
