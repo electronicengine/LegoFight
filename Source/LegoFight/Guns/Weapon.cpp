@@ -5,6 +5,7 @@
 #include "../Characters/LegoCharacter.h"
 #include "../Vehicles/LegoCarChasis.h"
 #include "Kismet/GameplayStatics.h"
+#include "../LegoFightGameInstance.h"
 
 AWeapon::AWeapon()
 {
@@ -98,6 +99,7 @@ void AWeapon::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
         else if (Cast<ALegoCarChasis>(OtherActor)) {
             UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
             Cast<ALegoCarChasis>(OtherActor)->addDamage(crash_speed * 4);
+
         }
         Last_Time = now;
     }
@@ -106,14 +108,22 @@ void AWeapon::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 
 void AWeapon::makePluginSettings()
 {
-    Type_ = (Brick_Name.Find("fire") >= 0) ? WeaponType::fire : WeaponType::melee;
+    if (Brick_Name.Find(MELEE_WEAPON_APPENDIX) >= 0)
+        Type_ = WeaponType::melee;
+    else if (Brick_Name.Find(FIRE_WEAPON_APPENDIX) >= 0)
+        Type_ = WeaponType::fire;
+    else if (Brick_Name.Find(EXPLOSIVE_WEAPON_APPENDIX) >= 0)
+        Type_ = WeaponType::explosive;
 
-    if (Type_ == WeaponType::fire) {
-
-        enablePhysics(false);
-        setCollisionProfile("OverlapAll");
-    }
-    else {
+    switch (Type_)
+    {
+    case WeaponType::fire:
+        if (Owner_Item || Owner_Car) {
+            enablePhysics(false);
+            setCollisionProfile("OverlapAll");
+        }
+        break;
+    case WeaponType::melee:
         enablePhysics(true);
         setCollisionProfile("BlockAll");
         Brick->SetMassOverrideInKg(NAME_None, 10, true);
@@ -121,8 +131,22 @@ void AWeapon::makePluginSettings()
         Brick->SetNotifyRigidBodyCollision(true);
 
         Brick->OnComponentHit.AddDynamic(this, &AWeapon::OnHit);
-
+        break;
+    case WeaponType::explosive:
+        enablePhysics(true);
+        setCollisionProfile("BlockAll");
+        Brick->SetMassOverrideInKg(NAME_None, 10, true);
+        Brick->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+        Brick->SetNotifyRigidBodyCollision(true);
+        SetLifeSpan(20);
+        Mass_ = 17;
+        Brick->SetMassOverrideInKg(NAME_None, 17);
+        Brick->OnComponentHit.AddDynamic(this, &AWeapon::OnHit);
+        break;
+    default:
+        break;
     }
+
 }
 
 

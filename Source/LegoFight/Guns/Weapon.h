@@ -16,7 +16,8 @@
 
 enum WeaponType {
     fire,
-    melee
+    melee,
+    explosive
 };
 
 class ALegoCharacter;

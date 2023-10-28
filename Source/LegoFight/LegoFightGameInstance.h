@@ -14,15 +14,16 @@
 #include "LegoFightGameInstance.generated.h"
 
 
-#define WEAPON_APPENDIX         "weapon"
-#define FIRE_WEAPON_APPENDIX    "fire"
-#define MELEE_WEAPON_APPENDIX   "melee"
-#define VEHICLE_APPENDIX        "vehicle"
-#define MACHINE_APPENDIX        "machine"
-#define AI_APPENDIX             "ai"
-#define SIDED_APPENDIX          "sided"
-#define LOW_APPENDIX            "Low"
-#define HIGH_APPENDIX           "High"
+#define WEAPON_APPENDIX             "weapon"
+#define EXPLOSIVE_WEAPON_APPENDIX   "explosive"
+#define FIRE_WEAPON_APPENDIX        "fire"
+#define MELEE_WEAPON_APPENDIX       "melee"
+#define VEHICLE_APPENDIX            "vehicle"
+#define MACHINE_APPENDIX            "machine"
+#define AI_APPENDIX                 "ai"
+#define SIDED_APPENDIX              "sided"
+#define LOW_APPENDIX                "Low"
+#define HIGH_APPENDIX               "High"
 
 
 

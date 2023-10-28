@@ -157,6 +157,7 @@ public:
     UStaticMesh* test_mesh;
     bool First_Hit;
     bool Grabbed;
+    float Mass_;
 
     UFUNCTION(BlueprintCallable)
         void applyForceToOwner(FVector Force, FVector Location);

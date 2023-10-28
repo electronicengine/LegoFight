@@ -175,6 +175,8 @@ void ABrick::setBrickTypeOptions(ItemOptions&Options)
     Brick->SetMaterialByName(FName("main"), Options.Material);
     Material = Options.Material;
 
+    Mass_ = Brick->GetMass();
+
     if (Options.Name.Find("Plate") >= 0) {
         Brick->SetMassOverrideInKg(NAME_None, 1000000, true);
         Brick->SetMassScale(NAME_None, 100000);

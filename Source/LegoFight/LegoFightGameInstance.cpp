@@ -275,6 +275,7 @@ AWeapon* ULegoFightGameInstance::spawnWeapon(const FString& Name, const FVector&
     weapon = GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation + FVector(0, 0, 100.0f), SpawnRotation);
     Item_Options[Name].Color = Selected_Color;
     weapon->setBrickTypeOptions(Item_Options[Name]);
+    weapon->makePluginSettings();
     return weapon;
 }
 

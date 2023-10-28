@@ -142,10 +142,15 @@ void ALegoCharacter::calculateProjectilePath(AActor* Projectile, const FVector& 
     FHitResult HitResult;
     TArray<FVector> PathPositions;
     FVector LastTraceDestination;
+    float k = 0;
+
+        
+    if (Cast<ABrick>(Projectile))
+        k =  100 / Cast<ABrick>(Projectile)->Mass_;
 
     // Initial projectile parameters
     FVector StartLocation = Projectile->GetActorLocation();
-    FVector LaunchVelocity = ForwardVector * 3; // Adjust as needed
+    FVector LaunchVelocity = ForwardVector * k; // Adjust as needed
     float ProjectileRadius = 5;  // Adjust based on your projectile's collision size
 
     TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
