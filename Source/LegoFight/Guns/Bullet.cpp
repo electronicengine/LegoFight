@@ -50,6 +50,8 @@ ABullet::ABullet()
         material_asset(TEXT("Material'/Game/Guns/materials/bullet_material.bullet_material'"));
 
     Bullet_Mesh->SetMaterial(0, material_asset.Object);
+
+    Strenght_ = 3;
 }
 
 
@@ -62,10 +64,10 @@ void ABullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
     if (!First_Hit) {
         if (brick)
         {
-            brick->addDamage(3);
+            brick->addDamage(Strenght_);
         }
         else if (vehicle) {
-            vehicle->addDamage(3);
+            vehicle->addDamage(Strenght_);
         }
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
         First_Hit = true;

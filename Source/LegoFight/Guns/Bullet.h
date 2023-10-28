@@ -25,6 +25,8 @@ public:
 	TSubclassOf<class UParticleSystem> Particle;
 	UParticleSystem* Particle_Effect;
 
+	int Strenght_;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

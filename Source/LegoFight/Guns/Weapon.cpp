@@ -86,23 +86,20 @@ bool AWeapon::checkWeaponDetached()
 
 void AWeapon::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    int now = time(NULL);
+ 
+    int crash_speed = Brick->GetPhysicsLinearVelocity().Size();
 
-    if (now - Last_Time > 1) {
-        int crash_speed = Brick->GetPhysicsLinearVelocity().Size();
+    if (Cast<ABrick>(OtherActor)) {
 
-        if (Cast<ABrick>(OtherActor)) {
-
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
-            Cast<ABrick>(OtherActor)->addDamage(crash_speed * 4);
-        }
-        else if (Cast<ALegoCarChasis>(OtherActor)) {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
-            Cast<ALegoCarChasis>(OtherActor)->addDamage(crash_speed * 4);
-
-        }
-        Last_Time = now;
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
+        Cast<ABrick>(OtherActor)->addDamage(crash_speed * 4);
     }
+    else if (Cast<ALegoCarChasis>(OtherActor)) {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle_Effect, GetActorLocation());
+        Cast<ALegoCarChasis>(OtherActor)->addDamage(crash_speed * 4);
+
+    }
+    
 
 }
 

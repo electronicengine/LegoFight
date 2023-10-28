@@ -406,8 +406,11 @@ void ALegoCharacter::fire()
 
         bullet_ptr = GetWorld()->SpawnActor<ABullet>(Bullet_Container, spawn_location, spawn_rotation);
 
-        if (bullet_ptr != nullptr)
+        if (bullet_ptr != nullptr) {
+            bullet_ptr->Strenght_ = 40;
             bullet_ptr->addFireImpulse(Builder_Camera->GetForwardVector().Rotation().Vector(), 30000);
+
+        }
     }
   
 
