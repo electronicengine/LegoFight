@@ -87,6 +87,12 @@ void UCharacterWidget::Button_InteractClicked()
 	ALegoCharacter* character = Cast<ALegoCharacter>(GetOwningPlayerPawn());
 	if (character) {
 		character->equip();
+		if (character->Keeping_Bricks) {
+			Button_Plug->SetVisibility(ESlateVisibility::Visible);
+		}
+		else {
+			Button_Plug->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 	else {
 
@@ -96,13 +102,7 @@ void UCharacterWidget::Button_InteractClicked()
 		}
 	}
 
-	if (character->Keeping_Bricks) {
-		Button_Plug->SetVisibility(ESlateVisibility::Visible);
-	}
-	else {
-		Button_Plug->SetVisibility(ESlateVisibility::Hidden);
 
-	}
 
 }
 
