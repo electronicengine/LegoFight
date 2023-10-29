@@ -41,10 +41,6 @@ public:
     UPROPERTY(meta = (BindWidget))
         UButton* Button_Aim;
     UPROPERTY(meta = (BindWidget))
-        UButton* Button_ZoomIn;
-    UPROPERTY(meta = (BindWidget))
-        UButton* Button_ZoomOut;
-    UPROPERTY(meta = (BindWidget))
         UButton* Button_LocationOffset;
     UPROPERTY(meta = (BindWidget))
         UButton* Button_RotationOffset;
@@ -82,6 +78,9 @@ public:
     void setInteractButtonVisibilty(ESlateVisibility Val);
     void setFireButtonVisibilty(ESlateVisibility Val);
     void setAimButtonVisibilty(ESlateVisibility Val);
+    void setBuilderModeButtons();
+    void setSlingModeButtons();
+    void setCharacterModeButtons();
 
 };
 

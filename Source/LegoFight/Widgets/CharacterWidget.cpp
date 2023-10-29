@@ -17,25 +17,13 @@ bool UCharacterWidget::Initialize()
 	Button_Fire->OnClicked.AddDynamic(this, &UCharacterWidget::Button_FireClicked);
 	Button_Inventory->OnClicked.AddDynamic(this, &UCharacterWidget::Button_InventoryClicked);
 	Button_Aim->OnClicked.AddDynamic(this, &UCharacterWidget::Button_AimClicked);
-	Button_ZoomIn->OnClicked.AddDynamic(this, &UCharacterWidget::Button_ZoomInClicked);
-	Button_ZoomOut->OnClicked.AddDynamic(this, &UCharacterWidget::Button_ZoomOutClicked);
 	Button_LocationOffset->OnClicked.AddDynamic(this, &UCharacterWidget::Button_LocationOffsetClicked);
 	Button_RotationOffset->OnClicked.AddDynamic(this, &UCharacterWidget::Button_RotationOffsetClicked);
 	Button_Jump->OnClicked.AddDynamic(this, &UCharacterWidget::Button_JumpClicked);
 
 
-	Button_GetBrick->SetVisibility(ESlateVisibility::Hidden);
-	Button_Save->SetVisibility(ESlateVisibility::Hidden);
-	Button_Plug->SetVisibility(ESlateVisibility::Hidden);
-	Button_Interact->SetVisibility(ESlateVisibility::Hidden);
-	Button_Fire->SetVisibility(ESlateVisibility::Hidden);
-	Button_Inventory->SetVisibility(ESlateVisibility::Hidden);
-	Button_Aim->SetVisibility(ESlateVisibility::Visible);
-	Button_ZoomIn->SetVisibility(ESlateVisibility::Hidden);
-	Button_ZoomOut->SetVisibility(ESlateVisibility::Hidden);
-	Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
-	Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
-	Button_Jump->SetVisibility(ESlateVisibility::Visible);
+	setCharacterModeButtons();
+
 
 	return true;
 }
@@ -45,28 +33,24 @@ void UCharacterWidget::Button_GetBrickClicked()
 	ALegoCharacter* character = Cast<ALegoCharacter>(GetOwningPlayerPawn());
 	if (character) {
 		character->buyBrick();
-		Button_GetBrick->SetVisibility(ESlateVisibility::Visible);
-		Button_Save->SetVisibility(ESlateVisibility::Hidden);
-		Button_Interact->SetVisibility(ESlateVisibility::Hidden);
-		Button_Fire->SetVisibility(ESlateVisibility::Hidden);
-		Button_Inventory->SetVisibility(ESlateVisibility::Visible);
-		Button_Aim->SetVisibility(ESlateVisibility::Visible);
 
-		if (!character->Sling_Mode_Enable) {
+		if (character->Builder_Mode_Enable) {
+			setBuilderModeButtons();
+
+			Button_GetBrick->SetVisibility(ESlateVisibility::Visible);
+			Button_Interact->SetVisibility(ESlateVisibility::Visible);
 			Button_Plug->SetVisibility(ESlateVisibility::Visible);
 			Button_LocationOffset->SetVisibility(ESlateVisibility::Visible);
 			Button_RotationOffset->SetVisibility(ESlateVisibility::Visible);
-			Button_ZoomIn->SetVisibility(ESlateVisibility::Hidden);
-			Button_ZoomOut->SetVisibility(ESlateVisibility::Hidden);
+
+		}
+		else if(character->Sling_Mode_Enable) {
+			setSlingModeButtons();
+			Button_GetBrick->SetVisibility(ESlateVisibility::Visible);
 
 		}
 		else {
-			Button_Plug->SetVisibility(ESlateVisibility::Hidden);
-			Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
-			Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
-			Button_ZoomIn->SetVisibility(ESlateVisibility::Visible);
-			Button_ZoomOut->SetVisibility(ESlateVisibility::Visible);
-
+			setCharacterModeButtons();
 		}
 
 	}
@@ -86,17 +70,14 @@ void UCharacterWidget::Button_PlugClicked()
 	if (character) {
 		character->plugObject();
 
-		Button_GetBrick->SetVisibility(ESlateVisibility::Visible);
-		Button_Save->SetVisibility(ESlateVisibility::Hidden);
-		Button_Plug->SetVisibility(ESlateVisibility::Hidden);
-		Button_Interact->SetVisibility(ESlateVisibility::Hidden);
-		Button_Fire->SetVisibility(ESlateVisibility::Visible);
-		Button_Inventory->SetVisibility(ESlateVisibility::Visible);
-		Button_Aim->SetVisibility(ESlateVisibility::Visible);
-		Button_ZoomIn->SetVisibility(ESlateVisibility::Hidden);
-		Button_ZoomOut->SetVisibility(ESlateVisibility::Hidden);
-		Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
-		Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
+		if (character->Builder_Mode_Enable) {
+			setBuilderModeButtons();
+
+			Button_GetBrick->SetVisibility(ESlateVisibility::Visible);
+			Button_Plug->SetVisibility(ESlateVisibility::Hidden);
+
+		}
+
 
 	}
 }
@@ -113,6 +94,14 @@ void UCharacterWidget::Button_InteractClicked()
 		if (vehicle) {
 			vehicle->exitCar();
 		}
+	}
+
+	if (character->Keeping_Bricks) {
+		Button_Plug->SetVisibility(ESlateVisibility::Visible);
+	}
+	else {
+		Button_Plug->SetVisibility(ESlateVisibility::Hidden);
+
 	}
 
 }
@@ -139,13 +128,16 @@ void UCharacterWidget::Button_InventoryClicked()
 	ALegoCharacter* character = Cast<ALegoCharacter>(GetOwningPlayerPawn());
 	if (character) {
 		character->openInventoryWidget();
-		Button_GetBrick->SetVisibility(ESlateVisibility::Visible);
-		Button_Save->SetVisibility(ESlateVisibility::Hidden);
-		Button_Plug->SetVisibility(ESlateVisibility::Hidden);
-		Button_Interact->SetVisibility(ESlateVisibility::Hidden);
-		Button_Fire->SetVisibility(ESlateVisibility::Hidden);
-		Button_Inventory->SetVisibility(ESlateVisibility::Visible);
-		Button_Aim->SetVisibility(ESlateVisibility::Visible);
+
+		if (character->Builder_Mode_Enable) {
+			setBuilderModeButtons();
+			Button_GetBrick->SetVisibility(ESlateVisibility::Visible);
+		}
+		else if(character->Sling_Mode_Enable) {
+			setSlingModeButtons();
+			Button_GetBrick->SetVisibility(ESlateVisibility::Visible);
+		}
+		
 	}
 
 }
@@ -157,45 +149,16 @@ void UCharacterWidget::Button_AimClicked()
 	if (character) {
 		character->changeCameraMode();
 
-		if (character->Builder_Mode_Enable || character->Sling_Mode_Enable) {
-			Button_GetBrick->SetVisibility(ESlateVisibility::Hidden);
-			Button_Save->SetVisibility(ESlateVisibility::Visible);
-
-			if (character->Keeping_Bricks) {
-				Button_Plug->SetVisibility(ESlateVisibility::Visible);
-				Button_LocationOffset->SetVisibility(ESlateVisibility::Visible);
-				Button_RotationOffset->SetVisibility(ESlateVisibility::Visible);
-			}
-			else {
-				Button_Plug->SetVisibility(ESlateVisibility::Hidden);
-				Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
-				Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
-			}
-
-			Button_Interact->SetVisibility(ESlateVisibility::Hidden);
-			Button_Fire->SetVisibility(ESlateVisibility::Visible);
-			Button_Inventory->SetVisibility(ESlateVisibility::Visible);
-			Button_Aim->SetVisibility(ESlateVisibility::Visible);
-			Button_ZoomIn->SetVisibility(ESlateVisibility::Visible);
-			Button_ZoomOut->SetVisibility(ESlateVisibility::Visible);
-			Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
-			Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
-			Button_Jump->SetVisibility(ESlateVisibility::Hidden);
+		if (character->Builder_Mode_Enable) {
+			setBuilderModeButtons();
+		}
+		else if (character->Sling_Mode_Enable) {
+		
+			setSlingModeButtons();
 
 		}
 		else {
-			Button_GetBrick->SetVisibility(ESlateVisibility::Hidden);
-			Button_Save->SetVisibility(ESlateVisibility::Hidden);
-			Button_Plug->SetVisibility(ESlateVisibility::Hidden);
-			Button_Interact->SetVisibility(ESlateVisibility::Hidden);
-			Button_Fire->SetVisibility(ESlateVisibility::Hidden);
-			Button_Inventory->SetVisibility(ESlateVisibility::Hidden);
-			Button_Aim->SetVisibility(ESlateVisibility::Visible);
-			Button_ZoomIn->SetVisibility(ESlateVisibility::Hidden);
-			Button_ZoomOut->SetVisibility(ESlateVisibility::Hidden);
-			Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
-			Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
-			Button_Jump->SetVisibility(ESlateVisibility::Visible);
+			setCharacterModeButtons();
 
 		}
 	}
@@ -262,4 +225,59 @@ void UCharacterWidget::setFireButtonVisibilty(ESlateVisibility Val)
 void UCharacterWidget::setAimButtonVisibilty(ESlateVisibility Val)
 {
 	Button_Aim->SetVisibility(Val);
+}
+
+void UCharacterWidget::setBuilderModeButtons()
+{
+	ALegoCharacter* character = Cast<ALegoCharacter>(GetOwningPlayerPawn());
+
+	Button_GetBrick->SetVisibility(ESlateVisibility::Hidden);
+	Button_Save->SetVisibility(ESlateVisibility::Visible);
+
+	if (character->Keeping_Bricks) {
+		Button_Plug->SetVisibility(ESlateVisibility::Visible);
+		Button_LocationOffset->SetVisibility(ESlateVisibility::Visible);
+		Button_RotationOffset->SetVisibility(ESlateVisibility::Visible);
+	}
+	else {
+		Button_Plug->SetVisibility(ESlateVisibility::Hidden);
+		Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
+		Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	Button_Interact->SetVisibility(ESlateVisibility::Hidden);
+	Button_Fire->SetVisibility(ESlateVisibility::Visible);
+	Button_Inventory->SetVisibility(ESlateVisibility::Visible);
+	Button_Aim->SetVisibility(ESlateVisibility::Visible);
+	Button_Jump->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UCharacterWidget::setSlingModeButtons()
+{
+	Button_GetBrick->SetVisibility(ESlateVisibility::Hidden);
+	Button_Save->SetVisibility(ESlateVisibility::Hidden);
+	Button_Plug->SetVisibility(ESlateVisibility::Hidden);
+	Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
+	Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
+	Button_Interact->SetVisibility(ESlateVisibility::Hidden);
+	Button_Fire->SetVisibility(ESlateVisibility::Hidden);
+	Button_Inventory->SetVisibility(ESlateVisibility::Visible);
+	Button_Aim->SetVisibility(ESlateVisibility::Visible);
+	Button_Jump->SetVisibility(ESlateVisibility::Hidden);
+
+}
+
+void UCharacterWidget::setCharacterModeButtons() {
+
+	Button_GetBrick->SetVisibility(ESlateVisibility::Hidden);
+	Button_Save->SetVisibility(ESlateVisibility::Hidden);
+	Button_Plug->SetVisibility(ESlateVisibility::Hidden);
+	Button_Interact->SetVisibility(ESlateVisibility::Hidden);
+	Button_Fire->SetVisibility(ESlateVisibility::Hidden);
+	Button_Inventory->SetVisibility(ESlateVisibility::Hidden);
+	Button_Aim->SetVisibility(ESlateVisibility::Visible);
+	Button_LocationOffset->SetVisibility(ESlateVisibility::Hidden);
+	Button_RotationOffset->SetVisibility(ESlateVisibility::Hidden);
+	Button_Jump->SetVisibility(ESlateVisibility::Visible);
+
 }
